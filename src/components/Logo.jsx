@@ -5,7 +5,7 @@ function Logo() {
   return (
     <Link to="/app">
       <img
-        src="../../public/img/logo.png"
+        src="/img/logo.png"
         alt="IHS Soccer"
         className="absolute left-0 top-0 h-full pl-1 pt-1"
       />
