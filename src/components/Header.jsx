@@ -1,24 +1,46 @@
+import { createContext } from 'react';
 import styles from './Header.module.css';
 // import User from '../components/User';
 import Logo from './Logo';
-import SeasonSelector from '../features/seasons/SeasonSelector';
+import SeasonSelector from './SeasonSelector';
 // import { useAuth } from '../contexts/FakeAuthContexts';
+import { styled } from 'styled-components';
+
+const StyledHeader = styled.header`
+  display: relative;
+  margin-bottom: 0.5rem;
+  text-align: center;
+`;
+const Div = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+`;
+const Div2 = styled.div`
+  margin-top: auto;
+  margin-bottom: 1.25rem;
+`;
+const H1 = styled.h1`
+  margin-top: 2.5rem;
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+  font-weight: 700;
+  color: var(--color-brand--2);
+`;
 
 function Header() {
   // const { isAuthenticated } = useAuth();
   return (
-    <header className="relative mb-2">
+    <StyledHeader className="relative mb-2">
       <Logo></Logo>
-      <div className="flex h-full flex-col">
-        <h1 className="mt-10 text-4xl font-bold text-navy">
-          INDEPENDENCE GIRLS SOCCER
-        </h1>
-        <div className="mb-5 mt-auto">
+      <Div>
+        <H1>INDEPENDENCE GIRLS SOCCER</H1>
+        <Div2>
           <SeasonSelector />
-        </div>
-      </div>
+        </Div2>
+      </Div>
       {/* {isAuthenticated ? <User /> : null} */}
-    </header>
+    </StyledHeader>
   );
 }
 

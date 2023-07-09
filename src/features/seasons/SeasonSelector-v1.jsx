@@ -46,6 +46,4 @@ export async function loader() {
   return seasons;
 }
 
-//TODO USE REACT QUERY?  - data is called in CabinTable
-
 export default SeasonSelector;
