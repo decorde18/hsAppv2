@@ -10,8 +10,8 @@ const Select = styled.select`
 `;
 
 function SeasonSelector({ seasonProps }) {
-  const { currentSeason, recentSeason, onChangeSeason } = seasonProps;
-  const { isLoading, seasons } = useSeasons();
+  // console.log(seasonProps);
+  const { currentSeason, recentSeason, onChangeSeason, seasons } = seasonProps;
 
   function handleSeasonChange(e) {
     //TODO handle if add new season
@@ -21,20 +21,19 @@ function SeasonSelector({ seasonProps }) {
     onChangeSeason(season);
     localStorage.setItem('currentSeason', season);
   }
-  if (isLoading) return <Spinner />;
+  console.log(recentSeason);
+  // if (isLoading) return <Spinner />;
   return (
     <Select
-      defaultValue={currentSeason || recentSeason[0].id}
+      defaultValue={currentSeason || recentSeason.id}
       onChange={handleSeasonChange}
     >
       <option value="createSeason">Add A New Season</option>
-      {seasons
-        .sort((a, b) => +b.season - +a.season)
-        .map((season) => (
-          <option value={season.id} key={season.id}>
-            Season {season.season} ({season.schoolYear})
-          </option>
-        ))}
+      {seasons.map((season) => (
+        <option value={season.id} key={season.id}>
+          Season {season?.season} ({season?.schoolYear})
+        </option>
+      ))}
     </Select>
   );
 }

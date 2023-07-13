@@ -2,7 +2,7 @@ import SideBar from '../components/SideBar';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import MainSection from '../components/MainSection';
-import { useRecentSeason } from '../features/seasons/useSeasons';
+import { useSeasons } from '../features/seasons/useSeasons';
 // import { useNavigation } from 'react-router-dom';
 import Spinner from './Spinner';
 import { styled } from 'styled-components';
@@ -41,34 +41,43 @@ const Main = styled.main`
 
 function AppLayout() {
   const [currentSeason, setCurrentSeason] = useState();
-  const { isLoadingRecent, recentSeason } = useRecentSeason([]);
-
+  const [recentSeason, setRecentSeason] = useState([]);
+  const { isLoadingSeasons, seasons } = useSeasons();
   useEffect(
     function () {
+      if (isLoadingSeasons) return;
+      setRecentSeason(
+        seasons.reduce(
+          (season, acc) => (season.season > acc.season ? season : acc),
+          []
+        )
+      );
       if (localStorage.getItem('currentSeason')) {
         setCurrentSeason(localStorage.getItem('currentSeason'));
         return;
       }
-      if (isLoadingRecent) return;
-      setCurrentSeason(recentSeason.at(0).id);
+      setCurrentSeason(recentSeason?.id);
     },
-    [recentSeason, currentSeason, isLoadingRecent]
+    [seasons, recentSeason, currentSeason, isLoadingSeasons]
   );
   // const navigation = useNavigation();
   // const isLoading = navigation.state === 'loading';
 
+  if (isLoadingSeasons) return;
+  <Spinner />;
+  console.log(recentSeason);
   return (
     <StyledAppLayout>
-      {isLoadingRecent && <Spinner />}
-
       <Header
         seasonProps={{
           currentSeason,
           recentSeason,
           onChangeSeason: setCurrentSeason,
+          seasons,
         }}
         type="app"
       />
+
       <Main className="flex">
         <SideBar></SideBar>
         <MainSection
@@ -76,6 +85,7 @@ function AppLayout() {
             currentSeason,
             recentSeason,
             onChangeSeason: setCurrentSeason,
+            seasons,
           }}
         ></MainSection>
       </Main>
