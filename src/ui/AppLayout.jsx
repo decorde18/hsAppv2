@@ -67,6 +67,7 @@ function AppLayout() {
           recentSeason,
           onChangeSeason: setCurrentSeason,
         }}
+        type="app"
       />
       <Main className="flex">
         <SideBar></SideBar>

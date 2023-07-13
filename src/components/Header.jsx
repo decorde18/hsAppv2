@@ -34,7 +34,7 @@ function Header({ seasonProps, type }) {
       <Logo></Logo>
       <Div>
         <H1>INDEPENDENCE GIRLS SOCCER</H1>
-        {type !== 'nonApp' && (
+        {type == 'app' && (
           <Div2>
             <SeasonSelector seasonProps={seasonProps} />
           </Div2>
