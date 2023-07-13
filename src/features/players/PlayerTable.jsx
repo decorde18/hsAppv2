@@ -3,11 +3,10 @@ import Spinner from '../../ui/Spinner';
 import PlayerRow from './PlayerRow';
 import PlayerSeasonRow from './PlayerSeasonRow';
 import { usePlayerSeasons, usePlayers } from './usePlayers';
-import { useSeasons } from '../seasons/useSeasons';
+
 import { useState } from 'react';
 import Button from '../../components/Button';
-import { useQuery } from '@tanstack/react-query';
-import { useSearchParams } from 'react-router-dom';
+
 const Table = styled.div`
   border: 1px solid var(--color-grey-200);
 
@@ -31,11 +30,8 @@ const TableHeader = styled.header`
   color: var(--color-grey-600);
   padding: 1.6rem 2.4rem;
 `;
-function PlayerTable() {
-  const [currentSeasonParams] = useSearchParams();
-
-  const currentSeason = currentSeasonParams.get('current-season');
-
+function PlayerTable({ seasonProps }) {
+  const { currentSeason } = seasonProps;
   const [rosterType, setRosterType] = useState('season');
   const { isLoadingPlayers, players } = usePlayers();
   const { isLoadingPlayerSeasons, playerSeasons } = usePlayerSeasons();
@@ -79,5 +75,5 @@ function PlayerTable() {
     </>
   );
 }
-//TODO FIX filter playerSeason is hard coded to 22, needs to be current season
+
 export default PlayerTable;

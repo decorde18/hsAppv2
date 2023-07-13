@@ -28,7 +28,7 @@ const H1 = styled.h1`
   color: var(--color-brand--2);
 `;
 
-function Header() {
+function Header({ seasonProps }) {
   // const { isAuthenticated } = useAuth();
   return (
     <StyledHeader className="relative mb-2">
@@ -36,7 +36,7 @@ function Header() {
       <Div>
         <H1>INDEPENDENCE GIRLS SOCCER</H1>
         <Div2>
-          <SeasonSelector />
+          <SeasonSelector seasonProps={seasonProps} />
         </Div2>
       </Div>
       {/* {isAuthenticated ? <User /> : null} */}

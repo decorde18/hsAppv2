@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { getSeasons, getRecentSeason } from '../../services/apiSeasons';
-import { useEffect, useState } from 'react';
 
 export function useSeasons() {
   const {

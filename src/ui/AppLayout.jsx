@@ -2,9 +2,11 @@ import SideBar from '../components/SideBar';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import MainSection from '../components/MainSection';
-import { useNavigation } from 'react-router-dom';
+import { useRecentSeason } from '../features/seasons/useSeasons';
+// import { useNavigation } from 'react-router-dom';
 import Spinner from './Spinner';
 import { styled } from 'styled-components';
+import { useEffect, useState } from 'react';
 
 const StyledAppLayout = styled.div`
   //THIS IS FOR THE HEADER< BODY< FOOTER
@@ -38,17 +40,43 @@ const Main = styled.main`
 // `;
 
 function AppLayout() {
+  const [currentSeason, setCurrentSeason] = useState();
+  const { isLoadingRecent, recentSeason } = useRecentSeason([]);
+
+  useEffect(
+    function () {
+      if (localStorage.getItem('currentSeason')) {
+        setCurrentSeason(localStorage.getItem('currentSeason'));
+        return;
+      }
+      if (isLoadingRecent) return;
+      setCurrentSeason(recentSeason.at(0).id);
+    },
+    [recentSeason, currentSeason, isLoadingRecent]
+  );
   // const navigation = useNavigation();
   // const isLoading = navigation.state === 'loading';
 
   return (
     <StyledAppLayout>
-      {/* {isLoading && <Spinner />} */}
+      {isLoadingRecent && <Spinner />}
 
-      <Header />
+      <Header
+        seasonProps={{
+          currentSeason,
+          recentSeason,
+          onChangeSeason: setCurrentSeason,
+        }}
+      />
       <Main className="flex">
         <SideBar></SideBar>
-        <MainSection></MainSection>
+        <MainSection
+          seasonProps={{
+            currentSeason,
+            recentSeason,
+            onChangeSeason: setCurrentSeason,
+          }}
+        ></MainSection>
       </Main>
       <Footer />
     </StyledAppLayout>

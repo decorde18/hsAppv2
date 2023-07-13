@@ -20,6 +20,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
 import Players from './pages/Players';
 import People from './pages/People';
+import Games from './pages/Games';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -42,6 +43,7 @@ function App() {
           <Route path="app" element={<AppLayout />}>
             <Route path="players" element={<Players />} />
             <Route path="people" element={<People />} />
+            <Route path="games" element={<Games />} />
             {/* <Route path="users" element={<Users />} />
             <Route path="settings" element={<Settings />} />
             <Route path="account" element={<Account />} /> */}

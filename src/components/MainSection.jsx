@@ -23,11 +23,11 @@ const Div = styled.div`
 //   align-items: center;
 //   height: calc(85vh);
 // }
-function MainSection() {
+function MainSection({ seasonProps }) {
   return (
     <Div>
       <AppNav></AppNav>
-      <Outlet></Outlet>
+      <Outlet context={[seasonProps]}></Outlet>
     </Div>
   );
 }
