@@ -1,8 +1,7 @@
 import { styled } from 'styled-components';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
-import AppLayout from '../ui/AppLayout';
-import styles from './PageNotFound.module.css';
+// import AppLayout from '../ui/AppLayout';
 
 const Div = styled.div`
   display: grid;
@@ -19,7 +18,7 @@ const Div2 = styled.div`
 function PageNotFound() {
   return (
     <Div>
-      <Header />
+      <Header type="nonApp" />
       <Div2>SORRY THIS PAGE IS NOT FOUND </Div2>
       <Footer />
     </Div>

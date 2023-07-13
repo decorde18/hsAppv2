@@ -25,7 +25,3 @@ function People() {
 }
 
 export default People;
-
-function Cabins() {
-  return <></>;
-}

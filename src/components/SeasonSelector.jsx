@@ -1,5 +1,5 @@
 import { styled } from 'styled-components';
-import { useSeasons, useRecentSeason } from '../features/seasons/useSeasons';
+import { useSeasons } from '../features/seasons/useSeasons';
 import Spinner from './Spinner';
 
 const Select = styled.select`
@@ -24,7 +24,7 @@ function SeasonSelector({ seasonProps }) {
   if (isLoading) return <Spinner />;
   return (
     <Select
-      defaultValue={currentSeason || recentSeason.id}
+      defaultValue={currentSeason || recentSeason[0].id}
       onChange={handleSeasonChange}
     >
       <option value="createSeason">Add A New Season</option>
