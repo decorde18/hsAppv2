@@ -1,5 +1,4 @@
-import { createContext } from 'react';
-import styles from './Header.module.css';
+// import { createContext } from 'react';
 // import User from '../components/User';
 import Logo from './Logo';
 import SeasonSelector from './SeasonSelector';
@@ -28,16 +27,18 @@ const H1 = styled.h1`
   color: var(--color-brand--2);
 `;
 
-function Header({ seasonProps }) {
+function Header({ seasonProps, type }) {
   // const { isAuthenticated } = useAuth();
   return (
     <StyledHeader className="relative mb-2">
       <Logo></Logo>
       <Div>
         <H1>INDEPENDENCE GIRLS SOCCER</H1>
-        <Div2>
-          <SeasonSelector seasonProps={seasonProps} />
-        </Div2>
+        {type !== 'nonApp' && (
+          <Div2>
+            <SeasonSelector seasonProps={seasonProps} />
+          </Div2>
+        )}
       </Div>
       {/* {isAuthenticated ? <User /> : null} */}
     </StyledHeader>
