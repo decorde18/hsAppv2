@@ -3,7 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 // import Settings from './pages/Settings';
 // import Account from './pages/Account';
 // import Login from './pages/Login';
-import HomePage from './pages/HomePage';
+// import HomePage from './pages/HomePage';
 import PageNotFound from './pages/PageNotFound';
 import GlobalStyles from './styles/GlobalStyles';
 import AppLayout from './ui/AppLayout';
@@ -30,8 +30,8 @@ function App() {
       <GlobalStyles />
       <BrowserRouter>
         <Routes>
-          <Route index element={<Navigate replace to="homepage" />} />
-          <Route path="homepage" element={<HomePage />} />
+          {/* <Route index element={<Navigate replace to="homepage" />} />
+          <Route path="homepage" element={<HomePage />} /> */}
           <Route path="app" element={<AppLayout />}>
             <Route path="players" element={<Players />} />
             <Route path="people" element={<People />} />
