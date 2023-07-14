@@ -29,7 +29,7 @@ const H1 = styled.h1`
 `;
 
 function Header({ seasonProps, type }) {
-  if (seasonProps.recentSeason.length === 0) return <Spinner />;
+  // if (seasonProps.recentSeason.length === 0) return <Spinner />;
   // const { isAuthenticated } = useAuth();
   return (
     <StyledHeader className="relative mb-2">
