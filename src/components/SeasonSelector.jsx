@@ -1,6 +1,4 @@
 import { styled } from 'styled-components';
-import { useSeasons } from '../features/seasons/useSeasons';
-import Spinner from './Spinner';
 
 const Select = styled.select`
   padding-top: 0.5rem 2rem;
@@ -10,28 +8,24 @@ const Select = styled.select`
 `;
 
 function SeasonSelector({ seasonProps }) {
-  // console.log(seasonProps);
-  const { currentSeason, recentSeason, onChangeSeason, seasons } = seasonProps;
+  const { currentSeason, onChangeSeason, seasons } = seasonProps;
 
   function handleSeasonChange(e) {
-    //TODO handle if add new season
-    updateCurrentSeason(+e.target.value);
+    if (e.target.value === 'createSeason') return; //TODO handle if createNewSeasonseason
+    updateCurrentSeason(e.target.value);
   }
+
   function updateCurrentSeason(season) {
     onChangeSeason(season);
     localStorage.setItem('currentSeason', season);
   }
-  console.log(recentSeason);
-  // if (isLoading) return <Spinner />;
+  if (!currentSeason) return;
   return (
-    <Select
-      defaultValue={currentSeason || recentSeason.id}
-      onChange={handleSeasonChange}
-    >
+    <Select defaultValue={currentSeason} onChange={handleSeasonChange}>
       <option value="createSeason">Add A New Season</option>
       {seasons.map((season) => (
         <option value={season.id} key={season.id}>
-          Season {season?.season} ({season?.schoolYear})
+          Season {season.season} ({season.schoolYear})
         </option>
       ))}
     </Select>

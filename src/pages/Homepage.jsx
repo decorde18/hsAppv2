@@ -9,7 +9,7 @@ const StyledHomePage = styled.div`
   grid-template-rows: 15rem 1fr auto;
 `;
 //TODO create a PageNav page (if we want from the top)
-function Homepage() {
+function HomePage() {
   return (
     <StyledHomePage>
       <Header type="nonApp" />
@@ -22,4 +22,4 @@ function Homepage() {
   );
 }
 
-export default Homepage;
+export default HomePage;

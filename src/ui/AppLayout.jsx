@@ -2,7 +2,7 @@ import SideBar from '../components/SideBar';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import MainSection from '../components/MainSection';
-import { useSeasons } from '../features/seasons/useSeasons';
+import { useSeasons, useRecentSeason } from '../features/seasons/useSeasons';
 // import { useNavigation } from 'react-router-dom';
 import Spinner from './Spinner';
 import { styled } from 'styled-components';
@@ -41,31 +41,26 @@ const Main = styled.main`
 
 function AppLayout() {
   const [currentSeason, setCurrentSeason] = useState();
-  const [recentSeason, setRecentSeason] = useState([]);
   const { isLoadingSeasons, seasons } = useSeasons();
+  const { isLoadingRecent, recentSeason } = useRecentSeason();
   useEffect(
     function () {
       if (isLoadingSeasons) return;
-      setRecentSeason(
-        seasons.reduce(
-          (season, acc) => (season.season > acc.season ? season : acc),
-          []
-        )
-      );
+      if (isLoadingRecent) return;
+
       if (localStorage.getItem('currentSeason')) {
         setCurrentSeason(localStorage.getItem('currentSeason'));
         return;
       }
-      setCurrentSeason(recentSeason?.id);
+      setCurrentSeason(recentSeason.id);
     },
-    [seasons, recentSeason, currentSeason, isLoadingSeasons]
+    [seasons, recentSeason, currentSeason, isLoadingSeasons, isLoadingRecent]
   );
   // const navigation = useNavigation();
   // const isLoading = navigation.state === 'loading';
 
-  if (isLoadingSeasons) return;
+  if (isLoadingSeasons || isLoadingRecent) return;
   <Spinner />;
-  console.log(recentSeason);
   return (
     <StyledAppLayout>
       <Header

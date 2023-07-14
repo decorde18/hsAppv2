@@ -14,8 +14,9 @@ export function useSeasons() {
 export function useRecentSeason() {
   const {
     isLoading: isLoadingRecent,
-    data: recentSeason,
+    data,
     error,
   } = useQuery({ queryKey: ['recentSeasons'], queryFn: getRecentSeason });
+  const [recentSeason] = data ? data : [];
   return { isLoadingRecent, error, recentSeason };
 }
