@@ -29,18 +29,18 @@ const H1 = styled.h1`
 `;
 
 function Header({ seasonProps, type }) {
-  // if (seasonProps.recentSeason.length === 0) return <Spinner />;
+  if (seasonProps.recentSeason.length === 0) return <Spinner />;
   // const { isAuthenticated } = useAuth();
   return (
     <StyledHeader className="relative mb-2">
       <Logo></Logo>
       <Div>
         <H1>INDEPENDENCE GIRLS SOCCER</H1>
-        {/* {type === 'app' && (
+        {type === 'app' && (
           <Div2>
             <SeasonSelector seasonProps={seasonProps} />
           </Div2>
-        )} */}
+        )}
       </Div>
       {/* {isAuthenticated ? <User /> : null} */}
     </StyledHeader>
