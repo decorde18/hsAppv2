@@ -3,7 +3,6 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 // import Settings from './pages/Settings';
 // import Account from './pages/Account';
 // import Login from './pages/Login';
-import HomePage from './pages/HomePage';
 import PageNotFound from './pages/PageNotFound';
 import GlobalStyles from './styles/GlobalStyles';
 import AppLayout from './ui/AppLayout';
@@ -13,6 +12,7 @@ import { Toaster } from 'react-hot-toast';
 import Players from './pages/Players';
 import People from './pages/People';
 import Games from './pages/Games';
+import Homepage from './pages/HomePage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -31,7 +31,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route index element={<Navigate replace to="homepage" />} />
-          <Route path="homepage" element={<HomePage />} />
+          <Route path="homepage" element={<Homepage />} />
           <Route path="app" element={<AppLayout />}>
             <Route path="players" element={<Players />} />
             <Route path="people" element={<People />} />
