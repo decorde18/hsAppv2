@@ -11,15 +11,14 @@ const StyledHomePage = styled.div`
 //TODO create a PageNav page (if we want from the top)
 function Homepage() {
   return (
-    // <StyledHomePage>
-    //   <Header type="nonApp" />
-    //   <main>
-    //     This is the main section. It will include all things on the landing
-    //     page. This page is before you are logged in
-    //   </main>
-    //   <Footer />
-    // </StyledHomePage>
-    <div>Hello</div>
+    <StyledHomePage>
+      <Header type="nonApp" />
+      <main>
+        This is the main section. It will include all things on the landing
+        page. This page is before you are logged in
+      </main>
+      <Footer />
+    </StyledHomePage>
   );
 }
 

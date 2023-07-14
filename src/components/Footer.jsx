@@ -1,6 +1,16 @@
-import styles from "./Footer.module.css";
+import { styled } from 'styled-components';
+
+const StyledFooter = styled.footer`
+  margin-top: auto;
+`;
+
+// .copyright {
+//   font-size: 1.2rem;
+//   color: var(--color-light--1);
+// }
+
 function Footer() {
-  return <footer className={styles.footer}>FOOTER</footer>;
+  return <StyledFooter>FOOTER</StyledFooter>;
 }
 
 export default Footer;
