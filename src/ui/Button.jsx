@@ -47,13 +47,18 @@ const variations = {
     }
   `,
 };
-
+const types = {
+  selected: css`
+    background-color: red;
+  `,
+};
 const Button = styled.button`
   border: none;
   border-radius: var(--border-radius-sm);
   box-shadow: var(--shadow-sm);
   ${(props) => sizes[props.size]}
   ${(props) => variations[props.variation]}
+  ${(props) => types[props.type]}
 `;
 Button.defaultProps = {
   variation: 'primary',

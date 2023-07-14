@@ -1,12 +1,16 @@
 import styled from 'styled-components';
-import { useState } from 'react';
 
-// import CreateCabinForm from './CreateCabinForm';
-// import { useDeleteCabin } from './useDeleteCabin';
-// import { formatCurrency } from '../../utils/helpers';
+import CreatePlayerForm from './CreatePlayerForm';
 
-// import { HiSquare2Stack, HiPencil, HiTrash } from 'react-icons/hi2';
-// import { useCreateCabin } from './useCreateCabin';
+import { useCreatePlayer } from './useCreatePlayer';
+import { useDeletePlayer } from './useDeletePlayer';
+
+import { HiSquare2Stack, HiPencil, HiTrash } from 'react-icons/hi2';
+
+import ConfirmDelete from '../../ui/ConfirmDelete';
+import Modal from '../../ui/Modal';
+import Table from '../../ui/Table';
+import Menus from '../../ui/Menus';
 
 const TableRow = styled.div`
   display: grid;
@@ -20,15 +24,6 @@ const TableRow = styled.div`
   }
 `;
 
-const Img = styled.img`
-  display: block;
-  width: 6.4rem;
-  aspect-ratio: 3 / 2;
-  object-fit: cover;
-  object-position: center;
-  transform: scale(1.5) translateX(-7px);
-`;
-
 const Player = styled.div`
   font-size: 1.6rem;
   font-weight: 600;
@@ -36,64 +31,44 @@ const Player = styled.div`
   font-family: 'Sono';
 `;
 
-const Price = styled.div`
-  font-family: 'Sono';
-  font-weight: 600;
-`;
-
-const Discount = styled.div`
-  font-family: 'Sono';
-  font-weight: 500;
-  color: var(--color-green-700);
-`;
-
 function PlayerRow({ player }) {
   // const [showForm, setShowForm] = useState(false);
-  // const { isDeleting, deleteCabin } = useDeleteCabin();
-  // const { isCreating, createCabin } = useCreateCabin();
-  // const {
-  //   id: cabinId,
-  //   name,
-  //   maxCapacity,
-  //   regularPrice,
-  //   discount,
-  //   description,
-  //   image,
-  // } = cabin;
-  // function handleDuplicate() {
-  //   createCabin({
-  //     name: `Copy of ${name}`,
-  //     maxCapacity,
-  //     regularPrice,
-  //     discount,
-  //     description,
-  //     image,
-  //   });
-  // }
+  const { isDeleting, deletePlayer } = useDeletePlayer();
+  const { isCreating, createPlayer } = useCreatePlayer();
+  console.log(player.id);
   return (
     <>
       <TableRow role="row">
         {/* <img src={image} /> */}
         <Player>{`${player.people.firstName} ${player.people.lastName}`}</Player>
-        {/* <Price>{formatCurrency(regularPrice)}</Price> */}
-        {/* {discount ? (
-          <Discount>{formatCurrency(discount)}</Discount>
-        ) : (
-          <span>&mdash;</span>
-        )} */}
-        <div>
-          {/* <button disabled={isCreating} onClick={handleDuplicate}>
-            <HiSquare2Stack />
-          </button>
-          <button onClick={() => setShowForm((show) => !show)}>
-            <HiPencil />
-          </button>
-          <button onClick={() => deleteCabin(cabinId)} disabled={isDeleting}>
-            <HiTrash />
-          </button> */}
-        </div>
+        <Modal>
+          {/* <Menus.Menu>
+            <Menus.Toggle id={player.id} /> */}
+
+          {/* <Menus.List id={player.id}>
+              <Modal.Open opens="edit">
+                <Menus.Button icon={HiPencil}>edit</Menus.Button>
+              </Modal.Open>
+              <Modal.Open opens="delete">
+                <Menus.Button icon={HiTrash}>delete</Menus.Button>
+              </Modal.Open>
+            </Menus.List> */}
+
+          {/* <Modal.Window name="edit">
+              {<CreatePlayerForm playerToEdit={player} />}
+            </Modal.Window> */}
+
+          {/* <Modal.Window name="delete">
+              <ConfirmDelete
+                resourceName="players"
+                disabled={isDeleting}
+                onConfirm={() => deletePlayer(player.id)}
+              />
+            </Modal.Window> */}
+          {/* </Menus.Menu> */}
+        </Modal>
       </TableRow>
-      {/* {showForm && <CreateCabinForm cabinToEdit={cabin} />} */}
+      {/* {showForm && <CreatePlayerForm playerToEdit={player} />} */}
     </>
   );
 }

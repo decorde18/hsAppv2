@@ -5,35 +5,62 @@ import Spinner from '../../ui/Spinner';
 import { useGames } from './useGames';
 
 import { useState } from 'react';
-import Button from '../../components/Button';
-const Table = styled.div`
-  border: 1px solid var(--color-grey-200);
+import Button from '../../ui/Button';
+import Table from '../../ui/Table';
+import Empty from '../../ui/Empty';
+import GameRow from './GameRow';
+import { useSearchParams } from 'react-router-dom';
 
-  font-size: 1.4rem;
-  background-color: var(--color-grey-0);
-  border-radius: 7px;
-  overflow: hidden;
+const StyledDiv = styled.div`
+  display: flex;
+  gap: 2px;
 `;
-
-const TableHeader = styled.header`
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 0.5fr 0.5fr 0.5fr 1fr;
-  column-gap: 2.4rem;
-  align-items: center;
-  text-align: center;
-  background-color: var(--color-grey-50);
-  border-bottom: 1px solid var(--color-grey-100);
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  font-weight: 600;
-  color: var(--color-grey-600);
-  padding: 1.6rem 2.4rem;
-`;
-
 function GameTable({ seasonProps }) {
+  const { currentSeason } = seasonProps;
+  const [scheduleType, setScheduleType] = useState('season');
   const { isLoadingGames, games } = useGames();
-  console.log(games);
-  return <div>games</div>;
+
+  function handleOnToggle(val) {
+    setScheduleType(val);
+  }
+
+  if (isLoadingGames) return <Spinner />;
+  if (!games.length) return <Empty resource="Games" />;
+  const gamesSeason = games.filter((game) => game.season == currentSeason);
+  return (
+    <>
+      <StyledDiv>
+        <Button
+          variation={scheduleType === 'season' ? 'primary' : 'secondary'}
+          onClick={() => handleOnToggle('season')}
+        >
+          Current SEASON
+        </Button>
+        <Button
+          variation={scheduleType === 'allTime' ? 'primary' : 'secondary'}
+          onClick={() => handleOnToggle('allTime')}
+        >
+          ALL TIME
+        </Button>
+      </StyledDiv>
+
+      <Table columns="0.6fr .5fr .5fr 2.2fr 1fr 1fr .6fr;">
+        <Table.Header>
+          <div></div>
+          <div>Date</div>
+          <div>Time</div>
+          <div>Opponent</div>
+          <div>Location</div>
+          <div>Team</div>
+          <div></div>
+        </Table.Header>
+        <Table.Body
+          data={scheduleType === 'season' ? gamesSeason : games}
+          render={(game) => <GameRow game={game} key={game.id} />}
+        />
+      </Table>
+    </>
+  );
 }
 
 export default GameTable;

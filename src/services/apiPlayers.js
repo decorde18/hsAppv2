@@ -4,9 +4,7 @@ import supabase from './supabase';
 export async function getPlayers() {
   const { data: players, error } = await supabase.from('players').select(`
     *,
-    people (
-      *
-    )
+    people (*)
   `);
 
   if (error) {
@@ -40,6 +38,17 @@ export async function updatePlayerSeason({ id, ...updateField }) {
     console.log(error);
     throw new Error('Player Season Could Not Be updated');
   }
+}
+export async function createEditPlayer(newPlayer, id) {}
+
+export async function deletePlayer(id) {
+  //TODO ask for delete Person in People
+  const { error } = await supabase.from('player').delete().eq('id', id);
+  if (error) {
+    console.log(error);
+    throw new Error('Player Could Not Be Deleted');
+  }
+  return null;
 }
 // export async function createEditPlayer(newCabin, id) {
 //   const hasImagePath = newCabin.image?.startsWith?.(supabaseUrl);

@@ -1,13 +1,19 @@
 import styled from 'styled-components';
-import { useState } from 'react';
 
-import Spinner from '../../ui/Spinner';
-// import { useSettings } from './useSettings';
 import { useUpdatePlayerSeason } from './useUpdatePlayerSeason';
+
+import { useCreatePlayer } from './useCreatePlayer';
+import { useDeletePlayer } from './useDeletePlayer';
+
+import { HiSquare2Stack, HiPencil, HiTrash } from 'react-icons/hi2';
 
 import Form from '../../ui/Form';
 import FormRow from '../../ui/FormRow';
 import Input from '../../ui/Input';
+import ConfirmDelete from '../../ui/ConfirmDelete';
+import Modal from '../../ui/Modal';
+import Table from '../../ui/Table';
+import Menus from '../../ui/Menus';
 
 const TableRow = styled.div`
   display: grid;
@@ -37,25 +43,11 @@ const Player = styled.div`
   /* font-family: 'Sono'; */
 `;
 
-const Price = styled.div`
-  font-family: 'Sono';
-  font-weight: 600;
-`;
-
-const Discount = styled.div`
-  font-family: 'Sono';
-  font-weight: 500;
-  color: var(--color-green-700);
-`;
-
 function PlayerSeasonRow({ playerSeason }) {
   const { players: player } = playerSeason;
   const { people } = player;
   // const { isLoading } = useSettings();
   const { updateSetting, isUpdating } = useUpdatePlayerSeason();
-
-  // return <Spinner />;
-  // if (isLoading) return <Spinner />;
 
   function handleChange(e, field, id) {
     const { value } = e.target;

@@ -2,12 +2,9 @@
 import supabase from './supabase';
 
 export async function getGames() {
-  const { data: games, error } = await supabase.from('games').select(`
-    *,
-    locations (
-      *
-    ), opponent(*)
-  `);
+  const { data: games, error } = await supabase
+    .from('games')
+    .select('*, schools(*), locations(*)');
 
   if (error) {
     console.log(error);
