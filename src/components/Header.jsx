@@ -4,7 +4,6 @@ import Logo from './Logo';
 import SeasonSelector from './SeasonSelector';
 // import { useAuth } from '../contexts/FakeAuthContexts';
 import { styled } from 'styled-components';
-import Spinner from './Spinner';
 
 const StyledHeader = styled.header`
   display: relative;
@@ -29,7 +28,6 @@ const H1 = styled.h1`
 `;
 
 function Header({ seasonProps, type }) {
-  if (seasonProps.recentSeason.length === 0) return <Spinner />;
   // const { isAuthenticated } = useAuth();
   return (
     <StyledHeader className="relative mb-2">

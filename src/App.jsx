@@ -12,7 +12,7 @@ import { Toaster } from 'react-hot-toast';
 import Players from './pages/Players';
 import People from './pages/People';
 import Games from './pages/Games';
-import HomePage from './pages/HomePage';
+import PublicPage from './pages/PublicPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -30,8 +30,8 @@ function App() {
       <GlobalStyles />
       <BrowserRouter>
         <Routes>
-          <Route index element={<Navigate replace to="homepage" />} />
-          <Route path="homepage" element={<HomePage />} />
+          <Route index element={<Navigate replace to="public" />} />
+          <Route path="public" element={<PublicPage />} />
           <Route path="app" element={<AppLayout />}>
             <Route path="players" element={<Players />} />
             <Route path="people" element={<People />} />
