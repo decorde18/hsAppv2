@@ -8,6 +8,7 @@ import { useState } from 'react';
 import Button from '../../ui/Button';
 import Table from '../../ui/Table';
 import Empty from '../../ui/Empty';
+import Menus from '../../ui/Menus';
 
 // const Table = styled.div`
 //   border: 1px solid var(--color-grey-200);
@@ -41,20 +42,49 @@ function PlayerTable({ seasonProps }) {
   const [rosterType, setRosterType] = useState('season');
   const { isLoadingPlayers, players } = usePlayers();
   const { isLoadingPlayerSeasons, playerSeasons } = usePlayerSeasons();
-  function handleOnToggle(val) {
-    setRosterType(val);
-  }
   if (isLoadingPlayers || isLoadingPlayerSeasons) return <Spinner />;
   if (!players.length) return <Empty resource="Players" />;
 
+  function handleOnToggle(val) {
+    setRosterType(val);
+  }
   const playerSeason = playerSeasons.filter(
     (playerSeason) => playerSeason.seasons.id === +currentSeason
   );
+  const isSeason = rosterType === 'season';
+  const seasonTable = {
+    head: (
+      <>
+        <div></div>
+        <div>Player</div>
+        <div>Status</div>
+        <div>DOB</div>
+        <div>Entry Year</div>
+        <div>Grade</div>
+        <div>Returner</div>
+        <div>Team</div>
+        <div></div>
+      </>
+    ),
+    columns: '0.2fr 2fr 1fr .5fr .5fr .5fr .5fr 1fr .2fr;',
+  };
+  const table = {
+    head: (
+      <>
+        <div></div>
+        <div>Player</div>
+        <div>DOB</div>
+        <div></div>
+      </>
+    ),
+    columns: '0.2fr 2fr 1fr .2fr;',
+  };
+
   return (
     <>
       <StyledDiv>
         <Button
-          variation={rosterType === 'season' ? 'primary' : 'secondary'}
+          variation={isSeason ? 'primary' : 'secondary'}
           onClick={() => handleOnToggle('season')}
         >
           Current SEASON
@@ -66,27 +96,23 @@ function PlayerTable({ seasonProps }) {
           ALL TIME
         </Button>
       </StyledDiv>
-      <Table columns="0.6fr .5fr .5fr 2.2fr 1fr 1fr .6fr;">
-        <Table.Header>
-          <div>Player</div>
-          <div>Status</div>
-          <div>DOB</div>
-          <div>Entry Year</div>
-          <div>Grade</div>
-          <div>Returner</div>
-          <div>Team</div>
-        </Table.Header>
-        <Table.Body
-          data={rosterType === 'season' ? playerSeason : players}
-          render={(player) =>
-            rosterType === 'season' ? (
-              <PlayerSeasonRow playerSeason={player} key={player.id} />
-            ) : (
-              <PlayerRow player={player} key={player.id} />
-            )
-          }
-        />
-      </Table>
+      <Menus>
+        <Table columns={isSeason ? seasonTable.columns : table.columns}>
+          <Table.Header>
+            {isSeason ? seasonTable.head : table.head}
+          </Table.Header>
+          <Table.Body
+            data={isSeason ? playerSeason : players}
+            render={(player) =>
+              isSeason ? (
+                <PlayerSeasonRow playerSeason={player} key={player.id} />
+              ) : (
+                <PlayerRow player={player} key={player.id} />
+              )
+            }
+          />
+        </Table>
+      </Menus>
     </>
   );
 }

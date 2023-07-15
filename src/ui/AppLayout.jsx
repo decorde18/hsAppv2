@@ -1,5 +1,5 @@
 import SideBar from '../components/SideBar';
-import Header from '../components/Header';
+import Header from './Header';
 import Footer from '../components/Footer';
 import MainSection from '../components/MainSection';
 import { useSeasons, useRecentSeason } from '../features/seasons/useSeasons';

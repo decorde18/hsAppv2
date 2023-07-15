@@ -14,6 +14,7 @@ import ConfirmDelete from '../../ui/ConfirmDelete';
 import Modal from '../../ui/Modal';
 import Table from '../../ui/Table';
 import Menus from '../../ui/Menus';
+import { format } from 'date-fns';
 
 const TableRow = styled.div`
   display: grid;
@@ -54,7 +55,8 @@ function PlayerSeasonRow({ playerSeason }) {
     if (!value) return;
     updateSetting({ [field]: value, id });
   }
-
+  //todo i am here fix role=row from rowin cabin
+  //todo then menus in playerrow
   return (
     <>
       <TableRow role="row">
@@ -69,7 +71,7 @@ function PlayerSeasonRow({ playerSeason }) {
           <option value="Interested">Interested</option>
           <option value="Not Playing">Not Playing</option>
         </select>
-        <div>{player.dateOfBirth}</div>
+        <div>{format(new Date(player.dateOfBirth), 'MM/dd/yy')}</div>
         <div>{player.entryYear}</div>
         <div>{playerSeason.grade}</div>
         <div>{playerSeason.returningPlayer ? 'YES' : 'NO'}</div>

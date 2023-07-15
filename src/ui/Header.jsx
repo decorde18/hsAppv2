@@ -1,14 +1,16 @@
 // import { createContext } from 'react';
 // import User from '../components/User';
 import Logo from './Logo';
-import SeasonSelector from './SeasonSelector';
+import SeasonSelector from '../components/SeasonSelector';
 // import { useAuth } from '../contexts/FakeAuthContexts';
 import { styled } from 'styled-components';
+import Logout from '../features/authentication/Logout';
 
 const StyledHeader = styled.header`
-  display: relative;
+  display: flex;
   margin-bottom: 0.5rem;
   text-align: center;
+  justify-content: space-between;
 `;
 const Div = styled.div`
   display: flex;
@@ -40,7 +42,7 @@ function Header({ seasonProps, type }) {
           </Div2>
         )}
       </Div>
-      {/* {isAuthenticated ? <User /> : null} */}
+      {type === 'app' ? <Logout /> : <div />}
     </StyledHeader>
   );
 }

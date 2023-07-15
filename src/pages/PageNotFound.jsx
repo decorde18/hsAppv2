@@ -1,6 +1,6 @@
 import { styled } from 'styled-components';
 import Footer from '../components/Footer';
-import Header from '../components/Header';
+import Header from '../ui/Header';
 // import AppLayout from '../ui/AppLayout';
 
 const Div = styled.div`

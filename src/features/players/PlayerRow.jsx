@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+// import { useState } from 'react';
 
 import CreatePlayerForm from './CreatePlayerForm';
 
@@ -11,18 +12,7 @@ import ConfirmDelete from '../../ui/ConfirmDelete';
 import Modal from '../../ui/Modal';
 import Table from '../../ui/Table';
 import Menus from '../../ui/Menus';
-
-const TableRow = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  column-gap: 2.4rem;
-  align-items: center;
-  padding: 0 2rem;
-
-  &:not(:last-child) {
-    border-bottom: 1px solid var(--color-grey-100);
-  }
-`;
+import { format } from 'date-fns';
 
 const Player = styled.div`
   font-size: 1.6rem;
@@ -32,44 +22,47 @@ const Player = styled.div`
 `;
 
 function PlayerRow({ player }) {
-  // const [showForm, setShowForm] = useState(false);
+  //   const [showForm, setShowForm] = useState(false);
   const { isDeleting, deletePlayer } = useDeletePlayer();
   const { isCreating, createPlayer } = useCreatePlayer();
-  console.log(player.id);
+  const {
+    id: playerId,
+    people: { firstName, lastName },
+    dateOfBirth,
+  } = player;
   return (
-    <>
-      <TableRow role="row">
-        {/* <img src={image} /> */}
-        <Player>{`${player.people.firstName} ${player.people.lastName}`}</Player>
+    <Table.Row>
+      <div></div>
+      <Player>{`${firstName} ${lastName}`}</Player>
+      <Player>{format(new Date(dateOfBirth), 'MM/dd/yy')}</Player>
+      <div>
         <Modal>
-          {/* <Menus.Menu>
-            <Menus.Toggle id={player.id} /> */}
-
-          {/* <Menus.List id={player.id}>
+          <Menus.Menu>
+            <Menus.Toggle id={playerId} />
+            <Menus.List id={playerId}>
               <Modal.Open opens="edit">
                 <Menus.Button icon={HiPencil}>edit</Menus.Button>
               </Modal.Open>
               <Modal.Open opens="delete">
                 <Menus.Button icon={HiTrash}>delete</Menus.Button>
               </Modal.Open>
-            </Menus.List> */}
+            </Menus.List>
 
-          {/* <Modal.Window name="edit">
+            <Modal.Window name="edit">
               {<CreatePlayerForm playerToEdit={player} />}
-            </Modal.Window> */}
+            </Modal.Window>
 
-          {/* <Modal.Window name="delete">
+            <Modal.Window name="delete">
               <ConfirmDelete
-                resourceName="players"
+                resourceName="player"
                 disabled={isDeleting}
-                onConfirm={() => deletePlayer(player.id)}
+                onConfirm={() => deletePlayer(playerId)}
               />
-            </Modal.Window> */}
-          {/* </Menus.Menu> */}
+            </Modal.Window>
+          </Menus.Menu>
         </Modal>
-      </TableRow>
-      {/* {showForm && <CreatePlayerForm playerToEdit={player} />} */}
-    </>
+      </div>
+    </Table.Row>
   );
 }
 

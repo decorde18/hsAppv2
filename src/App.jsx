@@ -2,7 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 // import Users from './pages/Users';
 // import Settings from './pages/Settings';
 // import Account from './pages/Account';
-// import Login from './pages/Login';
+import Login from './pages/Login';
 import PageNotFound from './pages/PageNotFound';
 import GlobalStyles from './styles/GlobalStyles';
 import AppLayout from './ui/AppLayout';
@@ -12,7 +12,9 @@ import { Toaster } from 'react-hot-toast';
 import Players from './pages/Players';
 import People from './pages/People';
 import Games from './pages/Games';
+import Schedule from './pages/Schedule';
 import PublicPage from './pages/PublicPage';
+import ProtectedRoute from './ui/ProtectedRoute';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -31,8 +33,16 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route index element={<Navigate replace to="public" />} />
+
           <Route path="public" element={<PublicPage />} />
-          <Route path="app" element={<AppLayout />}>
+          <Route
+            path="app"
+            element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }
+          >
             <Route path="players" element={<Players />} />
             <Route path="people" element={<People />} />
             <Route path="games" element={<Games />} />
@@ -40,7 +50,8 @@ function App() {
             <Route path="settings" element={<Settings />} />
             <Route path="account" element={<Account />} /> */}
           </Route>
-          {/* <Route path="login" element={<Login />} /> */}
+          <Route path="login" element={<Login />} />
+          <Route path="schedule" element={<Schedule />} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </BrowserRouter>

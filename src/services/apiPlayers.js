@@ -43,7 +43,7 @@ export async function createEditPlayer(newPlayer, id) {}
 
 export async function deletePlayer(id) {
   //TODO ask for delete Person in People
-  const { error } = await supabase.from('player').delete().eq('id', id);
+  const { error } = await supabase.from('players').delete().eq('id', id);
   if (error) {
     console.log(error);
     throw new Error('Player Could Not Be Deleted');
