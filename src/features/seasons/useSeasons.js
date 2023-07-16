@@ -1,5 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
-import { getRecentSeason, getSeasons } from '../../services/apiSeasons';
+import {
+  getRecentSeason,
+  getSeasons,
+  getSeason,
+} from '../../services/apiSeasons';
 
 export function useSeasons() {
   const {
@@ -19,4 +23,16 @@ export function useRecentSeason() {
   } = useQuery({ queryKey: ['recentSeasons'], queryFn: getRecentSeason });
   const [recentSeason] = data ? data : [];
   return { isLoadingRecent, error, recentSeason };
+}
+
+export function useSeason(seasonId) {
+  const {
+    isLoading: isLoadingSeason,
+    data: season,
+    error,
+  } = useQuery({
+    queryKey: ['season'],
+    queryFn: () => (seasonId ? getSeason(seasonId) : null),
+  });
+  return { isLoadingSeason, error, season };
 }

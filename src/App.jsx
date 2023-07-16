@@ -15,6 +15,7 @@ import Games from './pages/Games';
 import Schedule from './pages/Schedule';
 import PublicPage from './pages/PublicPage';
 import ProtectedRoute from './ui/ProtectedRoute';
+import { PDFViewer } from '@react-pdf/renderer';
 
 const queryClient = new QueryClient({
   defaultOptions: {

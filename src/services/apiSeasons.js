@@ -24,3 +24,16 @@ export async function getRecentSeason() {
   }
   return recentSeason;
 }
+
+export async function getSeason(seasonId) {
+  const { data: recentSeason, error } = await supabase
+    .from('seasons')
+    .select('*')
+    .eq('id', seasonId)
+    .single();
+  if (error) {
+    console.log(error);
+    throw new Error('Recent Season Could Not Be Loaded');
+  }
+  return recentSeason;
+}

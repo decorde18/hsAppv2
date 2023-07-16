@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getGames } from '../../services/apiGames';
+import { getGames, getGamesSeason } from '../../services/apiGames';
 
 export function useGames() {
   const {
@@ -9,4 +9,16 @@ export function useGames() {
   } = useQuery({ queryKey: ['games'], queryFn: getGames });
 
   return { isLoadingGames, error, games };
+}
+
+export function useGamesSeason(seasonId) {
+  const {
+    isLoading: isLoadingGamesSeason,
+    data: gamesSeason,
+    error,
+  } = useQuery({
+    queryKey: ['gamesSeason'],
+    queryFn: () => (seasonId ? getGamesSeason(seasonId) : null),
+  });
+  return { isLoadingGamesSeason, error, gamesSeason };
 }

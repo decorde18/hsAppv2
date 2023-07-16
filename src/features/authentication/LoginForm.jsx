@@ -8,8 +8,8 @@ import { login } from '../../services/apiAuth';
 import { useLogin } from './useLogin';
 
 function LoginForm() {
-  const [email, setEmail] = useState('decorde@yahoo.com');
-  const [password, setPassword] = useState('Latin4488dav1');
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState();
   const { login, isLoading } = useLogin();
 
   function handleSubmit(e) {

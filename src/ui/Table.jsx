@@ -28,6 +28,12 @@ const StyledHeader = styled(CommonRow)`
   font-weight: 600;
   color: var(--color-grey-600);
 `;
+const StyledPrintHeader = styled(CommonRow)`
+  padding: 0.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  font-weight: 600;
+`;
 
 const StyledRow = styled(CommonRow)`
   padding: 0.2rem 1rem;
@@ -35,6 +41,13 @@ const StyledRow = styled(CommonRow)`
   &:not(:last-child) {
     border-bottom: 1px solid var(--color-grey-100);
   }
+`;
+const StyledPrintRow = styled(CommonRow)`
+  padding: 0.1rem;
+  font-size: 1.1rem;
+  /* &:not(:last-child) {
+    border-bottom: 1px solid var(--color-grey-100);
+  } */
 `;
 
 const StyledBody = styled.section`
@@ -78,12 +91,28 @@ function Header({ children }) {
     </StyledHeader>
   );
 }
+function PrintHeader({ children }) {
+  const { columns } = useContext(TableContext);
+  return (
+    <StyledPrintHeader role="row" columns={columns} as="print-header">
+      {children}
+    </StyledPrintHeader>
+  );
+}
 function Row({ children }) {
   const { columns } = useContext(TableContext);
   return (
     <StyledRow role="row" columns={columns}>
       {children}
     </StyledRow>
+  );
+}
+function PrintRow({ children }) {
+  const { columns } = useContext(TableContext);
+  return (
+    <StyledPrintRow role="print-row" columns={columns}>
+      {children}
+    </StyledPrintRow>
   );
 }
 
@@ -93,7 +122,9 @@ function Body({ data, render }) {
 }
 
 Table.Header = Header;
+Table.PrintHeader = PrintHeader;
 Table.Row = Row;
+Table.PrintRow = PrintRow;
 Table.Body = Body;
 Table.Footer = Footer;
 
