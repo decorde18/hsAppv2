@@ -25,10 +25,15 @@ const Heading = styled.h1`
       font-size: 3rem;
       font-weight: 600;
     `}
-      ${(props) =>
+  ${(props) =>
     props.location === 'center' &&
     css`
       text-align: center;
+    `}
+  ${(props) =>
+    props.location === 'left' &&
+    css`
+      text-align: left;
     `}
     line-height:1.4
 `;

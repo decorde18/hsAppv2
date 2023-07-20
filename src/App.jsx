@@ -9,8 +9,10 @@ import AppLayout from './ui/AppLayout';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
+import NewPlayer from './pages/NewPlayer';
 import Players from './pages/Players';
 import People from './pages/People';
+import Communication from './pages/Communication';
 import Games from './pages/Games';
 import Schedule from './pages/Schedule';
 import PublicPage from './pages/PublicPage';
@@ -46,6 +48,7 @@ function App() {
           >
             <Route path="players" element={<Players />} />
             <Route path="people" element={<People />} />
+            <Route path="communication" element={<Communication />} />
             <Route path="games" element={<Games />} />
             {/* <Route path="users" element={<Users />} />
             <Route path="settings" element={<Settings />} />
@@ -53,6 +56,7 @@ function App() {
           </Route>
           <Route path="login" element={<Login />} />
           <Route path="schedule" element={<Schedule />} />
+          <Route path="newplayer" element={<NewPlayer />} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </BrowserRouter>

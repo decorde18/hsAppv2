@@ -58,8 +58,8 @@ function GameRow({ game }) {
     <>
       <Table.Row>
         <div></div>
-        <div>{format(new Date(game.date), 'MM/dd/yy')}</div>
-        <div>{formatTime(game.time, true)}</div>
+        <div>{game.date && format(new Date(game.date), 'MM/dd/yy')}</div>
+        <div>{game.time && formatTime(game.time, true)}</div>
         <Game>{game.schools.school}</Game>
         <div>{game.locations.name}</div>
         <div>{game.teamType}</div>

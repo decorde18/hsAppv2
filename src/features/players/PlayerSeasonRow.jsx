@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import { useUpdatePlayerSeason } from './useUpdatePlayerSeason';
+import { useUpdatePlayerSeason } from './usePlayerSeason';
 
 import { useCreatePlayer } from './useCreatePlayer';
 import { useDeletePlayer } from './useDeletePlayer';
@@ -71,7 +71,10 @@ function PlayerSeasonRow({ playerSeason }) {
           <option value="Interested">Interested</option>
           <option value="Not Playing">Not Playing</option>
         </select>
-        <div>{format(new Date(player.dateOfBirth), 'MM/dd/yy')}</div>
+        <div>
+          {player.dateOfBirth &&
+            format(new Date(player.dateOfBirth), 'MM/dd/yy')}
+        </div>
         <div>{player.entryYear}</div>
         <div>{playerSeason.grade}</div>
         <div>{playerSeason.returningPlayer ? 'YES' : 'NO'}</div>

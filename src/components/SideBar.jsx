@@ -16,18 +16,28 @@ const Div = styled.div`
   align-items: center;
   gap: 1rem;
 `;
-//TODO   !!FIXME hard coded at 22, needs to be set to Current Season
-function SideBar() {
+
+function SideBar({ seasonProps }) {
   return (
     <Aside>
       <Div>
         <Button type="sideNav">Print Roster</Button>
         <Button type="sideNav">
-          <NavLink to="../schedule?season=22" target="_blank">
+          <NavLink
+            to={`../schedule?season=${seasonProps.currentSeason}`}
+            target="_blank"
+          >
             Print Schedule
           </NavLink>
         </Button>
-        <Button type="sideNav">Something</Button>
+        <Button type="sideNav">
+          <NavLink to={`./communication?season=${seasonProps.currentSeason}`}>
+            Communication
+          </NavLink>
+        </Button>
+        <Button type="sideNav">
+          <NavLink to={`./people`}>People</NavLink>
+        </Button>
         <Button type="sideNav">Season Settings</Button>
       </Div>
     </Aside>

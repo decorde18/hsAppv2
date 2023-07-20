@@ -16,7 +16,7 @@ function ScheduleRow({ game }) {
       <Table.PrintRow>
         <div></div>
         <Right>{format(new Date(game.date), 'MM/dd/yy')}</Right>
-        <Right>{formatTime(game.time, true)}</Right>
+        {game.time ? <Right>{formatTime(game.time, true)}</Right> : <div></div>}
         <div>{game.schools.school}</div>
         <div>{game.locations.name}</div>
         <Comment>{game.comment}</Comment>

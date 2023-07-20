@@ -11,7 +11,7 @@ export function useDeletePlayer() {
     onSuccess: () => {
       // alert(`Player ${name} successfully deleted`);
       toast.success(`Player  successfully deleted`);
-      queryClient.invalidateQueries({ queryKey: ['cabins'] }); // this invalidates data thus making it fetch so the UI is updated with the server -- can specify which queries to invalidate
+      queryClient.invalidateQueries({ queryKey: ['players'] }); // this invalidates data thus making it fetch so the UI is updated with the server -- can specify which queries to invalidate
     },
     // onError: (err) => alert(err.message), //comes from apiPlayers
     onError: (err) => toast.error(err.message),

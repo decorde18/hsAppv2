@@ -12,17 +12,10 @@ const Div = styled.div`
   margin-right: 1rem;
   height: 100%;
   border-width: 1px;
+  min-width: 75vw;
+  max-width: 1100px;
 `;
-// .mainSection {
-//   flex-basis: 56rem;
-//   background-color: var(--color-dark--1);
-//   padding: 2rem 3rem 1.5rem 3rem;
 
-//   display: flex;
-//   flex-direction: column;
-//   align-items: center;
-//   height: calc(85vh);
-// }
 function MainSection({ seasonProps }) {
   return (
     <Div>
@@ -33,9 +26,3 @@ function MainSection({ seasonProps }) {
 }
 
 export default MainSection;
-
-// flex-basis: 56rem;
-
-// display: flex;
-// flex-direction: column;
-// align-items: center;

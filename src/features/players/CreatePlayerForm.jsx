@@ -1,66 +1,220 @@
-// import Input from '../../ui/Input';
-// import Form from '../../ui/Form';
-// import Button from '../../ui/Button';
-// import FileInput from '../../ui/FileInput';
-// import Textarea from '../../ui/Textarea';
-// import FormRow from '../../ui/FormRow';
+import Button from '../../ui/Button';
+import Form from '../../ui/Form';
+import FormRow from '../../ui/FormRow';
+import Heading from '../../ui/Heading';
+import Input from '../../ui/Input';
+import Row from '../../ui/Row';
 
-// import { useForm } from 'react-hook-form';
-// import { useCreateCabin } from './useCreateCabin';
-// import { useEditCabin } from './useEditCabin';
+import { useForm } from 'react-hook-form';
+import { useCreatePeople } from '../people/useCreatePeople';
+import { useCreatePlayerSeason } from './usePlayerSeason';
+import { useCreatePlayer } from './useCreatePlayer';
+import { useCreateParent, useCreatePlayerParent } from '../parents/useParents';
+import { useEffect, useState } from 'react';
 
-function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
-  return <div></div>;
-  // const { id: editId, ...editValues } = cabinToEdit;
-  // const isEditSession = Boolean(editId);
-  // const { register, handleSubmit, reset, getValues, formState } = useForm({
-  //   defaultValues: isEditSession ? editValues : {},
-  // });
-  // const { errors } = formState;
-  // const { isCreating, createCabin } = useCreateCabin();
-  // // const queryClient = useQueryClient();
-  // const { isEditing, editCabin } = useEditCabin();
-  // const isWorking = isCreating || isEditing;
-  // function onSubmit(data) {
-  //   // mutate(data); //no image needed
-  //   const image = typeof data.image === 'string' ? data.image : data.image[0];
-  //   if (isEditSession)
-  //     editCabin(
-  //       { newCabinData: { ...data, image }, id: editId },
-  //       {
-  //         onSuccess: (data) => {
-  //           reset();
-  //           onCloseModal?.();
-  //         },
-  //       }
-  //     );
-  //   else
-  //     createCabin(
-  //       { ...data, image: data.image[0] },
-  //       {
-  //         onSuccess: (data) => {
-  //           reset();
-  //           onCloseModal?.();
-  //         },
-  //       }
-  //     );
-  // }
-  // function onError(errors) {
-  //   console.log(errors);
-  // }
-  // return (
-  //   <Form
-  //     onSubmit={handleSubmit(onSubmit, onError)}
-  //     type={onCloseModal ? 'Modal' : 'regular'}
-  //   >
-  //     <FormRow label="Cabin Name" error={errors?.name?.message}>
-  //       <Input
-  //         type="text"
-  //         id="name"
-  //         disabled={isWorking}
-  //         {...register('name', { required: 'This field is required' })}
-  //       />
-  //     </FormRow>
+//TODO FUTURE if new person is not needed, get person
+
+function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
+  const { id: editId, ...editValues } = playerToEdit;
+  const isEditSession = Boolean(editId);
+  const { register, handleSubmit, reset, getValues, formState } = useForm({
+    defaultValues: isEditSession ? editValues : {},
+  });
+  const { errors } = formState;
+  const { isCreatingPeople, createPeople } = useCreatePeople();
+  const { isCreatingPlayer, createPlayer } = useCreatePlayer();
+  const { isCreatingParent, createParent } = useCreateParent();
+  const { isCreatingPlayerParent, createPlayerParent } =
+    useCreatePlayerParent();
+  const { isCreatingPlayerSeason, createPlayerSeason } =
+    useCreatePlayerSeason();
+  //todo fixme hard coded 2023 needs to be currentseason
+  const currentSeason = { id: 22, season: 2023 };
+  let parentId;
+  let playerId;
+
+  const isWorking = false;
+  function onSubmit(data) {
+    //separate player from parent
+    const { parentfirstName, parentlastName, parentemail, ...playerTempData } =
+      data;
+    const parentPeopleData = {
+      firstName: parentfirstName,
+      lastName: parentlastName,
+      email: parentemail,
+    };
+    const { grade, previousSchool, ...playerPeopleData } = playerTempData;
+
+    //get player entryYear
+    const entryYear = currentSeason.season - (+grade - 9);
+    const playerData = { previousSchool, entryYear };
+    createPeople(
+      { ...playerPeopleData },
+      {
+        onSuccess: (data) => {
+          // create player and get ID
+          createPlayer(
+            { peopleId: data.id, ...playerData },
+            {
+              onSuccess: (data) => {
+                playerId = data.id;
+                createPeople(
+                  { ...parentPeopleData },
+                  {
+                    onSuccess: (data) => {
+                      // create player and get ID
+                      createParent(
+                        { peopleId: data.id },
+                        {
+                          onSuccess: (data) => {
+                            parentId = data.id;
+                            addPlayerParent();
+                          },
+                        }
+                      );
+                    },
+                  }
+                );
+              },
+            }
+          );
+        },
+      }
+    );
+    function addPlayerParent() {
+      createPlayerParent({ player: playerId, parent: parentId });
+      addPlayerSeason();
+    }
+    function addPlayerSeason() {
+      createPlayerSeason({
+        playerId,
+        seasonId: currentSeason.id,
+        grade,
+        status: 'Interested',
+      });
+
+      reset();
+      onCloseModal?.();
+    }
+  }
+  function onError(errors) {
+    console.log(errors);
+  }
+  function handleChange() {}
+  return (
+    //   >
+    <Form
+      onSubmit={handleSubmit(onSubmit, onError)}
+      type={onCloseModal ? 'Modal' : 'regular'}
+    >
+      <Row>
+        <Heading as="h2">Player Information</Heading>
+
+        <FormRow label="First Name *" error={errors?.firstName?.message}>
+          <Input
+            type="text"
+            id="firstName"
+            {...register('firstName', {
+              required: 'We need your first name',
+            })}
+            disabled={isWorking}
+          />
+        </FormRow>
+        <FormRow label="Last Name *" error={errors?.lastName?.message}>
+          <Input
+            type="text"
+            id="lastName"
+            {...register('lastName', {
+              required: 'We need your last name',
+            })}
+            disabled={isWorking}
+          />
+        </FormRow>
+        <FormRow label="Rising Grade *" error={errors?.grade?.message}>
+          <select
+            id="grade"
+            {...register('grade', {
+              required: 'We need your grade',
+            })}
+            disabled={isWorking}
+          >
+            <option value="9">9th</option>
+            <option value="10">10th</option>
+            <option value="11">11th</option>
+            <option value="12">12th</option>
+          </select>
+        </FormRow>
+        <FormRow
+          label="Previous School"
+          error={errors?.previousSchool?.message}
+        >
+          <Input
+            type="text"
+            id="previousSchool"
+            {...register('previousSchool', {
+              required: false,
+            })}
+            disabled={isWorking}
+          />
+        </FormRow>
+        <FormRow label="Email" error={errors?.email?.message}>
+          <Input
+            type="email"
+            id="email"
+            {...register('email', {
+              required: false,
+            })}
+            disabled={isWorking}
+          />
+        </FormRow>
+      </Row>
+      <Row>
+        <Heading as="h2">Parent Information</Heading>
+      </Row>
+      <FormRow label="First Name *" error={errors?.parentfirstName?.message}>
+        <Input
+          type="text"
+          id="parentfirstName"
+          {...register('parentfirstName', {
+            required: 'We need the parent first name',
+          })}
+          disabled={isWorking}
+        />
+      </FormRow>
+      <FormRow label="Last Name *" error={errors?.parentlastName?.message}>
+        <Input
+          type="text"
+          id="parentlastName"
+          {...register('parentlastName', {
+            required: 'We need the parent last name',
+          })}
+          disabled={isWorking}
+        />
+      </FormRow>
+      <FormRow label="Email *" error={errors?.parentemail?.message}>
+        <Input
+          type="email"
+          id="parentemail"
+          disabled={isWorking}
+          {...register('parentemail', {
+            required: 'We need a parent Email',
+          })}
+        />
+      </FormRow>
+      <FormRow>
+        <Button
+          variation="secondary"
+          type="reset"
+          onClick={() => onCloseModal?.()}
+        >
+          Cancel
+        </Button>
+        <Button disabled={isWorking}>
+          {isEditSession ? 'Edit Player' : 'Create New Player'}
+        </Button>
+      </FormRow>
+    </Form>
+  );
 
   //     <FormRow label="Maximum capacity" error={errors?.maxCapacity?.message}>
   //       <Input
@@ -140,4 +294,4 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
   // );
 }
 
-export default CreateCabinForm;
+export default CreatePlayerForm;

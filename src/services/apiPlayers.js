@@ -2,31 +2,83 @@
 import supabase from './supabase';
 
 export async function getPlayers() {
-  const { data: players, error } = await supabase.from('players').select(`
+  const { data: players, error } = await supabase
+    .from('players')
+    .select(
+      `
     *,
     people (*)
-  `);
-
+  `
+    )
+    .order('entryYear', { ascending: true })
+    .order('lastName', { foreignTable: 'people', ascending: true })
+    .order('firstName', { foreignTable: 'people', ascending: true });
+  //todo fixme these aren't ordering and I don't know why
   if (error) {
     console.log(error);
     throw new Error('Players Could Not Be Loaded');
   }
   return players;
 }
+export async function createEditPlayer(newPlayer, id) {
+  let query = supabase.from('players');
+  //create player
+  if (!id) query = query.insert([{ ...newPlayer }]);
+  //edit player
+  if (id)
+    query = query
+      .update({ ...newPlayer })
+      .eq('id', id)
+      .select();
+  const { data, error } = await query.select().single();
+  // .insert([{ some_column: "someValue", other_column: "otherValue" }])
+  if (error) {
+    console.log(error);
+    throw new Error('Player Could Not Be Created');
+  }
+  return data;
+}
+
+export async function deletePlayer(id) {
+  //TODO ask for delete Person in People
+  const { error } = await supabase.from('players').delete().eq('id', id);
+  if (error) {
+    console.log(error);
+    throw new Error('Player Could Not Be Deleted');
+  }
+  return null;
+}
+
 export async function getPlayerSeasons() {
-  const { data: playerSeasons, error } = await supabase.from('playerSeasons')
-    .select(`
+  const { data: playerSeasons, error } = await supabase
+    .from('playerSeasons')
+    .select(
+      `
     *,
     players (
       *, people(*)
     ), seasons(*)
-  `);
+  `
+    )
+    .order('grade', { ascending: false })
+    .order('status', { ascending: true });
 
   if (error) {
     console.log(error);
     throw new Error('Player Seasons Could Not Be Loaded');
   }
   return playerSeasons;
+}
+export async function createPlayerSeasons(newPlayerSeason) {
+  const { data, error } = await supabase
+    .from('playerSeasons')
+    .insert([{ ...newPlayerSeason }])
+    .select();
+  if (error) {
+    console.log(error);
+    throw new Error('Player Season Could Not Be created');
+  }
+  return data;
 }
 export async function updatePlayerSeason({ id, ...updateField }) {
   const { data, error } = await supabase
@@ -38,52 +90,5 @@ export async function updatePlayerSeason({ id, ...updateField }) {
     console.log(error);
     throw new Error('Player Season Could Not Be updated');
   }
+  return data;
 }
-export async function createEditPlayer(newPlayer, id) {}
-
-export async function deletePlayer(id) {
-  //TODO ask for delete Person in People
-  const { error } = await supabase.from('players').delete().eq('id', id);
-  if (error) {
-    console.log(error);
-    throw new Error('Player Could Not Be Deleted');
-  }
-  return null;
-}
-// export async function createEditPlayer(newCabin, id) {
-//   const hasImagePath = newCabin.image?.startsWith?.(supabaseUrl);
-//   const imageName = `${Math.random()}-${newCabin.image.name}`.replaceAll(
-//     '/',
-//     ''
-//   ); // if there are any slashes, supabase creates a new folder inside
-//   const imagePath = hasImagePath
-//     ? newCabin.image
-//     : `${supabaseUrl}/storage/v1/object/public/cabin-images/${imageName}`;
-//   let query = supabase.from('cabins');
-//   //create cabin
-//   if (!id) query = query.insert([{ ...newCabin, image: imagePath }]);
-//   //edit cabin
-//   if (id)
-//     query = query
-//       .update({ ...newCabin, image: imagePath })
-//       .eq('id', id)
-//       .select();
-//   const { data, error } = await query.select().single();
-//   // .insert([{ some_column: "someValue", other_column: "otherValue" }])
-//   if (error) {
-//     console.log(error);
-//     throw new Error('Cabin Could Not Be Created');
-//   }
-//   //upload image
-//   if (hasImagePath) return;
-//   const { error: storageError } = await supabase.storage
-//     .from('cabin-images')
-//     .upload(imageName, newCabin.image);
-//   //prevent new cabin from creating if error uploading image (delete)
-//   if (storageError) {
-//     await supabase.from('cabins').delete().eq('id', data.id);
-//     console.log(error);
-//     throw new Error('There was an error loading the image');
-//   }
-//   return data;
-// }

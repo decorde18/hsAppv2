@@ -9,11 +9,13 @@ import Button from '../../ui/Button';
 import Table from '../../ui/Table';
 import Empty from '../../ui/Empty';
 import GameRow from './GameRow';
+import AddGame from './AddGame';
 import { useSearchParams } from 'react-router-dom';
 
 const StyledDiv = styled.div`
   display: flex;
   gap: 2px;
+  justify-content: space-between;
 `;
 function GameTable({ seasonProps }) {
   const { currentSeason } = seasonProps;
@@ -30,18 +32,21 @@ function GameTable({ seasonProps }) {
   return (
     <>
       <StyledDiv>
-        <Button
-          variation={scheduleType === 'season' ? 'primary' : 'secondary'}
-          onClick={() => handleOnToggle('season')}
-        >
-          Current SEASON
-        </Button>
-        <Button
-          variation={scheduleType === 'allTime' ? 'primary' : 'secondary'}
-          onClick={() => handleOnToggle('allTime')}
-        >
-          ALL TIME
-        </Button>
+        <div>
+          <Button
+            variation={scheduleType === 'season' ? 'primary' : 'secondary'}
+            onClick={() => handleOnToggle('season')}
+          >
+            Current SEASON
+          </Button>
+          <Button
+            variation={scheduleType === 'allTime' ? 'primary' : 'secondary'}
+            onClick={() => handleOnToggle('allTime')}
+          >
+            ALL TIME
+          </Button>
+        </div>
+        <AddGame />
       </StyledDiv>
 
       <Table columns="0.6fr .5fr .5fr 2.2fr 1fr 1fr .6fr;">

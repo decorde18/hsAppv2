@@ -74,7 +74,16 @@ function AppLayout() {
       />
 
       <Main className="flex">
-        <SideBar></SideBar>
+        <SideBar
+          seasonProps={{
+            currentSeason,
+            recentSeason,
+            onChangeSeason: setCurrentSeason,
+            seasons,
+          }}
+        >
+          {' '}
+        </SideBar>
         <MainSection
           seasonProps={{
             currentSeason,

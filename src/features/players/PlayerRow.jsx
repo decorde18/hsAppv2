@@ -34,7 +34,9 @@ function PlayerRow({ player }) {
     <Table.Row>
       <div></div>
       <Player>{`${firstName} ${lastName}`}</Player>
-      <Player>{format(new Date(dateOfBirth), 'MM/dd/yy')}</Player>
+      <Player>
+        {dateOfBirth && format(new Date(dateOfBirth), 'MM/dd/yy')}
+      </Player>
       <div>
         <Modal>
           <Menus.Menu>
