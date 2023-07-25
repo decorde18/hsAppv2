@@ -1,6 +1,7 @@
 // import { createContext } from 'react';
 // import User from '../components/User';
 import Logo from './Logo';
+import HeaderMenu from './HeaderMenu';
 import SeasonSelector from '../components/SeasonSelector';
 // import { useAuth } from '../contexts/FakeAuthContexts';
 import { styled } from 'styled-components';
@@ -29,20 +30,19 @@ const H1 = styled.h1`
   color: var(--color-brand--2);
 `;
 
-function Header({ seasonProps, type }) {
+function Header() {
   // const { isAuthenticated } = useAuth();
   return (
     <StyledHeader className="relative mb-2">
       <Logo></Logo>
       <Div>
         <H1>INDEPENDENCE GIRLS SOCCER</H1>
-        {type === 'app' && (
-          <Div2>
-            <SeasonSelector seasonProps={seasonProps} />
-          </Div2>
-        )}
+
+        <Div2>
+          <SeasonSelector />
+        </Div2>
       </Div>
-      {type === 'app' ? <Logout /> : <div />}
+      <HeaderMenu />
     </StyledHeader>
   );
 }

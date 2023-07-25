@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import { useUpdatePlayerSeason } from './usePlayerSeason';
+import { useUpdatePlayerSeason } from './usePlayerSeasons';
 
 import { useCreatePlayer } from './useCreatePlayer';
 import { useDeletePlayer } from './useDeletePlayer';
@@ -15,6 +15,7 @@ import Modal from '../../ui/Modal';
 import Table from '../../ui/Table';
 import Menus from '../../ui/Menus';
 import { format } from 'date-fns';
+import CreatePlayerForm from './CreatePlayerForm';
 
 const TableRow = styled.div`
   display: grid;
@@ -43,13 +44,21 @@ const Player = styled.div`
   color: var(--color-grey-600);
   /* font-family: 'Sono'; */
 `;
+const StyledButton = styled.div`
+  background-color: ;
+`;
+//TODO get from season settings
+const teamLevels = [
+  { value: 1, team: 'Varsity' },
+  { value: 2, team: 'JV' },
+];
 
 function PlayerSeasonRow({ playerSeason }) {
   const { players: player } = playerSeason;
   const { people } = player;
-  // const { isLoading } = useSettings();
+  const { isDeleting, deletePlayer } = useDeletePlayer();
   const { updateSetting, isUpdating } = useUpdatePlayerSeason();
-
+  function handleTeamLevelChange() {}
   function handleChange(e, field, id) {
     const { value } = e.target;
     if (!value) return;
@@ -78,9 +87,51 @@ function PlayerSeasonRow({ playerSeason }) {
         <div>{player.entryYear}</div>
         <div>{playerSeason.grade}</div>
         <div>{playerSeason.returningPlayer ? 'YES' : 'NO'}</div>
-        <div>{playerSeason.teamLevel}</div>
+        <div>
+          {playerSeason.status === 'Rostered' ? (
+            teamLevels.map((teamLevel) => (
+              <button
+                value={teamLevel.value}
+                key={teamLevel.value}
+                name={playerSeason.teamLevel.map((team) =>
+                  team === teamLevel.value ? 'active' : null
+                )}
+              >
+                {teamLevel.team} onClick={handleTeamLevelChange}
+              </button>
+            ))
+          ) : (
+            <div></div>
+          )}
+        </div>
       </TableRow>
-      {/* {showForm && <CreateCabinForm cabinToEdit={cabin} />} */}
+      <div>
+        <Modal>
+          <Menus.Menu>
+            <Menus.Toggle id={player.id} />
+            <Menus.List id={player.id}>
+              <Modal.Open opens="edit">
+                <Menus.Button icon={HiPencil}>edit</Menus.Button>
+              </Modal.Open>
+              <Modal.Open opens="delete">
+                <Menus.Button icon={HiTrash}>delete</Menus.Button>
+              </Modal.Open>
+            </Menus.List>
+
+            <Modal.Window name="edit">
+              {<CreatePlayerForm playerToEdit={player} />}
+            </Modal.Window>
+
+            <Modal.Window name="delete">
+              <ConfirmDelete
+                resourceName="player"
+                disabled={isDeleting}
+                onConfirm={() => deletePlayer(player.id)}
+              />
+            </Modal.Window>
+          </Menus.Menu>
+        </Modal>
+      </div>
     </>
   );
 }

@@ -1,4 +1,10 @@
-import { useCreateGame, useEditGame } from './useGames';
+import {
+  useCreateGame,
+  useEditGame,
+  useGames,
+  useGamesSeason,
+} from './useGames';
+
 import styled from 'styled-components';
 
 import Input from '../../ui/Input';
@@ -11,12 +17,13 @@ import { useForm } from 'react-hook-form';
 import Select from '../../ui/Select';
 import Row from '../../ui/Row';
 import Heading from '../../ui/Heading';
-import { useQueryClient } from '@tanstack/react-query';
+
 import { useLocations } from '../locations/useLocations';
 import { useSchools } from '../schools/useSchools';
 import Spinner from '../../ui/Spinner';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import ButtonChecked from '../../ui/ButtonChecked';
+import { AppContext } from '../../ui/AppLayout';
 
 const Header = styled.header`
   display: flex;
@@ -85,8 +92,9 @@ const gameTypes = [
 ];
 
 function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
-  const queryClient = useQueryClient();
-  // const games = queryClient.getQueryData(['games']);
+  const { currentSeason } = useContext(AppContext);
+  const { gamesSeason } = useGamesSeason(currentSeason);
+
   const { isLoadingLocations, locations } = useLocations();
   const { isLoadingSchools, schools } = useSchools();
   const { id: editId, ...editValues } = gameToEdit;
@@ -115,13 +123,21 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
     const selectedSchool = schools.find(
       (school) => school.id === +e.target.value
     );
-    setLocation(
+    handleLocationChange(
       selectedSchool.home_location ? selectedSchool.home_location : 'default'
     );
-    setClassification(
+    handleClassificationChange(
       selectedSchool.classification ? selectedSchool.classification : 'default'
     );
     //todo set district similarly
+  }
+  function handleLocationChange(val) {
+    val = +val?.target?.value || val;
+    setLocation(val);
+  }
+  function handleClassificationChange(val) {
+    val = val?.target?.value || val;
+    setClassification(val);
   }
   //todo create home function
   function handleHomeTeamChange(e) {
@@ -139,9 +155,38 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
   //TODO don't hard code Varsity and JV
 
   function onSubmit(data) {
+    data = { ...data, seasonTime, season: currentSeason };
+    const editData = (({
+      date,
+      time,
+      district,
+      home,
+      teamType,
+      gameType,
+      seasonTime,
+      season,
+      opponent,
+      classification,
+      comment,
+      location,
+    }) => ({
+      date,
+      time,
+      district,
+      home,
+      teamType,
+      gameType,
+      seasonTime,
+      season,
+      opponent,
+      classification,
+      comment,
+      location,
+    }))(data);
+    console.log(editGame);
     if (isEditSession)
       editGame(
-        { newGameData: { ...data }, id: editId },
+        { newGameData: { ...editData }, id: editId },
         {
           onSuccess: (data) => {
             reset();
@@ -150,18 +195,17 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
         }
       );
     else {
-      data = { ...data, seasonTime };
-      console.log(data);
+      if (data.time === '') delete data.time;
+      createGame(
+        { ...data },
+        {
+          onSuccess: (data) => {
+            reset();
+            onCloseModal?.();
+          },
+        }
+      );
     }
-    // createGame(
-    //   { ...data },
-    //   {
-    //     onSuccess: (data) => {
-    //       reset();
-    //       onCloseModal?.();
-    //     },
-    //   }
-    // );
   }
   function onError(errors) {
     console.log(errors);
@@ -174,15 +218,21 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
       <Row>
         <Header as="h2" location="center">
           <span>Team Type </span>
-          <StyledSelect onChange={handleTeamTypeChange}>
-            <option value="varsity">Varsity</option>
-            <option value="jv">JV</option>
+          <StyledSelect
+            onChange={handleTeamTypeChange}
+            {...register('teamType')}
+          >
+            <option value="Varsity">Varsity</option>
+            <option value="JV">JV</option>
           </StyledSelect>
         </Header>
         <FormRow label="Game Type" error={errors?.gameType?.message}>
           <StyledSelect
             type="white"
-            {...register('gameType', { required: 'This field is required' })}
+            {...register('gameType', {
+              validate: (value) =>
+                value !== 'default' || 'Please select a game type',
+            })}
             defaultValue={'default'}
             onChange={(e) =>
               setSeasonTime(
@@ -217,20 +267,24 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
             type="date"
             id="date"
             disabled={isWorking}
-            {...register('date', { required: 'This field is required' })}
+            {...register('date', { required: 'Please Provide a date' })}
           />
         </FormRow>
         <FormRow label="Time" error={errors?.time?.message}>
           <Input
             type="time"
             id="time"
+            defaultValue={null}
             disabled={isWorking}
             {...register('time')}
           />
         </FormRow>
         <FormRow label="Opponent *" error={errors?.opponent?.message}>
           <StyledSelect
-            {...register('opponent', { required: 'This field is required' })}
+            {...register('opponent', {
+              validate: (value) =>
+                value !== 'default' || 'Please select an Opponent',
+            })}
             type="white"
             onChange={handleOpponentChange}
             defaultValue={'default'}
@@ -245,16 +299,15 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
             ))}
           </StyledSelect>
         </FormRow>
-        <FormRow label="Class" error={errors?.classification?.message}>
+        <FormRow label="Class" error={errors?.class?.message}>
           <StyledSelect
             type="white"
-            // onChange={handleOpponentChange}
-            // value={''}
             {...register('classification', {
-              required: 'This field is required',
+              validate: (value) =>
+                value !== 'default' || "Please select the opponent's class",
             })}
             value={classification}
-            onChange={(e) => setClassification(e.target.value)}
+            onChange={handleClassificationChange}
           >
             <option value="default">
               Please Select the Opponents&apos; Classification
@@ -269,33 +322,46 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
         </FormRow>
         <FormRow error={errors?.district?.message}>
           <ButtonChecked
-            {...register('district')}
             value={district}
             label={district ? 'District Game' : 'Non-District'}
             onClick={handleDistrictChange}
+            disabled={isWorking}
+          />
+          <input
+            type="hidden"
+            disabled={isWorking}
+            {...register('district', { value: district })}
           />
         </FormRow>
         <FormRow error={errors?.home?.message}>
+          <input
+            type="hidden"
+            disabled={isWorking}
+            {...register('home', { value: home })}
+          />
           <ButtonChecked
-            {...register('home')}
             value={home}
             label={home ? 'Home Team' : 'Away Team'}
             onClick={handleHomeTeamChange}
+            disabled={isWorking}
           />
         </FormRow>
         <FormRow label="Location *" error={errors?.location?.message}>
           <StyledSelect
             type="white"
             value={location}
-            {...register('location', { required: 'This field is required' })}
-            onChange={(e) => setLocation(e.target.value)}
+            {...register('location', {
+              validate: (value) =>
+                value !== 'default' || 'Please select a location',
+            })}
+            onChange={handleLocationChange}
           >
             <option value="default" disabled>
               Please Select Location
             </option>
-            {locations.map((location) => (
-              <option key={location.id} value={location.id}>
-                {location.name}
+            {locations.map((loc) => (
+              <option key={loc.id} value={loc.id}>
+                {loc.name}
               </option>
             ))}
           </StyledSelect>
@@ -326,30 +392,3 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
 }
 
 export default CreateGameForm;
-// function onSubmit(data) {
-//   // mutate(data); //no image needed
-//   const image = typeof data.image === 'string' ? data.image : data.image[0];
-//   if (isEditSession)
-//     editGame(
-//       { newGameData: { ...data, image }, id: editId },
-//       {
-//         onSuccess: (data) => {
-//           reset();
-//           onCloseModal?.();
-//         },
-//       }
-//     );
-//   else
-//     createGame(
-//       { ...data, image: data.image[0] },
-//       {
-//         onSuccess: (data) => {
-//           reset();
-//           onCloseModal?.();
-//         },
-//       }
-//     );
-// }
-// function onError(errors) {
-//   console.log(errors);
-// }

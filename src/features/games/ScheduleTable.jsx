@@ -14,7 +14,7 @@ const Right = styled.div`
 `;
 
 function ScheduleTable() {
-  //TODO FUTURE (need to think more on this) if no searchParam, use Recent once it loads
+  //TODO FUTURE ---need to create context provider in App for recent season... currently it is read in SeasonSelector, move to App --- if no searchParam, use Recent once it loads
   // const { isLoadingRecent, recentSeason } = useRecentSeason();
   const [searchParams] = useSearchParams();
 

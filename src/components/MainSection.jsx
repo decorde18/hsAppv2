@@ -16,11 +16,11 @@ const Div = styled.div`
   max-width: 1100px;
 `;
 
-function MainSection({ seasonProps }) {
+function MainSection() {
   return (
     <Div>
       <AppNav></AppNav>
-      <Outlet context={[seasonProps]}></Outlet>
+      <Outlet></Outlet>
     </Div>
   );
 }

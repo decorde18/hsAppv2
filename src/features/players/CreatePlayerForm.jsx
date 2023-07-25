@@ -7,10 +7,11 @@ import Row from '../../ui/Row';
 
 import { useForm } from 'react-hook-form';
 import { useCreatePeople } from '../people/useCreatePeople';
-import { useCreatePlayerSeason } from './usePlayerSeason';
+import { useCreatePlayerSeason } from './usePlayerSeasons';
 import { useCreatePlayer } from './useCreatePlayer';
 import { useCreateParent, useCreatePlayerParent } from '../parents/useParents';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { AppContext } from '../../ui/AppLayout';
 
 //TODO FUTURE if new person is not needed, get person
 
@@ -28,8 +29,8 @@ function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
     useCreatePlayerParent();
   const { isCreatingPlayerSeason, createPlayerSeason } =
     useCreatePlayerSeason();
-  //todo fixme hard coded 2023 needs to be currentseason
-  const currentSeason = { id: 22, season: 2023 };
+  const { currentSeason } = useContext(AppContext);
+
   let parentId;
   let playerId;
 

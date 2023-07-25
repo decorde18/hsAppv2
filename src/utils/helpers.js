@@ -57,3 +57,18 @@ export const formatTime = (time, noSeconds) => {
   timeValue += hours >= 12 ? ' PM' : ' AM'; // get AM/PM
   return timeValue;
 };
+export function formatDate(dt) {
+  // David Added function because format converts dates to time zone so they are off by half a day
+  const year = dt.getUTCFullYear();
+  const month = dt.getUTCMonth() + 1; // Date provides month index; not month number
+  const day = dt.getUTCDate();
+
+  // Print always "2017-12-12", regardless the time zone it executed in
+  console.log(year + '/' + padToTwo(month) + '/', padToTwo(day));
+  // Or use a template literal
+  return `${padToTwo(month)}/${padToTwo(day)}/${year}`;
+
+  function padToTwo(number) {
+    return number > 9 ? number : '0' + number;
+  }
+}

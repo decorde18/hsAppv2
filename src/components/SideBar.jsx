@@ -1,6 +1,8 @@
 import { styled } from 'styled-components';
 import Button from './Button';
 import { NavLink } from 'react-router-dom';
+import { useContext } from 'react';
+import { AppContext } from '../ui/AppLayout';
 
 const Aside = styled.aside`
   padding-left: 0.5rem;
@@ -17,21 +19,20 @@ const Div = styled.div`
   gap: 1rem;
 `;
 
-function SideBar({ seasonProps }) {
+function SideBar() {
+  const { currentSeason } = useContext(AppContext);
+
   return (
     <Aside>
       <Div>
         <Button type="sideNav">Print Roster</Button>
         <Button type="sideNav">
-          <NavLink
-            to={`../schedule?season=${seasonProps.currentSeason}`}
-            target="_blank"
-          >
+          <NavLink to={`../schedule?season=${currentSeason}`} target="_blank">
             Print Schedule
           </NavLink>
         </Button>
         <Button type="sideNav">
-          <NavLink to={`./communication?season=${seasonProps.currentSeason}`}>
+          <NavLink to={`./communication?season=${currentSeason}`}>
             Communication
           </NavLink>
         </Button>

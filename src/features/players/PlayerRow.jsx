@@ -1,12 +1,10 @@
 import styled from 'styled-components';
-// import { useState } from 'react';
 
 import CreatePlayerForm from './CreatePlayerForm';
 
-import { useCreatePlayer } from './useCreatePlayer';
 import { useDeletePlayer } from './useDeletePlayer';
 
-import { HiSquare2Stack, HiPencil, HiTrash } from 'react-icons/hi2';
+import { HiPencil, HiTrash } from 'react-icons/hi2';
 
 import ConfirmDelete from '../../ui/ConfirmDelete';
 import Modal from '../../ui/Modal';
@@ -22,9 +20,8 @@ const Player = styled.div`
 `;
 
 function PlayerRow({ player }) {
-  //   const [showForm, setShowForm] = useState(false);
   const { isDeleting, deletePlayer } = useDeletePlayer();
-  const { isCreating, createPlayer } = useCreatePlayer();
+
   const {
     id: playerId,
     people: { firstName, lastName },

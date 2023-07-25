@@ -69,6 +69,27 @@ export async function getPlayerSeasons() {
   }
   return playerSeasons;
 }
+export async function getPlayerSeason(seasonId) {
+  const { data: playerSeason, error } = await supabase
+    .from('playerSeasons')
+    .select(
+      `
+    *,
+    players (
+      *, people(*)
+    ), seasons(*)
+  `
+    )
+    .eq('seasonId', seasonId)
+    .order('grade', { ascending: false })
+    .order('status', { ascending: true });
+
+  if (error) {
+    console.log(error);
+    throw new Error('Player Seasons Could Not Be Loaded');
+  }
+  return playerSeason;
+}
 export async function createPlayerSeasons(newPlayerSeason) {
   const { data, error } = await supabase
     .from('playerSeasons')

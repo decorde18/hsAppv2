@@ -2,11 +2,9 @@ import SideBar from '../components/SideBar';
 import Header from './Header';
 import Footer from '../components/Footer';
 import MainSection from '../components/MainSection';
-import { useSeasons, useRecentSeason } from '../features/seasons/useSeasons';
-// import { useNavigation } from 'react-router-dom';
-import Spinner from './Spinner';
+
 import { styled } from 'styled-components';
-import { useEffect, useState } from 'react';
+import { createContext, useState } from 'react';
 
 const StyledAppLayout = styled.div`
   //THIS IS FOR THE HEADER< BODY< FOOTER
@@ -22,79 +20,26 @@ const Main = styled.main`
   grid-template-columns: 20rem auto;
   margin: 0 auto;
 `;
-
-// const Row = styled.div`
-//   display: flex;
-//   ${(props) =>
-//     props.type === 'horizontal' &&
-//     css`
-//     `}
-//   ${(props) =>
-//     props.type === 'vertical' &&
-//     css`
-//       flex-direction: column;
-//       gap:1.6rem
-//       justify-content: space-between;
-//       align-items: center;
-//     `}
-// `;
+export const AppContext = createContext();
 
 function AppLayout() {
-  const [currentSeason, setCurrentSeason] = useState();
-  const { isLoadingSeasons, seasons } = useSeasons();
-  const { isLoadingRecent, recentSeason } = useRecentSeason();
-  useEffect(
-    function () {
-      if (isLoadingSeasons) return;
-      if (isLoadingRecent) return;
+  const [currentSeason, setCurrentSeason] = useState('');
 
-      if (localStorage.getItem('currentSeason')) {
-        setCurrentSeason(localStorage.getItem('currentSeason'));
-        return;
-      }
-      setCurrentSeason(recentSeason.id);
-    },
-    [seasons, recentSeason, currentSeason, isLoadingSeasons, isLoadingRecent]
-  );
-  // const navigation = useNavigation();
-  // const isLoading = navigation.state === 'loading';
+  function updateCurrentSeason(season) {
+    setCurrentSeason(season);
+  }
 
-  if (isLoadingSeasons || isLoadingRecent) return;
-  <Spinner />;
   return (
-    <StyledAppLayout>
-      <Header
-        seasonProps={{
-          currentSeason,
-          recentSeason,
-          onChangeSeason: setCurrentSeason,
-          seasons,
-        }}
-        type="app"
-      />
-
-      <Main className="flex">
-        <SideBar
-          seasonProps={{
-            currentSeason,
-            recentSeason,
-            onChangeSeason: setCurrentSeason,
-            seasons,
-          }}
-        >
-          {' '}
-        </SideBar>
-        <MainSection
-          seasonProps={{
-            currentSeason,
-            recentSeason,
-            onChangeSeason: setCurrentSeason,
-            seasons,
-          }}
-        ></MainSection>
-      </Main>
-      <Footer />
-    </StyledAppLayout>
+    <AppContext.Provider value={{ currentSeason, updateCurrentSeason }}>
+      <StyledAppLayout>
+        <Header />
+        <Main className="flex">
+          <SideBar> </SideBar>
+          <MainSection></MainSection>
+        </Main>
+        <Footer />
+      </StyledAppLayout>
+    </AppContext.Provider>
   );
 }
 

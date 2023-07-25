@@ -4,13 +4,15 @@ import Spinner from '../../ui/Spinner';
 // import PlayerSeasonRow from './PlayerSeasonRow';
 import { useGames } from './useGames';
 
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import Button from '../../ui/Button';
 import Table from '../../ui/Table';
 import Empty from '../../ui/Empty';
 import GameRow from './GameRow';
 import AddGame from './AddGame';
 import { useSearchParams } from 'react-router-dom';
+import { AppContext } from '../../ui/AppLayout';
+import Menus from '../../ui/Menus';
 
 const StyledDiv = styled.div`
   display: flex;
@@ -18,7 +20,7 @@ const StyledDiv = styled.div`
   justify-content: space-between;
 `;
 function GameTable({ seasonProps }) {
-  const { currentSeason } = seasonProps;
+  const { currentSeason } = useContext(AppContext);
   const [scheduleType, setScheduleType] = useState('season');
   const { isLoadingGames, games } = useGames();
 
@@ -27,10 +29,11 @@ function GameTable({ seasonProps }) {
   }
 
   if (isLoadingGames) return <Spinner />;
-  if (!games.length) return <Empty resource="Games" />;
+  if (!games.length || currentSeason === 'createSeason')
+    return <Empty resource="Games" />;
   const gamesSeason = games.filter((game) => game.season == currentSeason);
   return (
-    <>
+    <Menus>
       <StyledDiv>
         <div>
           <Button
@@ -49,14 +52,16 @@ function GameTable({ seasonProps }) {
         <AddGame />
       </StyledDiv>
 
-      <Table columns="0.6fr .5fr .5fr 2.2fr 1fr 1fr .6fr;">
+      <Table columns="0.3fr .5fr .5fr 2.2fr .5fr 1fr 1fr 1fr .6fr;">
         <Table.Header>
           <div></div>
           <div>Date</div>
           <div>Time</div>
           <div>Opponent</div>
+          <div>Result</div>
           <div>Location</div>
           <div>Team</div>
+          <div>Comment</div>
           <div></div>
         </Table.Header>
         <Table.Body
@@ -64,7 +69,7 @@ function GameTable({ seasonProps }) {
           render={(game) => <GameRow game={game} key={game.id} />}
         />
       </Table>
-    </>
+    </Menus>
   );
 }
 

@@ -2,7 +2,8 @@ import styled from 'styled-components';
 import Spinner from '../../ui/Spinner';
 import CommunicationRow from './CommunicationRow';
 
-import { usePlayerSeasons, usePlayers } from '../players/usePlayers';
+import { usePlayers } from '../players/usePlayers';
+import { usePlayerSeasons } from '../players/usePlayerSeasons';
 
 import { useState } from 'react';
 import Button from '../../ui/Button';
