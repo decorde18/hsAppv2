@@ -32,6 +32,14 @@ function SideBar() {
           </NavLink>
         </Button>
         <Button type="sideNav">
+          <NavLink
+            to={`../protected/rosterTSSAA?season=${currentSeason}`}
+            target="_blank"
+          >
+            TSSAA Roster
+          </NavLink>
+        </Button>
+        <Button type="sideNav">
           <NavLink to={`./communication?season=${currentSeason}`}>
             Communication
           </NavLink>
