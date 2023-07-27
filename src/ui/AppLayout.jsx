@@ -21,14 +21,10 @@ const Main = styled.main`
   margin: 0 auto;
 `;
 export const AppContext = createContext();
-
-function AppLayout() {
-  const [currentSeason, setCurrentSeason] = useState('');
-
+function AppLayout({ currentSeason, setCurrentSeason }) {
   function updateCurrentSeason(season) {
     setCurrentSeason(season);
   }
-
   return (
     <AppContext.Provider value={{ currentSeason, updateCurrentSeason }}>
       <StyledAppLayout>
