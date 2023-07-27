@@ -5,7 +5,7 @@ import {
   useRecentSeason,
 } from '../features/seasons/useSeasons';
 import { useContext, useEffect, useState } from 'react';
-import { AppContext } from '../ui/AppLayout';
+import { AppContext } from '../App';
 import Spinner from '../ui/Spinner';
 
 const Select = styled.select`

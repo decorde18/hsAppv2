@@ -12,7 +12,7 @@ import { useCreatePlayer } from './useCreatePlayer';
 import { useEditPlayer } from './useEditPlayer';
 import { useCreateParent, useCreatePlayerParent } from '../parents/useParents';
 import { useContext, useEffect, useState } from 'react';
-import { AppContext } from '../../ui/AppLayout';
+import { AppContext } from '../../App';
 
 //TODO FUTURE if new person is not needed, get person
 

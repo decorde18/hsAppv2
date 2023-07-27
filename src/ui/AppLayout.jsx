@@ -20,22 +20,17 @@ const Main = styled.main`
   grid-template-columns: 20rem auto;
   margin: 0 auto;
 `;
-export const AppContext = createContext();
+
 function AppLayout({ currentSeason, setCurrentSeason }) {
-  function updateCurrentSeason(season) {
-    setCurrentSeason(season);
-  }
   return (
-    <AppContext.Provider value={{ currentSeason, updateCurrentSeason }}>
-      <StyledAppLayout>
-        <Header />
-        <Main className="flex">
-          <SideBar> </SideBar>
-          <MainSection></MainSection>
-        </Main>
-        <Footer />
-      </StyledAppLayout>
-    </AppContext.Provider>
+    <StyledAppLayout>
+      <Header />
+      <Main className="flex">
+        <SideBar> </SideBar>
+        <MainSection></MainSection>
+      </Main>
+      <Footer />
+    </StyledAppLayout>
   );
 }
 

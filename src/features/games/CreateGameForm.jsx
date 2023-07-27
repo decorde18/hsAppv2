@@ -23,7 +23,7 @@ import { useSchools } from '../schools/useSchools';
 import Spinner from '../../ui/Spinner';
 import { useContext, useState } from 'react';
 import ButtonChecked from '../../ui/ButtonChecked';
-import { AppContext } from '../../ui/AppLayout';
+import { AppContext } from '../../App';
 
 const Header = styled.header`
   display: flex;

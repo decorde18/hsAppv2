@@ -11,7 +11,7 @@ import Empty from '../../ui/Empty';
 import GameRow from './GameRow';
 import AddGame from './AddGame';
 import { useSearchParams } from 'react-router-dom';
-import { AppContext } from '../../ui/AppLayout';
+import { AppContext } from '../../App';
 import Menus from '../../ui/Menus';
 
 const StyledDiv = styled.div`

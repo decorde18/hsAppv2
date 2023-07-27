@@ -11,7 +11,7 @@ import Table from '../../ui/Table';
 import Empty from '../../ui/Empty';
 import Menus from '../../ui/Menus';
 import AddPlayer from './AddPlayer';
-import { AppContext } from '../../ui/AppLayout';
+import { AppContext } from '../../App';
 import Modal from '../../ui/Modal';
 import { HiPencil, HiTrash } from 'react-icons/hi2';
 import MenuFilterSort from '../../ui/MenuFilterSort';

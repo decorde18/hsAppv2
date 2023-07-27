@@ -21,7 +21,7 @@ import RosterTSSAA from './pages/RosterTSSAA';
 import PublicPage from './pages/PublicPage';
 import ProtectedRoute from './ui/ProtectedRoute';
 import { PDFViewer } from '@react-pdf/renderer';
-import { useState } from 'react';
+import { createContext, useState } from 'react';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -31,10 +31,13 @@ const queryClient = new QueryClient({
     },
   },
 });
+export const AppContext = createContext();
 
 function App() {
   const [currentSeason, setCurrentSeason] = useState('');
-
+  function updateCurrentSeason(season) {
+    setCurrentSeason(season);
+  }
   return (
     <QueryClientProvider client={queryClient}>
       <ReactQueryDevtools initialIsOpen={false} />
@@ -48,10 +51,11 @@ function App() {
             path="app"
             element={
               <ProtectedRoute>
-                <AppLayout
-                  currentSeason={currentSeason}
-                  setCurrentSeason={setCurrentSeason}
-                />
+                <AppContext.Provider
+                  value={{ currentSeason, updateCurrentSeason }}
+                >
+                  <AppLayout />
+                </AppContext.Provider>
               </ProtectedRoute>
             }
           >

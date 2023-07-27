@@ -79,7 +79,7 @@ function TssaaRosterTable() {
         </Table.PrintHeaderBorder>
         <Table.Body
           data={tssaaRoster.filter(
-            (player) => player.players.entryYear == seasonApi.season
+            (player) => player.players.entryYear !== seasonApi.season
           )}
           render={(player) => <TssaaTableRow player={player} key={player.id} />}
         />
@@ -98,7 +98,7 @@ function TssaaRosterTable() {
         </Table.PrintHeaderBorder>
         <Table.Body
           data={tssaaRoster.filter(
-            (player) => player.players.entryYear !== seasonApi.season
+            (player) => player.players.entryYear === seasonApi.season
           )}
           render={(player) => <TssaaTableRow player={player} key={player.id} />}
         />

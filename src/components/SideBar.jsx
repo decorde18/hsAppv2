@@ -2,7 +2,7 @@ import { styled } from 'styled-components';
 import Button from './Button';
 import { NavLink } from 'react-router-dom';
 import { useContext } from 'react';
-import { AppContext } from '../ui/AppLayout';
+import { AppContext } from '../App';
 
 const Aside = styled.aside`
   padding-left: 0.5rem;
