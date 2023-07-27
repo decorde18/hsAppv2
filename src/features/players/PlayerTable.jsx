@@ -5,7 +5,7 @@ import PlayerSeasonRow from './PlayerSeasonRow';
 import { usePlayers } from './usePlayers';
 import { usePlayerSeasons } from './usePlayerSeasons';
 
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import Button from '../../ui/Button';
 import Table from '../../ui/Table';
 import Empty from '../../ui/Empty';
@@ -37,6 +37,8 @@ function PlayerTable() {
   const [seasonPlayers, setSeasonPlayers] = useState([]);
   const [unsortedData, setUnsortedData] = useState([]);
   const [unfilteredData, setUnfilteredData] = useState([]);
+  const memo = useMemo(() => <Table />);
+
   useEffect(
     function () {
       if (isLoadingPlayerSeasons) return;
@@ -102,7 +104,6 @@ function PlayerTable() {
   const seasonTable = {
     head: (
       <MenuFilterSort>
-        <div></div>
         <div>
           <div>
             <button
@@ -112,10 +113,6 @@ function PlayerTable() {
             >
               Player
             </button>
-
-            {/* <MenuFilterSort.Menu>
-              <MenuFilterSort.Toggle id="filter"></MenuFilterSort.Toggle>
-            </MenuFilterSort.Menu> */}
           </div>
         </div>
         <div>
@@ -143,13 +140,16 @@ function PlayerTable() {
             Returner
           </button>
         </div>
+        <div>Enrolled Last Year</div>
+        <div>Lives With Parents</div>
         <div>Team</div>
         <div></div>
       </MenuFilterSort>
     ),
-    columns: '0.2fr 2fr 1fr .5fr .5fr .5fr .5fr 1fr .2fr;',
+    columns: '2fr 1fr 1fr 0.5fr 0.25fr 0.5fr 0.5fr 0.5fr 1.5fr 0.2fr;',
   };
-  const table = {
+
+  const tableValues = {
     head: (
       <>
         <div></div>
@@ -182,9 +182,9 @@ function PlayerTable() {
         <AddPlayer />
       </StyledDiv>
       <Menus>
-        <Table columns={isSeason ? seasonTable.columns : table.columns}>
+        <Table columns={isSeason ? seasonTable.columns : tableValues.columns}>
           <Table.Header>
-            {isSeason ? seasonTable.head : table.head}
+            {isSeason ? seasonTable.head : tableValues.head}
           </Table.Header>
           <Table.Body
             data={isSeason ? seasonPlayers : players}

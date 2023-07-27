@@ -31,7 +31,6 @@ export async function createEditPlayer(newPlayer, id) {
       .eq('id', id)
       .select();
   const { data, error } = await query.select().single();
-  // .insert([{ some_column: "someValue", other_column: "otherValue" }])
   if (error) {
     console.log(error);
     throw new Error('Player Could Not Be Created');

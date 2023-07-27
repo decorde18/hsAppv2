@@ -11,6 +11,7 @@ import Modal from '../../ui/Modal';
 import Table from '../../ui/Table';
 import Menus from '../../ui/Menus';
 import { format } from 'date-fns';
+import { formatDate } from '../../utils/helpers';
 
 const Player = styled.div`
   font-size: 1.6rem;
@@ -31,9 +32,7 @@ function PlayerRow({ player }) {
     <Table.Row>
       <div></div>
       <Player>{`${firstName} ${lastName}`}</Player>
-      <Player>
-        {dateOfBirth && format(new Date(dateOfBirth), 'MM/dd/yy')}
-      </Player>
+      <Player>{dateOfBirth && formatDate(new Date(dateOfBirth))}</Player>
       <div>
         <Modal>
           <Menus.Menu>

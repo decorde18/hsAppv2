@@ -28,12 +28,12 @@ export function useRecentSeason() {
 }
 
 export function useSeason(seasonId) {
-  console.log(
-    useQuery({
-      queryKey: ['season'],
-      queryFn: () => (seasonId ? getSeason(seasonId) : null),
-    })
-  );
+  // console.log(
+  //   useQuery({
+  //     queryKey: ['season'],
+  //     queryFn: () => (seasonId ? getSeason(seasonId) : null),
+  //   })
+  // );
   const {
     setSeason,
     isLoading: isLoadingSeason,

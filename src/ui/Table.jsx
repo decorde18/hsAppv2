@@ -34,6 +34,13 @@ const StyledPrintHeader = styled(CommonRow)`
   letter-spacing: 0.4px;
   font-weight: 600;
 `;
+const StyledPrintHeaderBorder = styled(CommonRow)`
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  font-weight: 600;
+  border: 1px solid;
+  column-gap: 0;
+`;
 
 const StyledRow = styled(CommonRow)`
   padding: 0.2rem 1rem;
@@ -45,6 +52,13 @@ const StyledRow = styled(CommonRow)`
 const StyledPrintRow = styled(CommonRow)`
   padding: 0.1rem;
   font-size: 1.1rem;
+  /* &:not(:last-child) {
+    border-bottom: 1px solid var(--color-grey-100);
+  } */
+`;
+const StyledPrintRowBorder = styled(CommonRow)`
+  font-size: 1.1rem;
+  column-gap: 0;
   /* &:not(:last-child) {
     border-bottom: 1px solid var(--color-grey-100);
   } */
@@ -99,6 +113,18 @@ function PrintHeader({ children }) {
     </StyledPrintHeader>
   );
 }
+function PrintHeaderBorder({ children }) {
+  const { columns } = useContext(TableContext);
+  return (
+    <StyledPrintHeaderBorder
+      role="row"
+      columns={columns}
+      as="print-header-border"
+    >
+      {children}
+    </StyledPrintHeaderBorder>
+  );
+}
 function Row({ children }) {
   const { columns } = useContext(TableContext);
   return (
@@ -115,6 +141,14 @@ function PrintRow({ children }) {
     </StyledPrintRow>
   );
 }
+function PrintRowBorder({ children }) {
+  const { columns } = useContext(TableContext);
+  return (
+    <StyledPrintRowBorder role="print-row-border" columns={columns}>
+      {children}
+    </StyledPrintRowBorder>
+  );
+}
 
 function Body({ data, render }) {
   if (!data.length) return <Empty>No Data to Show at the moment</Empty>;
@@ -123,8 +157,10 @@ function Body({ data, render }) {
 
 Table.Header = Header;
 Table.PrintHeader = PrintHeader;
+Table.PrintHeaderBorder = PrintHeaderBorder;
 Table.Row = Row;
 Table.PrintRow = PrintRow;
+Table.PrintRowBorder = PrintRowBorder;
 Table.Body = Body;
 Table.Footer = Footer;
 

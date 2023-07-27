@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import PageNotFound from './pages/PageNotFound';
 import GlobalStyles from './styles/GlobalStyles';
 import AppLayout from './ui/AppLayout';
+import AppLayoutPdf from './ui/AppLayoutPdf';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
@@ -15,6 +16,8 @@ import People from './pages/People';
 import Communication from './pages/Communication';
 import Games from './pages/Games';
 import Schedule from './pages/Schedule';
+import ScheduleTSSAA from './pages/ScheduleTSSAA';
+import RosterTSSAA from './pages/RosterTSSAA';
 import PublicPage from './pages/PublicPage';
 import ProtectedRoute from './ui/ProtectedRoute';
 import { PDFViewer } from '@react-pdf/renderer';
@@ -50,10 +53,23 @@ function App() {
             <Route path="people" element={<People />} />
             <Route path="communication" element={<Communication />} />
             <Route path="games" element={<Games />} />
+
             {/* <Route path="users" element={<Users />} />
             <Route path="settings" element={<Settings />} />
-            <Route path="account" element={<Account />} /> */}
+          <Route path="account" element={<Account />} /> */}
           </Route>
+          <Route
+            path="protected"
+            element={
+              <ProtectedRoute>
+                <AppLayoutPdf />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="scheduleTSSAA" element={<ScheduleTSSAA />} />
+            <Route path="rosterTSSAA" element={<RosterTSSAA />} />
+          </Route>
+
           <Route path="login" element={<Login />} />
           <Route path="schedule" element={<Schedule />} />
           <Route path="newplayer" element={<NewPlayer />} />

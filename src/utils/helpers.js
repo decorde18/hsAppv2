@@ -64,7 +64,7 @@ export function formatDate(dt) {
   const day = dt.getUTCDate();
 
   // Print always "2017-12-12", regardless the time zone it executed in
-  console.log(year + '/' + padToTwo(month) + '/', padToTwo(day));
+
   // Or use a template literal
   return `${padToTwo(month)}/${padToTwo(day)}/${year}`;
 

@@ -30,17 +30,19 @@ const H1 = styled.h1`
   color: var(--color-brand--2);
 `;
 
-function Header() {
+function Header({ type }) {
   // const { isAuthenticated } = useAuth();
+
   return (
     <StyledHeader className="relative mb-2">
       <Logo></Logo>
       <Div>
         <H1>INDEPENDENCE GIRLS SOCCER</H1>
-
-        <Div2>
-          <SeasonSelector />
-        </Div2>
+        {type !== 'nonApp' && (
+          <Div2>
+            <SeasonSelector />
+          </Div2>
+        )}
       </Div>
       <HeaderMenu />
     </StyledHeader>

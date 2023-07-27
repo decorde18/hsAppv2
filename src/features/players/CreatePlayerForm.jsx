@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form';
 import { useCreatePeople } from '../people/useCreatePeople';
 import { useCreatePlayerSeason } from './usePlayerSeasons';
 import { useCreatePlayer } from './useCreatePlayer';
+import { useEditPlayer } from './useEditPlayer';
 import { useCreateParent, useCreatePlayerParent } from '../parents/useParents';
 import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../../ui/AppLayout';
@@ -18,6 +19,7 @@ import { AppContext } from '../../ui/AppLayout';
 function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
   const { id: editId, ...editValues } = playerToEdit;
   const isEditSession = Boolean(editId);
+
   const { register, handleSubmit, reset, getValues, formState } = useForm({
     defaultValues: isEditSession ? editValues : {},
   });
@@ -29,6 +31,9 @@ function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
     useCreatePlayerParent();
   const { isCreatingPlayerSeason, createPlayerSeason } =
     useCreatePlayerSeason();
+
+  const { isEditingPlayer, editPlayer } = useEditPlayer();
+
   const { currentSeason } = useContext(AppContext);
 
   let parentId;
@@ -36,6 +41,22 @@ function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
 
   const isWorking = false;
   function onSubmit(data) {
+    if (isEditSession) {
+      const { people: playerPeopleData } = { data };
+      delete data.people;
+      editPlayer(
+        { newPlayerData: data, id: editId },
+        {
+          onSuccess: (data) => {
+            reset();
+            onCloseModal?.();
+          },
+          onError: (err) => console.log(err),
+        }
+      );
+      return;
+    }
+
     //separate player from parent
     const { parentfirstName, parentlastName, parentemail, ...playerTempData } =
       data;
@@ -49,6 +70,7 @@ function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
     //get player entryYear
     const entryYear = currentSeason.season - (+grade - 9);
     const playerData = { previousSchool, entryYear };
+
     createPeople(
       { ...playerPeopleData },
       {
@@ -101,7 +123,7 @@ function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
   function onError(errors) {
     console.log(errors);
   }
-  function handleChange() {}
+
   return (
     //   >
     <Form
@@ -110,12 +132,11 @@ function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
     >
       <Row>
         <Heading as="h2">Player Information</Heading>
-
         <FormRow label="First Name *" error={errors?.firstName?.message}>
           <Input
             type="text"
             id="firstName"
-            {...register('firstName', {
+            {...register('people.firstName', {
               required: 'We need your first name',
             })}
             disabled={isWorking}
@@ -125,26 +146,38 @@ function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
           <Input
             type="text"
             id="lastName"
-            {...register('lastName', {
+            {...register('people.lastName', {
               required: 'We need your last name',
             })}
             disabled={isWorking}
           />
         </FormRow>
-        <FormRow label="Rising Grade *" error={errors?.grade?.message}>
-          <select
-            id="grade"
-            {...register('grade', {
-              required: 'We need your grade',
-            })}
-            disabled={isWorking}
-          >
-            <option value="9">9th</option>
-            <option value="10">10th</option>
-            <option value="11">11th</option>
-            <option value="12">12th</option>
-          </select>
-        </FormRow>
+        {isEditSession && (
+          <FormRow label="Date of Birth" error={errors?.dateOfBirth?.message}>
+            <Input
+              type="date"
+              id="dateOfBirth"
+              {...register('dateOfBirth')}
+              disabled={isWorking}
+            />
+          </FormRow>
+        )}
+        {!isEditSession && (
+          <FormRow label="Rising Grade *" error={errors?.grade?.message}>
+            <select
+              id="grade"
+              {...register('grade', {
+                required: 'We need your grade',
+              })}
+              disabled={isWorking}
+            >
+              <option value="9">9th</option>
+              <option value="10">10th</option>
+              <option value="11">11th</option>
+              <option value="12">12th</option>
+            </select>
+          </FormRow>
+        )}
         <FormRow
           label="Previous School"
           error={errors?.previousSchool?.message}
@@ -162,46 +195,53 @@ function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
           <Input
             type="email"
             id="email"
-            {...register('email', {
+            {...register('people.email', {
               required: false,
             })}
             disabled={isWorking}
           />
         </FormRow>
       </Row>
-      <Row>
-        <Heading as="h2">Parent Information</Heading>
-      </Row>
-      <FormRow label="First Name *" error={errors?.parentfirstName?.message}>
-        <Input
-          type="text"
-          id="parentfirstName"
-          {...register('parentfirstName', {
-            required: 'We need the parent first name',
-          })}
-          disabled={isWorking}
-        />
-      </FormRow>
-      <FormRow label="Last Name *" error={errors?.parentlastName?.message}>
-        <Input
-          type="text"
-          id="parentlastName"
-          {...register('parentlastName', {
-            required: 'We need the parent last name',
-          })}
-          disabled={isWorking}
-        />
-      </FormRow>
-      <FormRow label="Email *" error={errors?.parentemail?.message}>
-        <Input
-          type="email"
-          id="parentemail"
-          disabled={isWorking}
-          {...register('parentemail', {
-            required: 'We need a parent Email',
-          })}
-        />
-      </FormRow>
+      {!isEditSession && (
+        <>
+          <Row>
+            <Heading as="h2">Parent Information</Heading>
+          </Row>
+          <FormRow
+            label="First Name *"
+            error={errors?.parentfirstName?.message}
+          >
+            <Input
+              type="text"
+              id="parentfirstName"
+              {...register('parentfirstName', {
+                required: 'We need the parent first name',
+              })}
+              disabled={isWorking}
+            />
+          </FormRow>
+          <FormRow label="Last Name *" error={errors?.parentlastName?.message}>
+            <Input
+              type="text"
+              id="parentlastName"
+              {...register('parentlastName', {
+                required: 'We need the parent last name',
+              })}
+              disabled={isWorking}
+            />
+          </FormRow>
+          <FormRow label="Email *" error={errors?.parentemail?.message}>
+            <Input
+              type="email"
+              id="parentemail"
+              disabled={isWorking}
+              {...register('parentemail', {
+                required: 'We need a parent Email',
+              })}
+            />
+          </FormRow>
+        </>
+      )}
       <FormRow>
         <Button
           variation="secondary"

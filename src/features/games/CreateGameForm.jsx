@@ -183,7 +183,6 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
       comment,
       location,
     }))(data);
-    console.log(editGame);
     if (isEditSession)
       editGame(
         { newGameData: { ...editData }, id: editId },
