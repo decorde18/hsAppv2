@@ -8,9 +8,6 @@ import { usePlayerSeasons } from './usePlayerSeasons';
 import Table from '../../ui/Table';
 import Empty from '../../ui/Empty';
 
-import { useContext, useEffect, useMemo, useState } from 'react';
-
-import { AppContext } from '../../ui/AppLayout';
 import { useSearchParams } from 'react-router-dom';
 import Heading from '../../ui/Heading';
 
