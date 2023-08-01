@@ -15,13 +15,19 @@ import Players from './pages/Players';
 import People from './pages/People';
 import Communication from './pages/Communication';
 import Games from './pages/Games';
+import Season from './pages/Season';
 import Schedule from './pages/Schedule';
 import ScheduleTSSAA from './pages/ScheduleTSSAA';
 import RosterTSSAA from './pages/RosterTSSAA';
+import Roster from './pages/Roster';
 import PublicPage from './pages/PublicPage';
 import ProtectedRoute from './ui/ProtectedRoute';
 import { PDFViewer } from '@react-pdf/renderer';
-import { createContext, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
+import Uniforms from './pages/Uniforms';
+import UniformJerseys from './pages/UniformJerseys';
+import UniformSeasons from './pages/UniformSeasons';
+import UniformSeasonPlayers from './pages/UniformSeasonPlayers';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -34,10 +40,10 @@ const queryClient = new QueryClient({
 export const AppContext = createContext();
 
 function App() {
-  const [currentSeason, setCurrentSeason] = useState('');
-  function updateCurrentSeason(season) {
-    setCurrentSeason(season);
-  }
+  const [currentSeason, setCurrentSeason] = useState(
+    localStorage.getItem('currentSeason') || ''
+  );
+
   return (
     <QueryClientProvider client={queryClient}>
       <ReactQueryDevtools initialIsOpen={false} />
@@ -52,7 +58,7 @@ function App() {
             element={
               <ProtectedRoute>
                 <AppContext.Provider
-                  value={{ currentSeason, updateCurrentSeason }}
+                  value={{ currentSeason, setCurrentSeason }}
                 >
                   <AppLayout />
                 </AppContext.Provider>
@@ -63,6 +69,14 @@ function App() {
             <Route path="people" element={<People />} />
             <Route path="communication" element={<Communication />} />
             <Route path="games" element={<Games />} />
+            <Route path="season" element={<Season />} />
+            <Route path="uniforms" element={<Uniforms />} />
+            <Route path="uniformJerseys" element={<UniformJerseys />} />
+            <Route path="uniformSeasons" element={<UniformSeasons />} />
+            <Route
+              path="uniformSeasonPlayers"
+              element={<UniformSeasonPlayers />}
+            />
 
             {/* <Route path="users" element={<Users />} />
             <Route path="settings" element={<Settings />} />
@@ -82,6 +96,7 @@ function App() {
 
           <Route path="login" element={<Login />} />
           <Route path="schedule" element={<Schedule />} />
+          <Route path="roster" element={<Roster />} />
           <Route path="newplayer" element={<NewPlayer />} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>

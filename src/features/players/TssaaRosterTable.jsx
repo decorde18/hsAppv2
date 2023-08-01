@@ -29,7 +29,7 @@ function TssaaRosterTable() {
 
   if (!season) return <div>Sorry You Must Have A Season Selected</div>;
   if (isLoadingPlayerSeasons || isLoadingSeason) return <Spinner />;
-  if (!playerSeasons.length) return <Empty resource="Games" />;
+  if (!playerSeasons.length) return <Empty resource="Players" />;
 
   const tssaaRoster = playerSeasons
     .filter(

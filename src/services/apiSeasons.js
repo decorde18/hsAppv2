@@ -37,3 +37,32 @@ export async function getSeason(seasonId) {
   }
   return recentSeason;
 }
+
+export async function updateSeasonApi({ id, ...updateField }) {
+  const { data, error } = await supabase
+    .from('seasons')
+    .update(updateField)
+    .eq('id', id)
+    .select();
+  if (error) {
+    console.log(error);
+    throw new Error('Season Could Not Be Updated');
+  }
+  return data;
+}
+
+export async function createEditSeason(newSeason, id) {
+  let query = supabase.from('seasons');
+
+  if (!id) query = query.insert({ ...newSeason }).select();
+
+  if (id) query = query.update({ newSeason }).eq('id', id).select();
+
+  const { data, error } = await query.select().single();
+
+  if (error) {
+    console.log(error);
+    throw new Error('Season Could Not Be Created');
+  }
+  return data;
+}

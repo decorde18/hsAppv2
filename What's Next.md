@@ -33,3 +33,5 @@ git push heroku master (once deployed)
 
 heroku open
 heroku config:set **\***
+
+## Still not using Context correctly. Current season doesn't get passed to season selector or seasonsettings and I have to make a filter

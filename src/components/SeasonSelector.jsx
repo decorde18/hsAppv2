@@ -18,25 +18,27 @@ const Select = styled.select`
 function SeasonSelector() {
   const { isLoadingSeasons, seasons } = useSeasons();
   const { isLoadingRecent, recentSeason } = useRecentSeason();
-
-  const { currentSeason, updateCurrentSeason } = useContext(AppContext);
+  const curSeason = localStorage.getItem('currentSeason');
+  const { currentSeason, setCurrentSeason } = useContext(AppContext);
   //TODO handle if createNewSeason
 
   useEffect(
     function () {
+      if (curSeason) setCurrentSeason(curSeason);
       if (!recentSeason) return;
-      if (currentSeason === '') updateCurrentSeason(recentSeason.id);
+      if (currentSeason === '') setCurrentSeason(recentSeason.id);
     },
-    [currentSeason, recentSeason, updateCurrentSeason]
+    [currentSeason, recentSeason, setCurrentSeason, curSeason]
   );
   function handleSeasonChange(e) {
-    updateCurrentSeason(e.target.value);
-  }
+    localStorage.setItem('currentSeason', e.target.value);
 
+    setCurrentSeason(e.target.value);
+  }
   if (isLoadingSeasons || isLoadingRecent) return;
 
   return (
-    <Select defaultValue={recentSeason.id} onChange={handleSeasonChange}>
+    <Select defaultValue={currentSeason} onChange={handleSeasonChange}>
       <option value="createSeason">Add A New Season</option>
       {seasons.map((season) => (
         <option value={season?.id || 'createSeason'} key={season.id}>

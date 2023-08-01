@@ -25,7 +25,12 @@ function SideBar() {
   return (
     <Aside>
       <Div>
-        <Button type="sideNav">Print Roster</Button>
+        <Button type="sideNav">
+          {' '}
+          <NavLink to={`../roster?season=${currentSeason}`} target="_blank">
+            Print Roster
+          </NavLink>
+        </Button>
         <Button type="sideNav">
           <NavLink to={`../schedule?season=${currentSeason}`} target="_blank">
             Print Schedule
@@ -47,7 +52,21 @@ function SideBar() {
         <Button type="sideNav">
           <NavLink to={`./people`}>People</NavLink>
         </Button>
-        <Button type="sideNav">Season Settings</Button>
+        <Button type="sideNav">
+          <NavLink to={`./uniforms`}>Uniform Data</NavLink>
+        </Button>
+        <Button type="sideNav">
+          <NavLink to={`./uniformJerseys`}>Uniform Jerseys</NavLink>
+        </Button>
+        <Button type="sideNav">
+          <NavLink to={`./uniformSeasonPlayers`}>Uniform Assignments</NavLink>
+        </Button>
+        <Button type="sideNav">
+          <NavLink to={`./uniformSeasons`}>Uniform Seasons</NavLink>
+        </Button>
+        <Button type="sideNav">
+          <NavLink to={`./season`}>Season Settings</NavLink>
+        </Button>
       </Div>
     </Aside>
   );

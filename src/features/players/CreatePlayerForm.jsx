@@ -125,7 +125,6 @@ function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
   }
 
   return (
-    //   >
     <Form
       onSubmit={handleSubmit(onSubmit, onError)}
       type={onCloseModal ? 'Modal' : 'regular'}

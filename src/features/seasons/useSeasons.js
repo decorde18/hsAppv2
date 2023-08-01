@@ -1,9 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
 import {
   getRecentSeason,
   getSeasons,
   getSeason,
   getSeason as curSeasonApi,
+  updateSeasonApi,
+  createEditSeason,
 } from '../../services/apiSeasons';
 import { toast } from 'react-hot-toast';
 
@@ -44,4 +47,31 @@ export function useSeason(seasonId) {
     queryFn: () => (seasonId ? getSeason(seasonId) : null),
   });
   return { isLoadingSeason, error, season, setSeason };
+}
+
+export function useUpdateSeason(seasonId, updateField) {
+  const queryClient = useQueryClient();
+
+  const { mutate: updateSeason, isLoading: isUpdating } = useMutation({
+    mutationFn: updateSeasonApi,
+    onSuccess: () => {
+      toast.success('Successfully edited');
+      queryClient.invalidateQueries({ queries: ['season'] });
+    },
+    onError: (err) => toast.error(err.message),
+  });
+  return { isUpdating, updateSeason };
+}
+export function useCreateSeason() {
+  const queryClient = useQueryClient();
+  const { mutate: createSeason, isLoading: isCreating } = useMutation({
+    mutationFn: createEditSeason,
+    onSuccess: () => {
+      toast.success('New Season successfully created');
+      queryClient.invalidateQueries({ queries: ['seasons'] });
+    },
+    onError: (err) => toast.error(err.message),
+  });
+
+  return { createSeason, isCreating };
 }

@@ -150,7 +150,6 @@ function PlayerSeasonRow({ playerSeason }) {
         <div>{player.entryYear}</div>
         <div>{playerSeason.grade}</div>
         <div>
-          {' '}
           <Switch
             isOn={returningPlayer}
             id2={`returner-${playerSeason.id}`}

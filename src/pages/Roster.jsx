@@ -1,5 +1,7 @@
+import PublicPlayerTable from '../features/players/PublicPlayerTable';
+
 function Roster() {
-  return <div>Public Roster</div>;
+  return <PublicPlayerTable />;
 }
 
 export default Roster;
