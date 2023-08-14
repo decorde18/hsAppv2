@@ -28,6 +28,9 @@ const Div = styled.div`
   gap: 50px;
   padding-bottom: 2.5rem;
 `;
+const People = styled.div`
+  font-size: 1.3rem;
+`;
 function PublicPlayerTable() {
   const [searchParams] = useSearchParams();
   const season = searchParams.get('season');
@@ -175,17 +178,17 @@ function PublicPlayerTable() {
       <Div>
         <div>
           <Heading as="h3">Team Personnel</Heading>
-          <div>
+          <People>
             Head Coach:
             <span>
               {' '}
               {`${seasonApi.people.firstName} ${seasonApi.people.lastName}`}
             </span>
-          </div>
-          <div>
+          </People>
+          <People>
             Assistant Coaches:
             <span> {seasonApi.assistant_coaches}</span>
-          </div>
+          </People>
           {seasonApi.manager ? (
             <div>
               Managers:
@@ -194,25 +197,25 @@ function PublicPlayerTable() {
           ) : (
             <div></div>
           )}
-          <div>
+          <People>
             Trainer:
             <span> {seasonApi.trainer}</span>
-          </div>
+          </People>
         </div>
         <div>
           <Heading as="h3">Administration</Heading>
-          <div>
+          <People>
             Principal:
             <span> {seasonApi.principal}</span>
-          </div>
-          <div>
+          </People>
+          <People>
             Assistant Principals:
             <span> {seasonApi.assistantPrincipals}</span>
-          </div>
-          <div>
+          </People>
+          <People>
             Athletic Director:
             <span> {seasonApi.athleticDirector}</span>
-          </div>
+          </People>
         </div>
       </Div>
     </>
