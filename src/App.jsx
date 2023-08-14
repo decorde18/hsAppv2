@@ -1,7 +1,8 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+
 // import Users from './pages/Users';
 // import Settings from './pages/Settings';
-// import Account from './pages/Account';
+import Account from './pages/Account';
 import Login from './pages/Login';
 import PageNotFound from './pages/PageNotFound';
 import GlobalStyles from './styles/GlobalStyles';
@@ -28,6 +29,7 @@ import Uniforms from './pages/Uniforms';
 import UniformJerseys from './pages/UniformJerseys';
 import UniformSeasons from './pages/UniformSeasons';
 import UniformSeasonPlayers from './pages/UniformSeasonPlayers';
+import { CurrentSeasonProvider } from './contexts/CurrentSeasonContext';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -37,7 +39,6 @@ const queryClient = new QueryClient({
     },
   },
 });
-export const AppContext = createContext();
 
 function App() {
   const [currentSeason, setCurrentSeason] = useState(
@@ -45,79 +46,77 @@ function App() {
   );
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ReactQueryDevtools initialIsOpen={false} />
-      <GlobalStyles />
-      <BrowserRouter>
-        <Routes>
-          <Route index element={<Navigate replace to="public" />} />
+    <CurrentSeasonProvider>
+      <QueryClientProvider client={queryClient}>
+        <ReactQueryDevtools initialIsOpen={false} />
+        <GlobalStyles />
+        <BrowserRouter>
+          <Routes>
+            <Route index element={<Navigate replace to="public" />} />
 
-          <Route path="public" element={<PublicPage />} />
-          <Route
-            path="app"
-            element={
-              <ProtectedRoute>
-                <AppContext.Provider
-                  value={{ currentSeason, setCurrentSeason }}
-                >
-                  <AppLayout />
-                </AppContext.Provider>
-              </ProtectedRoute>
-            }
-          >
-            <Route path="players" element={<Players />} />
-            <Route path="people" element={<People />} />
-            <Route path="communication" element={<Communication />} />
-            <Route path="games" element={<Games />} />
-            <Route path="season" element={<Season />} />
-            <Route path="uniforms" element={<Uniforms />} />
-            <Route path="uniformJerseys" element={<UniformJerseys />} />
-            <Route path="uniformSeasons" element={<UniformSeasons />} />
+            <Route path="public" element={<PublicPage />} />
             <Route
-              path="uniformSeasonPlayers"
-              element={<UniformSeasonPlayers />}
-            />
+              path="app"
+              element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="players" element={<Players />} />
+              <Route path="people" element={<People />} />
+              <Route path="communication" element={<Communication />} />
+              <Route path="games" element={<Games />} />
+              <Route path="season" element={<Season />} />
+              <Route path="uniforms" element={<Uniforms />} />
+              <Route path="uniformJerseys" element={<UniformJerseys />} />
+              <Route path="uniformSeasons" element={<UniformSeasons />} />
+              <Route
+                path="uniformSeasonPlayers"
+                element={<UniformSeasonPlayers />}
+              />
+              {/* <Route path="users" element={<Users />} />*/}
+              {/* <Route path="settings" element={<Settings />} />
+               */}
+            </Route>
+            <Route
+              path="protected"
+              element={
+                <ProtectedRoute>
+                  <AppLayoutPdf />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="scheduleTSSAA" element={<ScheduleTSSAA />} />
+              <Route path="rosterTSSAA" element={<RosterTSSAA />} />
+              <Route path="account" element={<Account />} />
+            </Route>
 
-            {/* <Route path="users" element={<Users />} />
-            <Route path="settings" element={<Settings />} />
-          <Route path="account" element={<Account />} /> */}
-          </Route>
-          <Route
-            path="protected"
-            element={
-              <ProtectedRoute>
-                <AppLayoutPdf />
-              </ProtectedRoute>
-            }
-          >
-            <Route path="scheduleTSSAA" element={<ScheduleTSSAA />} />
-            <Route path="rosterTSSAA" element={<RosterTSSAA />} />
-          </Route>
-
-          <Route path="login" element={<Login />} />
-          <Route path="schedule" element={<Schedule />} />
-          <Route path="roster" element={<Roster />} />
-          <Route path="newplayer" element={<NewPlayer />} />
-          <Route path="*" element={<PageNotFound />} />
-        </Routes>
-      </BrowserRouter>
-      <Toaster
-        position="top-center"
-        gutter={12}
-        containerStyle={{ margin: '8px' }}
-        toastOptions={{
-          success: { duration: 3000 },
-          error: { duration: 5000 },
-          style: {
-            fontSize: '16px',
-            maxWidth: '500px',
-            padding: '16px 24px',
-            backgroundColor: 'var(--color-grey-0)',
-            color: 'var(--color-grey-700',
-          },
-        }}
-      />
-    </QueryClientProvider>
+            <Route path="login" element={<Login />} />
+            <Route path="schedule" element={<Schedule />} />
+            <Route path="roster" element={<Roster />} />
+            <Route path="newplayer" element={<NewPlayer />} />
+            <Route path="*" element={<PageNotFound />} />
+          </Routes>
+        </BrowserRouter>
+        <Toaster
+          position="top-center"
+          gutter={12}
+          containerStyle={{ margin: '8px' }}
+          toastOptions={{
+            success: { duration: 3000 },
+            error: { duration: 5000 },
+            style: {
+              fontSize: '16px',
+              maxWidth: '500px',
+              padding: '16px 24px',
+              backgroundColor: 'var(--color-grey-0)',
+              color: 'var(--color-grey-700',
+            },
+          }}
+        />
+      </QueryClientProvider>
+    </CurrentSeasonProvider>
   );
 }
 

@@ -47,7 +47,6 @@ const Center = styled.div`
 `;
 
 function PublicPlayerRow({ player }) {
-  console.log(player);
   return (
     <Table.PrintRow>
       <div></div>

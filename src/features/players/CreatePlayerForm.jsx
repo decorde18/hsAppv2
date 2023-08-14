@@ -12,8 +12,7 @@ import { useCreatePlayer } from './useCreatePlayer';
 import { useEditPlayer } from './useEditPlayer';
 import { useCreateParent, useCreatePlayerParent } from '../parents/useParents';
 import { useContext, useEffect, useState } from 'react';
-import { AppContext } from '../../App';
-
+import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 //TODO FUTURE if new person is not needed, get person
 
 function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
@@ -34,7 +33,7 @@ function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
 
   const { isEditingPlayer, editPlayer } = useEditPlayer();
 
-  const { currentSeason } = useContext(AppContext);
+  const { currentSeason } = useCurrentSeason();
 
   let parentId;
   let playerId;

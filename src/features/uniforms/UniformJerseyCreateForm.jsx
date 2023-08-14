@@ -12,8 +12,7 @@ import {
   useCreateUniformJersey,
 } from './useUniforms';
 import { useContext, useEffect, useState } from 'react';
-import { AppContext } from '../../App';
-
+// import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 function UniformJerseyCreateForm({ uniformToEdit = {}, onCloseModal }) {
   const { id: editId, ...editValues } = uniformToEdit;
 

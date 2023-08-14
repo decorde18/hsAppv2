@@ -26,6 +26,7 @@ const Center = styled.div`
 const Div = styled.div`
   display: flex;
   gap: 50px;
+  padding-bottom: 2.5rem;
 `;
 function PublicPlayerTable() {
   const [searchParams] = useSearchParams();
@@ -34,22 +35,48 @@ function PublicPlayerTable() {
   const { isLoadingUniformSeasonPlayers, uniformSeasonPlayers } =
     useUniformSeasonPlayers();
   const { isLoadingPlayerSeasons, playerSeasons } = usePlayerSeasons();
+  const { uniformSeasons } = useUniformSeasons();
 
   if (!season) return <div>Sorry You Must Have A Season Selected</div>;
   if (isLoadingPlayerSeasons || isLoadingSeason) return <Spinner />;
   if (!playerSeasons.length) return <Empty resource="Players" />;
 
-  const roster = playerSeasons
-    .filter(
-      (player) => +player.seasonId === +season && player.status === 'Rostered'
+  const roster = playerSeasons.filter(
+    (player) => +player.seasonId === +season && player.status === 'Rostered'
+  );
+  // .sort((a, b) => +a.grade - +b.grade);
+  const gkUnis = uniformSeasons.find(
+    (uni) =>
+      uni.season === +season &&
+      uni.team === 'GK' &&
+      uni.uniforms.type === 'GK Jersey'
+  );
+  const rosteredWithNumber = roster
+    .map((player) => ({
+      ...player,
+      uniform: uniformSeasonPlayers.find(
+        (jersey) => jersey.seasonPlayer === player.id
+      ),
+    }))
+    .sort(
+      (a, b) =>
+        +a.uniform?.uniformJerseys.number - +b.uniform?.uniformJerseys.number
+    );
+  const rosteredWithNumberGk = roster
+    .map((player) => ({
+      ...player,
+      uniform: uniformSeasonPlayers.find(
+        (jersey) =>
+          jersey.uniformJerseys.uniform == gkUnis.uniform &&
+          jersey.seasonPlayer === player.id
+      ),
+    }))
+    .sort(
+      (a, b) =>
+        +a.uniform?.uniformJerseys.number - +b.uniform?.uniformJerseys.number
     )
-    .sort((a, b) => +a.grade > +b.grade);
-  const rosteredWithNumber = roster.map((player) => ({
-    ...player,
-    uniform: uniformSeasonPlayers.find(
-      (jersey) => jersey.seasonPlayer === player.id
-    ),
-  }));
+    .filter((player) => player.uniform);
+
   return (
     <>
       <Heading as="h2" location="center">
@@ -73,7 +100,7 @@ function PublicPlayerTable() {
                 player.teamLevel.includes('Varsity')
               )}
               render={(player) => (
-                <PublicPlayerRow player={player} key={player.id} />
+                <PublicPlayerRow player={player} key={`V-${player.id}`} />
               )}
             />
           </Table>
@@ -94,10 +121,98 @@ function PublicPlayerTable() {
                 player.teamLevel.includes('JV')
               )}
               render={(player) => (
-                <PublicPlayerRow player={player} key={player.id} />
+                <PublicPlayerRow player={player} key={`JV-${player.id}`} />
               )}
             />
-          </Table>{' '}
+          </Table>
+        </div>
+      </Div>
+      <Div>
+        <div>
+          {' '}
+          <Heading as="h3">GK</Heading>
+          <Table columns=".25fr .5fr 2fr .5fr .75fr">
+            <Table.PrintHeader>
+              <div></div>
+              <div>#</div>
+              <Center>Player Name</Center>
+
+              <Center>Grade</Center>
+              <Center></Center>
+            </Table.PrintHeader>
+            <Table.Body
+              data={rosteredWithNumberGk.filter((player) =>
+                player.teamLevel.includes('Varsity')
+              )}
+              render={(player) => (
+                <PublicPlayerRow player={player} key={`V-GK-${player.id}`} />
+              )}
+            />
+          </Table>
+        </div>
+        <div>
+          <Heading as="h3">GK</Heading>
+          <Table columns=".25fr .5fr 2fr .5fr .75fr">
+            <Table.PrintHeader>
+              <div></div>
+              <div>#</div>
+              <Center>Player Name</Center>
+
+              <Center>Grade</Center>
+              <Center></Center>
+            </Table.PrintHeader>
+            <Table.Body
+              data={rosteredWithNumberGk.filter((player) =>
+                player.teamLevel.includes('JV')
+              )}
+              render={(player) => (
+                <PublicPlayerRow player={player} key={`JV-GK-${player.id}`} />
+              )}
+            />
+          </Table>
+        </div>
+      </Div>
+      <Div>
+        <div>
+          <Heading as="h3">Team Personnel</Heading>
+          <div>
+            Head Coach:
+            <span>
+              {' '}
+              {`${seasonApi.people.firstName} ${seasonApi.people.lastName}`}
+            </span>
+          </div>
+          <div>
+            Assistant Coaches:
+            <span> {seasonApi.assistant_coaches}</span>
+          </div>
+          {seasonApi.manager ? (
+            <div>
+              Managers:
+              <span> {seasonApi.manager}</span>
+            </div>
+          ) : (
+            <div></div>
+          )}
+          <div>
+            Trainer:
+            <span> {seasonApi.trainer}</span>
+          </div>
+        </div>
+        <div>
+          <Heading as="h3">Administration</Heading>
+          <div>
+            Principal:
+            <span> {seasonApi.principal}</span>
+          </div>
+          <div>
+            Assistant Principals:
+            <span> {seasonApi.assistantPrincipals}</span>
+          </div>
+          <div>
+            Athletic Director:
+            <span> {seasonApi.athleticDirector}</span>
+          </div>
         </div>
       </Div>
     </>

@@ -8,8 +8,7 @@ import Row from '../../ui/Row';
 import { useForm } from 'react-hook-form';
 import { useUniforms, useUpdateUniform, useCreateUniform } from './useUniforms';
 import { useContext, useEffect, useState } from 'react';
-import { AppContext } from '../../App';
-
+// import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 function UniformEditForm({ uniformToEdit = {}, onCloseModal }) {
   const { id: editId, ...editValues } = uniformToEdit;
 

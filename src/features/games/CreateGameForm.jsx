@@ -23,8 +23,7 @@ import { useSchools } from '../schools/useSchools';
 import Spinner from '../../ui/Spinner';
 import { useContext, useState } from 'react';
 import ButtonChecked from '../../ui/ButtonChecked';
-import { AppContext } from '../../App';
-
+import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 const Header = styled.header`
   display: flex;
   gap: 5rem;
@@ -92,7 +91,7 @@ const gameTypes = [
 ];
 
 function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
-  const { currentSeason } = useContext(AppContext);
+  const { currentSeason } = useCurrentSeason();
   const { gamesSeason } = useGamesSeason(currentSeason);
 
   const { isLoadingLocations, locations } = useLocations();

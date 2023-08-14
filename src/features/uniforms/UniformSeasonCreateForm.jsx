@@ -12,11 +12,10 @@ import {
   useCreateUniformSeason,
 } from './useUniforms';
 import { useContext, useEffect, useState } from 'react';
-import { AppContext } from '../../App';
-
+import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 function UniformSeasonCreateForm({ uniformToEdit = {}, onCloseModal }) {
   const { id: editId, ...editValues } = uniformToEdit;
-  const currentSeason = +localStorage.getItem('currentSeason');
+  const { currentSeason } = useCurrentSeason();
   const isEditSession = Boolean(editId);
   const { isLoadingUniformSeasons, uniforms } = useUniformSeasons();
   const { register, handleSubmit, reset, getValues, formState } = useForm({

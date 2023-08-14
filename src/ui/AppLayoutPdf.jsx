@@ -12,18 +12,10 @@ const StyledAppLayout = styled.div`
 export const AppContext = createContext();
 
 function AppLayoutPdf() {
-  const [currentSeason, setCurrentSeason] = useState('');
-
-  function updateCurrentSeason(season) {
-    setCurrentSeason(season);
-  }
-
   return (
-    <AppContext.Provider value={{ currentSeason, updateCurrentSeason }}>
-      <StyledAppLayout>
-        <Outlet></Outlet>
-      </StyledAppLayout>
-    </AppContext.Provider>
+    <StyledAppLayout>
+      <Outlet></Outlet>
+    </StyledAppLayout>
   );
 }
 

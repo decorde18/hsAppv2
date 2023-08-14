@@ -1,12 +1,7 @@
 import { styled } from 'styled-components';
-import {
-  useSeason,
-  useSeasons,
-  useRecentSeason,
-} from '../features/seasons/useSeasons';
-import { useContext, useEffect, useState } from 'react';
-import { AppContext } from '../App';
-import Spinner from '../ui/Spinner';
+import { useSeasons, useRecentSeason } from '../features/seasons/useSeasons';
+import { useCurrentSeason } from '../contexts/CurrentSeasonContext';
+import { useEffect } from 'react';
 
 const Select = styled.select`
   padding-top: 0.5rem 2rem;
@@ -17,28 +12,27 @@ const Select = styled.select`
 
 function SeasonSelector() {
   const { isLoadingSeasons, seasons } = useSeasons();
+  const { currentSeason, updateCurrentSeason } = useCurrentSeason();
+
   const { isLoadingRecent, recentSeason } = useRecentSeason();
-  const curSeason = localStorage.getItem('currentSeason');
-  const { currentSeason, setCurrentSeason } = useContext(AppContext);
-  //TODO handle if createNewSeason
 
   useEffect(
     function () {
-      if (curSeason) setCurrentSeason(curSeason);
       if (!recentSeason) return;
-      if (currentSeason === '') setCurrentSeason(recentSeason.id);
+      if (!currentSeason) updateCurrentSeason(recentSeason.id);
     },
-    [currentSeason, recentSeason, setCurrentSeason, curSeason]
+    [currentSeason, updateCurrentSeason, recentSeason]
   );
-  function handleSeasonChange(e) {
-    localStorage.setItem('currentSeason', e.target.value);
 
-    setCurrentSeason(e.target.value);
-  }
+  //   //TODO handle if createNewSeason
+
   if (isLoadingSeasons || isLoadingRecent) return;
 
   return (
-    <Select defaultValue={currentSeason} onChange={handleSeasonChange}>
+    <Select
+      defaultValue={currentSeason}
+      onChange={(e) => updateCurrentSeason(+e.target.value)}
+    >
       <option value="createSeason">Add A New Season</option>
       {seasons.map((season) => (
         <option value={season?.id || 'createSeason'} key={season.id}>

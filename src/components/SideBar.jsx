@@ -1,9 +1,8 @@
 import { styled } from 'styled-components';
-import Button from './Button';
+import Button from '../ui/Button';
 import { NavLink } from 'react-router-dom';
 import { useContext } from 'react';
-import { AppContext } from '../App';
-
+import { useCurrentSeason } from '../contexts/CurrentSeasonContext';
 const Aside = styled.aside`
   padding-left: 0.5rem;
   padding-right: 0.5rem;
@@ -20,7 +19,7 @@ const Div = styled.div`
 `;
 
 function SideBar() {
-  const { currentSeason } = useContext(AppContext);
+  const { currentSeason } = useCurrentSeason();
 
   return (
     <Aside>

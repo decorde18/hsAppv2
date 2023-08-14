@@ -11,7 +11,7 @@ import Table from '../../ui/Table';
 import Empty from '../../ui/Empty';
 import Menus from '../../ui/Menus';
 import AddPlayer from './AddPlayer';
-import { AppContext } from '../../App';
+import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 import Modal from '../../ui/Modal';
 import { HiPencil, HiTrash } from 'react-icons/hi2';
 import MenuFilterSort from '../../ui/MenuFilterSort';
@@ -33,7 +33,7 @@ const statusFilterLabel = [
 ];
 
 function PlayerTable() {
-  const { currentSeason } = useContext(AppContext);
+  const { currentSeason } = useCurrentSeason();
   const { isLoadingPlayers, players } = usePlayers();
   const { isLoadingPlayerSeasons, playerSeasons } = usePlayerSeasons();
 

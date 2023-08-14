@@ -26,7 +26,7 @@ function UniformJerseyTable() {
       <select defaultValue="default" onChange={handleJerseyChange}>
         <option value="default">Choose uniform style</option>
         {uniforms
-          .filter((uniform) => uniform.type === 'Jersey')
+          .filter((uniform) => uniform.type.includes('Jersey'))
           .filter((uniform) => uniform.active === true)
           .map((uniform) => (
             <option key={uniform.id} value={uniform.id}>

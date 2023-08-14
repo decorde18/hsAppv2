@@ -12,8 +12,7 @@ import {
   useCreateUniformSeasonPlayers,
 } from './useUniforms';
 import { useContext, useEffect, useState } from 'react';
-import { AppContext } from '../../App';
-
+// import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 function UniformSeasonPlayerCreateForm({ uniformToEdit = {}, onCloseModal }) {
   const { id: editId, ...editValues } = uniformToEdit;
 

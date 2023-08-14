@@ -28,7 +28,7 @@ export async function getRecentSeason() {
 export async function getSeason(seasonId) {
   const { data: recentSeason, error } = await supabase
     .from('seasons')
-    .select('*')
+    .select('*, people(*)')
     .eq('id', seasonId)
     .single();
   if (error) {

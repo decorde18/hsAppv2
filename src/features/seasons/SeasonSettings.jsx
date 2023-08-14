@@ -2,11 +2,11 @@ import { useContext, useEffect, useState } from 'react';
 import Heading from '../../ui/Heading';
 import Row from '../../ui/Row';
 import UpdateSeasonForm from './UpdateSeasonForm';
-import { AppContext } from '../../App';
+import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 import { useSeasons } from './useSeasons';
 
 function SeasonSettings() {
-  const { currentSeason } = useContext(AppContext);
+  const { currentSeason } = useCurrentSeason();
   const { isLoadingSeasons, seasons } = useSeasons();
   const [season, setSeason] = useState();
   useEffect(

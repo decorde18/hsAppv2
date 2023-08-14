@@ -11,8 +11,9 @@ import Empty from '../../ui/Empty';
 import GameRow from './GameRow';
 import AddGame from './AddGame';
 import { useSearchParams } from 'react-router-dom';
-import { AppContext } from '../../App';
+import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 import Menus from '../../ui/Menus';
+import Calendar from '../../services/googleApi';
 
 const StyledDiv = styled.div`
   display: flex;
@@ -20,7 +21,8 @@ const StyledDiv = styled.div`
   justify-content: space-between;
 `;
 function GameTable({ seasonProps }) {
-  const { currentSeason } = useContext(AppContext);
+  Calendar();
+  const { currentSeason } = useCurrentSeason();
   const [scheduleType, setScheduleType] = useState('season');
   const { isLoadingGames, games } = useGames();
 
