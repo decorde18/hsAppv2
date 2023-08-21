@@ -57,3 +57,13 @@ export async function deleteGame(id) {
   }
   return null;
 }
+
+export async function getPeriods() {
+  const { data: periods, error } = await supabase.from('periods').select('*');
+
+  if (error) {
+    console.log(error);
+    throw new Error('Periods Could Not Be Loaded');
+  }
+  return periods;
+}

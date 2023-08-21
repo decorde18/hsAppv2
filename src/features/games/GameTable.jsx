@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import Spinner from '../../ui/Spinner';
 // import PlayerRow from './PlayerRow';
 // import PlayerSeasonRow from './PlayerSeasonRow';
-import { useGames } from './useGames';
+import { useGames, useGoals, useGamePeriods } from './useGames';
 
 import { useContext, useState } from 'react';
 import Button from '../../ui/Button';
@@ -25,6 +25,8 @@ function GameTable({ seasonProps }) {
   const { currentSeason } = useCurrentSeason();
   const [scheduleType, setScheduleType] = useState('season');
   const { isLoadingGames, games } = useGames();
+  const { isLoadingGoals, goals } = useGoals();
+  const { isLoadingGamePeriods, periods } = useGamePeriods();
 
   function handleOnToggle(val) {
     setScheduleType(val);

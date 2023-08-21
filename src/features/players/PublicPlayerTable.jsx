@@ -179,41 +179,41 @@ function PublicPlayerTable() {
         <div>
           <Heading as="h3">Team Personnel</Heading>
           <People>
-            Head Coach:
+            <strong>Head Coach:</strong>
             <span>
               {' '}
               {`${seasonApi.people.firstName} ${seasonApi.people.lastName}`}
             </span>
           </People>
           <People>
-            Assistant Coaches:
+            <strong>Assistant Coaches:</strong>
             <span> {seasonApi.assistant_coaches}</span>
           </People>
           {seasonApi.manager ? (
             <div>
-              Managers:
+              <strong>Managers:</strong>
               <span> {seasonApi.manager}</span>
             </div>
           ) : (
             <div></div>
           )}
           <People>
-            Trainer:
+            <strong>Trainer:</strong>
             <span> {seasonApi.trainer}</span>
           </People>
         </div>
         <div>
           <Heading as="h3">Administration</Heading>
           <People>
-            Principal:
+            <strong>Principal:</strong>
             <span> {seasonApi.principal}</span>
           </People>
           <People>
-            Assistant Principals:
+            <strong>Assistant Principals:</strong>
             <span> {seasonApi.assistantPrincipals}</span>
           </People>
           <People>
-            Athletic Director:
+            <strong>Athletic Director:</strong>
             <span> {seasonApi.athleticDirector}</span>
           </People>
         </div>

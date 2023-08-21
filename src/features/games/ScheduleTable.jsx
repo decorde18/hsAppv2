@@ -65,6 +65,8 @@ function ScheduleTable() {
           render={(game) => <ScheduleRow game={game} key={game.id} />}
         />
       </Table>
+      <p>*- Denotes District Game</p>
+      <p>S- Denotes Pre Season Scrimmage</p>
     </>
   );
 }

@@ -4,7 +4,9 @@ import {
   getGamesSeason,
   createEditGame,
   deleteGame as deleteGameApi,
+  getPeriods,
 } from '../../services/apiGames';
+import { getGoals } from '../../services/apiStats';
 import { toast } from 'react-hot-toast';
 
 export function useGames() {
@@ -66,4 +68,23 @@ export function useDeleteGame() {
     onError: (err) => toast.error(err.message),
   });
   return { isDeleting, deleteGame };
+}
+
+export function useGoals() {
+  const {
+    isLoading: isLoadingGoals,
+    data: goals,
+    error,
+  } = useQuery({ queryKey: ['goals'], queryFn: getGoals });
+
+  return { isLoadingGoals, error, goals };
+}
+
+export function useGamePeriods() {
+  const {
+    isLoading: isLoadingPeriods,
+    data: periods,
+    error,
+  } = useQuery({ queryKey: ['periods'], queryFn: getPeriods });
+  return { isLoadingPeriods, error, periods };
 }

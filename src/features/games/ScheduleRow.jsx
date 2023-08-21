@@ -15,10 +15,23 @@ function ScheduleRow({ game }) {
   return (
     <>
       <Table.PrintRow>
-        <div></div>
+        <Right>
+          {game.seasonTime === 'Pre-Season' && (
+            <p>
+              <strong>S</strong>
+            </p>
+          )}
+        </Right>
         <Right>{formatDate(new Date(game.date))}</Right>
         {game.time ? <Right>{formatTime(game.time, true)}</Right> : <div></div>}
-        <div>{game.schools.school}</div>
+        <div>
+          {game.district && (
+            <span>
+              <strong>*-</strong>
+            </span>
+          )}
+          {game.schools.school}
+        </div>
         <div>{game.locations.name}</div>
         <Comment>{game.comment}</Comment>
         <div></div>
