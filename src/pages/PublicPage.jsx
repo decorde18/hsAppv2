@@ -69,7 +69,7 @@ function PublicPage() {
       {
         method: 'POST',
         // headers: { Authorization: 'Bearer ' + session.provider_token },
-        headers: { Authorization: 'Bearer decordecoach@gmail.com' },
+        headers: { Authorization: 'Bearer ' + session.provider_token },
         body: JSON.stringify(event),
       }
     )
