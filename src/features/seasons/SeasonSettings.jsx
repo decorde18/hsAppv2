@@ -1,26 +1,28 @@
-import { useContext, useEffect, useState } from 'react';
 import Heading from '../../ui/Heading';
 import Row from '../../ui/Row';
 import UpdateSeasonForm from './UpdateSeasonForm';
-import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 import { useSeasons } from './useSeasons';
+import Button from '../../ui/Button';
+import { NavLink, useSearchParams } from 'react-router-dom';
+import Spinner from '../../ui/Spinner';
+import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 
 function SeasonSettings() {
   const { currentSeason } = useCurrentSeason();
   const { isLoadingSeasons, seasons } = useSeasons();
-  const [season, setSeason] = useState();
-  useEffect(
-    function () {
-      if (isLoadingSeasons || currentSeason === '') return;
-      setSeason(seasons.find((season) => +season.id === currentSeason));
-    },
-    [currentSeason, seasons, isLoadingSeasons]
-  );
-  if (isLoadingSeasons || !season) return;
+
+  if (isLoadingSeasons) return <Spinner />;
+
+  const filteredSeason = seasons.find((season) => season.id === +currentSeason);
+
   return (
     <Row>
-      <Heading as="h1">{`Update ${season.season} Season`}</Heading>
-      <UpdateSeasonForm season={season} />
+      <Button type="sideNav">
+        {' '}
+        <NavLink to={`../newseason`}>New Season</NavLink>
+      </Button>
+      <Heading as="h1">{`Update ${filteredSeason.season} Season`}</Heading>
+      <UpdateSeasonForm season={filteredSeason} />
     </Row>
   );
 }

@@ -6,15 +6,30 @@ import {
   updatePlayerSeason,
   createPlayerSeasons,
 } from '../../services/apiPlayers';
+import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 
-export function usePlayerSeasons() {
+//TODO change all PlayerSeasons to add the object
+export function usePlayerSeasons(season) {
+  //Filter by season
+  const { currentSeason, recentSeason } = useCurrentSeason();
+  const filter =
+    season === 'recent'
+      ? { field: 'seasonId', value: recentSeason }
+      : !currentSeason || currentSeason === 'all'
+      ? null
+      : { field: 'seasonId', value: currentSeason };
+
   const {
     isLoading: isLoadingPlayerSeasons,
     data: playerSeasons,
     error,
-  } = useQuery({ queryKey: ['playerSeasons'], queryFn: getPlayerSeasons });
+  } = useQuery({
+    queryKey: ['playerSeasons', filter],
+    queryFn: () => getPlayerSeasons({ filter }),
+  });
   return { isLoadingPlayerSeasons, error, playerSeasons };
 }
+//TODO Take this out and just use usePlayerSeasons with the filter, maybe use this for specific player, specific season
 export function usePlayerSeason(seasonId) {
   const {
     isLoading: isLoadingPlayerSeason,
@@ -46,7 +61,6 @@ export function useCreatePlayerSeason() {
     useMutation({
       mutationFn: createPlayerSeasons,
       onSuccess: () => {
-        toast.success('New Player Season successfully created');
         queryClient.invalidateQueries({
           queries: ['playerSeasons', 'players'],
         });

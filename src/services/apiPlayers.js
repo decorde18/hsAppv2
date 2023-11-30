@@ -48,8 +48,9 @@ export async function deletePlayer(id) {
   return null;
 }
 
-export async function getPlayerSeasons() {
-  const { data: playerSeasons, error } = await supabase
+export async function getPlayerSeasons({ filter, sortBy }) {
+  if (filter.value === 'createSeason') return {};
+  let query = supabase
     .from('playerSeasons')
     .select(
       `
@@ -61,7 +62,9 @@ export async function getPlayerSeasons() {
     )
     .order('grade', { ascending: false })
     .order('status', { ascending: true });
-
+  //FILTER
+  if (filter !== null) query = query.eq(filter.field, filter.value);
+  const { data: playerSeasons, error } = await query;
   if (error) {
     console.log(error);
     throw new Error('Player Seasons Could Not Be Loaded');

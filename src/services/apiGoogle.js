@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+
 import { gapi } from 'gapi-script';
 // import Event from './components/Event.js';
 
@@ -12,11 +13,73 @@ const REACT_APP_CALENDAR_ID =
 const calendarID = REACT_APP_CALENDAR_ID;
 const apiKey = REACT_APP_GOOGLE_API_KEY;
 const accessToken = REACT_APP_GOOGLE_ACCESS_TOKEN;
-// // //** declare calendar instance */
 
+// //** declare calendar instance */
+
+function gapiLoadCalendar() {
+  gapi.load('client', initiateCalendar);
+}
+initiateCalendar;
+function initiateCalendar() {
+  gapi.client.init({
+    apiKey: apiKey,
+  });
+}
+gapiLoadCalendar();
+export async function getCalendar({ filter, sortBy }) {
+  gapi.client.load('calendar', 'v3');
+
+  let response;
+
+  response = await gapi.client.request({
+    path: `https://www.googleapis.com/calendar/v3/calendars/${calendarID}/events`,
+    params: {
+      orderBr: 'startTime',
+      timeMax: '2023-12-31T08:00:00-05:00',
+      timeMin: '2023-01-01T08:00:00-05:00',
+    },
+  });
+
+  return response.result.items;
+}
+
+// export async function getCalendar({ filter, sortBy }) {
+//   const data = gapi.load('client', init);
+//   async function init() {
+//     await gapi.client.init({
+//       apiKey: apiKey,
+//     });
+//     // .then(function () {
+//     //   return gapi.client.request({
+//     //     path: `https://www.googleapis.com/calendar/v3/calendars/${calendarID}/events`,
+//     //   });
+//     // });
+//     await getEvents();
+//   }
+//   async function getEvents() {
+//     try {
+//       const events = await gapi.client.request({
+//         path: `https://www.googleapis.com/calendar/v3/calendars/${calendarID}/events`,
+//       });
+//       return events.result.items;
+//     } catch (e) {
+//       console.log(e);
+//     }
+//     // .then(
+//     //   (response) => {
+//     //     const items = response.result.items;
+//     //     return items;
+//     //   },
+//     //   function (err) {
+//     //     return [false, err];
+//     //   }
+//     // );
+//   }
+//   console.log(data);
+//   return data;
+// }
 function Calendar() {
   const [events, setEvents] = useState([]);
-
   const getEvents = (calendarID, apiKey) => {
     function initiate() {
       gapi.client

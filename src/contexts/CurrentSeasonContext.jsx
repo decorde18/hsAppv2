@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect } from 'react';
+import { createContext, useContext } from 'react';
 import { useLocalStorageState } from '../hooks/useLocalStorageState';
 
 const CurrentSeasonContext = createContext();
@@ -8,14 +8,26 @@ function CurrentSeasonProvider({ children }) {
     false,
     'currentSeason'
   );
+  const [recentSeason, setRecentSeason] = useLocalStorageState(
+    false,
+    'recentSeason'
+  );
 
   function updateCurrentSeason(season) {
     setCurrentSeason(season);
   }
+  function updateRecentSeason(season) {
+    setRecentSeason(season);
+  }
 
   return (
     <CurrentSeasonContext.Provider
-      value={{ currentSeason, updateCurrentSeason }}
+      value={{
+        currentSeason,
+        updateCurrentSeason,
+        recentSeason,
+        updateRecentSeason,
+      }}
     >
       {children}
     </CurrentSeasonContext.Provider>

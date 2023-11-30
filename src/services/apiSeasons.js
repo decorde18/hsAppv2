@@ -1,10 +1,20 @@
 import supabase from './supabase';
 
-export async function getSeasons() {
-  const { data: seasons, error } = await supabase
+export async function getSeasons({ filter, sortBy } /*filter pagination*/) {
+  /*filter pagination*/
+  let query = supabase
     .from('seasons')
     .select('*')
     .order('season', { ascending: false });
+  // const { data: seasons, error } = await supabase
+  //   .from('seasons')
+  //   .select('*')
+  //   .order('season', { ascending: false });
+  //FILTER
+  if (filter !== null)
+    query = query[filter.method || 'eq'](filter.field, filter.value);
+  const { data: seasons, error } = await query;
+
   if (error) {
     console.log(error);
     throw new Error('Seasons Could Not Be Loaded');
@@ -25,11 +35,11 @@ export async function getRecentSeason() {
   return recentSeason;
 }
 
-export async function getSeason(seasonId) {
+export async function getSeason({ value: season }) {
   const { data: recentSeason, error } = await supabase
     .from('seasons')
     .select('*, people(*)')
-    .eq('id', seasonId)
+    .eq('id', season)
     .single();
   if (error) {
     console.log(error);

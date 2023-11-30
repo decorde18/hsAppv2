@@ -9,14 +9,28 @@ import {
   createEditSeason,
 } from '../../services/apiSeasons';
 import { toast } from 'react-hot-toast';
+import { useSearchParams, useParams } from 'react-router-dom';
+import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 
 export function useSeasons() {
+  /*filter pagination*/
+  //FILTER
+  const [searchParams] = useSearchParams();
+  const filterValue = searchParams.get('season');
+  const filter =
+    !filterValue || filterValue === 'all'
+      ? null
+      : { field: 'season', value: filterValue, method: 'eq' };
+
   const {
     //destructure has plenty of other useful values ie status console.log this query to see the different ones
     isLoading: isLoadingSeasons,
     data: seasons,
     error,
-  } = useQuery({ queryKey: ['seasons'], queryFn: getSeasons });
+  } = useQuery({
+    queryKey: ['seasons', filter] /*filter pagination*/,
+    queryFn: () => getSeasons({ filter }) /*filter pagination*/,
+  });
 
   return { isLoadingSeasons, error, seasons };
 }
@@ -25,26 +39,28 @@ export function useRecentSeason() {
     isLoading: isLoadingRecent,
     data,
     error,
-  } = useQuery({ queryKey: ['recentSeasons'], queryFn: getRecentSeason });
+  } = useQuery({ queryKey: ['recentSeason'], queryFn: getRecentSeason });
   const [recentSeason] = data ? data : [];
   return { isLoadingRecent, error, recentSeason };
 }
 
-export function useSeason(seasonId) {
-  // console.log(
-  //   useQuery({
-  //     queryKey: ['season'],
-  //     queryFn: () => (seasonId ? getSeason(seasonId) : null),
-  //   })
-  // );
+export function useSeason() {
+  const { currentSeason } = useCurrentSeason();
+
+  //Filter by season
+  const filter =
+    !currentSeason || currentSeason === 'all'
+      ? null
+      : { field: 'seasonId', value: currentSeason };
   const {
     setSeason,
     isLoading: isLoadingSeason,
     data: season,
     error,
   } = useQuery({
-    queryKey: ['season'],
-    queryFn: () => (seasonId ? getSeason(seasonId) : null),
+    queryKey: ['season', filter],
+    queryFn: () => (filter ? getSeason(filter) : null),
+    retry: false,
   });
   return { isLoadingSeason, error, season, setSeason };
 }

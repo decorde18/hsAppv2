@@ -34,4 +34,8 @@ git push heroku master (once deployed)
 heroku open
 heroku config:set **\***
 
-## Still not using Context correctly. Current season doesn't get passed to season selector or seasonsettings and I have to make a filter
+## Google calendar and add games
+
+## Google contacts ?
+
+## NEED TO UPDATE SEASON SELECTOR WHEN NEW SEASON IS ADDED. IT TAKES TO NEW SEASON< BUT NOT SEASON SELECTOR>

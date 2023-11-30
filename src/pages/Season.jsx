@@ -1,7 +1,7 @@
-import SeasonSettings from '../features/seasons/SeasonSettings';
+import SeasonMain from '../features/seasons/SeasonMain';
 
-function Communication() {
-  return <SeasonSettings />;
+function Season() {
+  return <SeasonMain />;
 }
 
-export default Communication;
+export default Season;

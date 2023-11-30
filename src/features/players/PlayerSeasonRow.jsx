@@ -93,8 +93,8 @@ function PlayerSeasonRow({ playerSeason }) {
   //load TeamLevel
   useEffect(
     function () {
-      teamLevels.map((levels) => {
-        teamLevel.map((level) => {
+      teamLevels?.map((levels) => {
+        teamLevel?.map((level) => {
           if (level.includes(levels.team) && !teamArray.includes(levels.team))
             setTeamArray([...teamArray, levels.team]);
         });

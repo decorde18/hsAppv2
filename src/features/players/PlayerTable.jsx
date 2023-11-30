@@ -4,8 +4,9 @@ import PlayerRow from './PlayerRow';
 import PlayerSeasonRow from './PlayerSeasonRow';
 import { usePlayers } from './usePlayers';
 import { usePlayerSeasons } from './usePlayerSeasons';
+import { useSeason } from '../seasons/useSeasons';
 
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Button from '../../ui/Button';
 import Table from '../../ui/Table';
 import Empty from '../../ui/Empty';
@@ -15,10 +16,8 @@ import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 import Modal from '../../ui/Modal';
 import { HiPencil, HiTrash } from 'react-icons/hi2';
 import MenuFilterSort from '../../ui/MenuFilterSort';
-import {
-  useUniformSeason,
-  useUniformSeasonPlayers,
-} from '../uniforms/useUniforms';
+import {} from '../uniforms/useUniforms';
+import { useSearchParams } from 'react-router-dom';
 
 const StyledDiv = styled.div`
   display: flex;
@@ -26,47 +25,64 @@ const StyledDiv = styled.div`
   justify-content: space-between;
 `;
 const statusFilterLabel = [
+  { value: 0, label: 'No Filter' },
   { value: 1, label: 'Rostered' },
-  { value: 2, label: 'Trying Out' },
-  { value: 3, label: 'Interested' },
+  { value: 2, label: 'Trying Out', seasonPhase: 'tryout' },
+  { value: 3, label: 'Interested', seasonPhase: 'pre-Tryout' },
   { value: 4, label: 'Not Playing' },
 ];
 
 function PlayerTable() {
   const { currentSeason } = useCurrentSeason();
-  const { isLoadingPlayers, players } = usePlayers();
+  const { isLoadingSeason, season } = useSeason();
+
   const { isLoadingPlayerSeasons, playerSeasons } = usePlayerSeasons();
-
   const [rosterType, setRosterType] = useState('season');
-  const [seasonPlayers, setSeasonPlayers] = useState([]);
-  const [unsortedData, setUnsortedData] = useState([]);
-  const [unfilteredData, setUnfilteredData] = useState([]);
-  const memo = useMemo(() => <Table />);
+  // const [seasonPlayers, setSeasonPlayers] = useState([]);
+  let seasonPlayers = [];
+  const [searchParams, setSearchParams] = useSearchParams();
+  // const [statusFilter, setStatusFilter] = useState();
 
-  useEffect(
-    function () {
-      if (isLoadingPlayerSeasons) return;
-      const seasonFilter = playerSeasons.filter(
-        (season) => season.seasonId === +currentSeason
-      );
-      setSeasonPlayers(seasonFilter);
-      setUnfilteredData(seasonFilter);
-      setUnsortedData(seasonFilter);
-    },
-    [playerSeasons, currentSeason, isLoadingPlayerSeasons]
-  );
+  // const [unsortedData, setUnsortedData] = useState([]);
+  // const [unfilteredData, setUnfilteredData] = useState([]);
+  // const memo = useMemo(() => <Table />);
+  //SET FILTER
+  let statusFilter;
+  let filteredPlayers = [];
+
+  if (isLoadingPlayerSeasons || isLoadingSeason) return <Spinner />;
 
   /// FILTER
-  function handleFilter(e) {
-    setSeasonPlayers(unfilteredData);
-    const filterLabel = statusFilterLabel.find(
-      (label) => label.value === +e.target.value
+  const rosterStatus = searchParams.get('rosterStatus');
+  //SET FILTER IN SEARCH PARAMS
+  function handleFilter({ filter, value }) {
+    searchParams.set(filter, value);
+    setSearchParams(searchParams);
+  }
+  //ON LOAD DEFAULT FILTER STATUS
+  if (!rosterStatus) {
+    const defaultStatusFilter = statusFilterLabel.find(
+      (phase) => phase?.seasonPhase === season.seasonPhase
     );
-    const filtered = [...unsortedData];
-    const filteredPlayers = filtered.filter(
-      (player) => player.status === filterLabel.label
+    statusFilter = defaultStatusFilter?.value || 1;
+    filteredPlayers = playerSeasons.filter(
+      (player) =>
+        player?.status ==
+        statusFilterLabel.find((label) => {
+          if (+label.value === statusFilter) return label.label;
+        }).label
     );
-    setSeasonPlayers(filteredPlayers);
+  } else {
+    //FILTER ON CHANGE
+    if (+rosterStatus === 0) filteredPlayers = playerSeasons;
+    else
+      filteredPlayers = playerSeasons.filter(
+        (player) =>
+          player?.status ==
+          statusFilterLabel.find((label) => {
+            if (+label.value === +rosterStatus) return label.label;
+          }).label
+      );
   }
   //SORT
   function handleSortClickSeason(e) {
@@ -90,19 +106,11 @@ function PlayerTable() {
       });
     else sorted.sort((a, b) => (a[field] - b[field]) * modifier);
     e.target.value = `${field}-${direction === 'true' ? 'false' : 'true'}`;
-    setSeasonPlayers(sorted);
-    setUnfilteredData(sorted);
+    seasonPlayers = sorted;
   }
-
-  function handleOnToggle(val) {
-    setRosterType(val);
-  }
-
-  if (isLoadingPlayers || isLoadingPlayerSeasons) return <Spinner />;
-  // constants  that must load after isLoading
 
   //If no season selected
-  if (!players.length || currentSeason === 'createSeason')
+  if (!playerSeasons.length || currentSeason === 'createSeason')
     return <Empty resource="Players" />;
 
   const seasonTable = {
@@ -123,8 +131,15 @@ function PlayerTable() {
           <button value="status" name="string" onClick={handleSortClickSeason}>
             Status
           </button>
-          <select onChange={handleFilter}>
-            <option value="none">No Filter</option>
+          <select
+            value={statusFilter}
+            onChange={(e) =>
+              handleFilter({
+                filter: 'rosterStatus',
+                value: e.target.value,
+              })
+            }
+          >
             {statusFilterLabel.map((label) => (
               <option value={label.value} key={label.value}>
                 {label.label}
@@ -165,24 +180,10 @@ function PlayerTable() {
     columns: '0.2fr 2fr 1fr .2fr;',
   };
 
-  const isSeason = rosterType === 'season';
+  const isSeason = true; //TODO this will allow season vs. all-time - needs to be created, some things are added below
   return (
     <>
       <StyledDiv>
-        <div>
-          <Button
-            variation={isSeason ? 'primary' : 'secondary'}
-            onClick={() => handleOnToggle('season')}
-          >
-            Current SEASON
-          </Button>
-          <Button
-            variation={rosterType === 'allTime' ? 'primary' : 'secondary'}
-            onClick={() => handleOnToggle('allTime')}
-          >
-            ALL TIME
-          </Button>
-        </div>
         <AddPlayer />
       </StyledDiv>
       <Menus>
@@ -191,7 +192,7 @@ function PlayerTable() {
             {isSeason ? seasonTable.head : tableValues.head}
           </Table.Header>
           <Table.Body
-            data={isSeason ? seasonPlayers : players}
+            data={filteredPlayers}
             render={(player) =>
               isSeason ? (
                 <PlayerSeasonRow playerSeason={player} key={player.id} />

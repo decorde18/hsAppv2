@@ -17,6 +17,7 @@ function UpdateSeasonForm({ season }) {
       <FormRow label="Season">
         <Input
           type="number"
+          key={season.season}
           defaultValue={season.season}
           onBlur={(e) => handleBlur(e, 'season')}
           disabled={isUpdating}
@@ -26,6 +27,7 @@ function UpdateSeasonForm({ season }) {
       <FormRow label="School Year">
         <Input
           type="text"
+          key={season.schoolYear}
           defaultValue={season.schoolYear}
           onBlur={(e) => handleBlur(e, 'schoolYear')}
           disabled={isUpdating}
@@ -35,6 +37,7 @@ function UpdateSeasonForm({ season }) {
       <FormRow label="Class">
         <Input
           type="text"
+          key={season.classification}
           defaultValue={season.classification}
           onBlur={(e) => handleBlur(e, 'classification')}
           disabled={isUpdating}
@@ -44,6 +47,7 @@ function UpdateSeasonForm({ season }) {
       <FormRow label="Region">
         <Input
           type="number"
+          key={season.region}
           defaultValue={season.region}
           onBlur={(e) => handleBlur(e, 'region')}
           disabled={isUpdating}
@@ -53,6 +57,7 @@ function UpdateSeasonForm({ season }) {
       <FormRow label="District">
         <Input
           type="number"
+          key={season.district}
           defaultValue={season.district}
           onBlur={(e) => handleBlur(e, 'district')}
           disabled={isUpdating}
@@ -63,6 +68,7 @@ function UpdateSeasonForm({ season }) {
       <FormRow label="Team Levels">
         <Input
           type="text"
+          key={season.teamLevels}
           defaultValue={season.teamLevels}
           onBlur={(e) => handleBlur(e, 'teamLevels')}
           disabled={isUpdating}
@@ -74,68 +80,3 @@ function UpdateSeasonForm({ season }) {
 }
 
 export default UpdateSeasonForm;
-
-//   // const { isLoading, settings } = useSettings();
-//   const {
-//     settings: {
-//       minBookingLength,
-//       maxBookingLength,
-//       maxGuestsPerBooking,
-//       breakfastPrice,
-//     } = {},
-//     isLoading,
-//   } = useSettings();
-//   const { updateSetting, isUpdating } = useUpdateSettings();
-
-//   // return <Spinner />;
-//   if (isLoading) return <Spinner />;
-
-//   function handleBlur(e, field) {
-//     const { value } = e.target;
-
-//     if (!value) return;
-//     updateSetting({ [field]: value });
-//   }
-
-//   // This time we are using UNCONTROLLED fields, so we will NOT store state
-//   return (
-//     <Form>
-//       <FormRow label='Minimum nights/booking'>
-//         <Input
-//           type='number'
-//           defaultValue={minBookingLength}
-//           onBlur={(e) => handleBlur(e, "minBookingLength")}
-//           disabled={isUpdating}
-//           id='min-nights'
-//         />
-//       </FormRow>
-//       <FormRow label='Maximum nights/booking'>
-//         <Input
-//           type='number'
-//           defaultValue={maxBookingLength}
-//           onBlur={(e) => handleBlur(e, "maxBookingLength")}
-//           disabled={isUpdating}
-//           id='max-nights'
-//         />
-//       </FormRow>
-//       <FormRow label='Maximum guests/booking'>
-//         <Input
-//           type='number'
-//           defaultValue={maxGuestsPerBooking}
-//           onBlur={(e) => handleBlur(e, "maxGuestsPerBooking")}
-//           disabled={isUpdating}
-//           id='max-guests'
-//         />
-//       </FormRow>
-//       <FormRow label='Breakfast price'>
-//         <Input
-//           type='number'
-//           defaultValue={breakfastPrice}
-//           onBlur={(e) => handleBlur(e, "breakfastPrice")}
-//           disabled={isUpdating}
-//           id='breakfast-price'
-//         />
-//       </FormRow>
-//     </Form>
-//   );
-// }

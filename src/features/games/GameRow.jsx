@@ -6,8 +6,9 @@ import { formatTime, formatDate } from '../../utils/helpers';
 import Modal from '../../ui/Modal';
 import Menus from '../../ui/Menus';
 import { HiPencil, HiSquare2Stack, HiTrash } from 'react-icons/hi2';
-import { useDeleteGame } from './useGames';
+import { useDeleteGame, useCancelGame } from './useGames';
 import ConfirmDelete from '../../ui/ConfirmDelete';
+import ConfirmCancel from '../../ui/ConfirmCancel';
 import CreateGameForm from './CreateGameForm';
 
 const TableRow = styled.div`
@@ -21,7 +22,7 @@ const TableRow = styled.div`
     border-bottom: 1px solid var(--color-grey-100);
   }
 `;
-const Game = styled.div`
+const Opponent = styled.div`
   font-size: 1.6rem;
   font-weight: 600;
   color: var(--color-grey-600);
@@ -39,28 +40,43 @@ const Result = styled.div`
   ${(props) => results[props.result]}
 `;
 function GameRow({ game }) {
+  // console.log(game);
   const { isDeleting, deleteGame } = useDeleteGame();
+  const { isCanceling, cancelGame } = useCancelGame();
   //TODO getOwnScore and opponentScore
-  const ownScore = 1;
-  const opponentScore = 2;
-  const result = ownScore
-    ? ownScore > opponentScore
-      ? 'W'
-      : ownScore === opponentScore
-      ? 'T'
-      : 'L'
-    : null;
+  // const { isLoadingGamePeriods, periods } = useGamePeriods();
+  const ownScore = game.goals.filter(
+    (goal) => goal?.event === 'Goal Scored'
+  ).length;
+  const opponentScore = game.goals.filter(
+    (goal) => goal?.event === 'Goal Against'
+  ).length;
+  const status = game.status === 'to be played' ? null : game.status;
+  const result = // if there is a score post it regardless of game type, otherwise only varsity non-scrimmages should eb posted
+    game.status === 'completed'
+      ? ownScore ||
+        opponentScore ||
+        (game.teamType === 'Varsity' && game.gameType !== 'Scrimmage')
+        ? ownScore > opponentScore
+          ? 'W'
+          : ownScore === opponentScore
+          ? 'T'
+          : 'L'
+        : null
+      : game.status;
   return (
     <>
       <Table.Row>
         <div></div>
         <div>{game.date && formatDate(new Date(game.date))}</div>
         <div>{game.time && formatTime(game.time, true)}</div>
-        <Game>{game.schools.school}</Game>
+        <Opponent>{game.schools.school}</Opponent>
         {result ? (
-          <Result
-            result={result}
-          >{`${result} ${ownScore}-${opponentScore}`}</Result>
+          <Result result={result}>
+            {status === 'completed'
+              ? `${result} ${ownScore}-${opponentScore}`
+              : status}
+          </Result>
         ) : (
           <div></div>
         )}
@@ -76,6 +92,9 @@ function GameRow({ game }) {
                 <Modal.Open opens="edit">
                   <Menus.Button icon={HiPencil}>edit</Menus.Button>
                 </Modal.Open>
+                <Modal.Open opens="cancel">
+                  <Menus.Button icon={HiTrash}>cancel</Menus.Button>
+                </Modal.Open>
                 <Modal.Open opens="delete">
                   <Menus.Button icon={HiTrash}>delete</Menus.Button>
                 </Modal.Open>
@@ -85,6 +104,13 @@ function GameRow({ game }) {
                 {<CreateGameForm gameToEdit={game} />}
               </Modal.Window>
 
+              <Modal.Window name="cancel">
+                <ConfirmCancel
+                  resourceName="games"
+                  disabled={isDeleting}
+                  onConfirm={() => cancelGame(game.id)}
+                />
+              </Modal.Window>
               <Modal.Window name="delete">
                 <ConfirmDelete
                   resourceName="games"

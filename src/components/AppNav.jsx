@@ -15,26 +15,14 @@ const Ul = styled.ul`
 
 const Li = styled.li``;
 
-// .nav a:link,
-// .nav a:visited {
-//   display: block;
-//   color: inherit;
-//   text-decoration: none;
-//   text-transform: uppercase;
-//   font-size: 1.2rem;
-//   font-weight: 700;
-//   padding: 0.5rem 2rem;
-//   border-radius: 5px;
-// }
-
-// /* CSS Modules feature */
-// .nav a:global(.active) {
-//   background-color: var(--color-dark--0);
-// }
-
 function AppNav() {
   return (
     <Ul>
+      <Li>
+        <Button type="nav">
+          <NavLink to="seasonMain">Main</NavLink>
+        </Button>
+      </Li>
       <Li>
         <Button type="nav">
           <NavLink to="players">Players</NavLink>
@@ -58,32 +46,3 @@ function AppNav() {
 }
 
 export default AppNav;
-
-// .nav {
-//   margin-top: 1rem;
-//   margin-bottom: 1rem;
-// }
-
-// .nav ul {
-//   list-style: none;
-//   display: flex;
-//   background-color: var(--color-dark--2);
-//   border-radius: 7px;
-// }
-
-// .nav a:link,
-// .nav a:visited {
-//   display: block;
-//   color: inherit;
-//   text-decoration: none;
-//   text-transform: uppercase;
-//   font-size: 1.2rem;
-//   font-weight: 700;
-//   padding: 0.5rem 2rem;
-//   border-radius: 5px;
-// }
-
-// /* CSS Modules feature */
-// .nav a:global(.active) {
-//   background-color: var(--color-dark--0);
-// }

@@ -1,13 +1,16 @@
 import supabase from './supabase';
 
-export async function getGames() {
-  const { data: games, error } = await supabase
+export async function getGames({ filter, sortBy }) {
+  let query = supabase
     .from('games')
     .select('*, schools(*), locations(*)')
     .order('date', {
       ascending: true,
     })
     .order('time', { ascending: true });
+  //FILTER
+  if (filter !== null) query = query.eq(filter.field, filter.value);
+  const { data: games, error } = await query;
 
   if (error) {
     console.log(error);
@@ -58,8 +61,27 @@ export async function deleteGame(id) {
   return null;
 }
 
-export async function getPeriods() {
-  const { data: periods, error } = await supabase.from('periods').select('*');
+export async function cancelGame(id) {
+  //to be played, canceled, forfeit, called early
+  //TODO Future this should be updateGameStatus and takes which status
+  const { error } = await supabase
+    .from('games')
+    .update({ status: 'canceled' })
+    .eq('id', id)
+    .select();
+
+  if (error) {
+    console.log(error);
+    throw new Error('Game Could Not Be Canceled');
+  }
+  return null;
+}
+export async function getPeriods(gameId) {
+  console.log(gameId);
+  const { data: periods, error } = await supabase
+    .from('periods')
+    .select('*')
+    .eq('gameId', gameId);
 
   if (error) {
     console.log(error);

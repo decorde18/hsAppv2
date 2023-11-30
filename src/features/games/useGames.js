@@ -4,17 +4,30 @@ import {
   getGamesSeason,
   createEditGame,
   deleteGame as deleteGameApi,
+  cancelGame as cancelGameApi,
   getPeriods,
 } from '../../services/apiGames';
 import { getGoals } from '../../services/apiStats';
 import { toast } from 'react-hot-toast';
+import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 
 export function useGames() {
+  const { currentSeason } = useCurrentSeason();
+  //Filter by season
+
+  const filter =
+    !currentSeason || currentSeason === 'all'
+      ? null
+      : { field: 'season', value: currentSeason };
+
   const {
     isLoading: isLoadingGames,
     data: games,
     error,
-  } = useQuery({ queryKey: ['games'], queryFn: getGames });
+  } = useQuery({
+    queryKey: ['games', filter],
+    queryFn: () => getGames({ filter }),
+  });
 
   return { isLoadingGames, error, games };
 }
@@ -71,20 +84,45 @@ export function useDeleteGame() {
 }
 
 export function useGoals() {
+  const { currentSeason } = useCurrentSeason();
+
+  //Filter by season
+
+  const filter =
+    !currentSeason || currentSeason === 'all'
+      ? null
+      : { field: 'periodId.gameId.season', value: currentSeason };
+
   const {
     isLoading: isLoadingGoals,
     data: goals,
     error,
-  } = useQuery({ queryKey: ['goals'], queryFn: getGoals });
+  } = useQuery({
+    queryKey: ['seasonGoals', filter],
+    queryFn: () => getGoals({ filter }),
+  });
 
   return { isLoadingGoals, error, goals };
 }
 
-export function useGamePeriods() {
+export function useGamePeriods(gameId) {
   const {
     isLoading: isLoadingPeriods,
     data: periods,
     error,
-  } = useQuery({ queryKey: ['periods'], queryFn: getPeriods });
+  } = useQuery({ queryKey: ['periods'], queryFn: () => getPeriods(gameId) });
   return { isLoadingPeriods, error, periods };
+}
+export function useCancelGame(gameId) {
+  const queryClient = useQueryClient();
+  const { isLoading: isCanceling, mutate: cancelGame } = useMutation({
+    mutationFn: cancelGameApi,
+    onSuccess: () => {
+      toast.success(`Game successfully canceled`);
+      queryClient.invalidateQueries({ queryKey: ['games'] });
+    },
+
+    onError: (err) => toast.error(err.message),
+  });
+  return { isCanceling, cancelGame };
 }

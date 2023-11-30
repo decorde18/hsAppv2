@@ -1,7 +1,6 @@
 import { styled } from 'styled-components';
 import Button from '../ui/Button';
 import { NavLink } from 'react-router-dom';
-import { useContext } from 'react';
 import { useCurrentSeason } from '../contexts/CurrentSeasonContext';
 const Aside = styled.aside`
   padding-left: 0.5rem;
@@ -63,15 +62,9 @@ function SideBar() {
         <Button type="sideNav">
           <NavLink to={`./uniformSeasons`}>Uniform Seasons</NavLink>
         </Button>
-        <Button type="sideNav">
-          <NavLink to={`./season`}>Season Settings</NavLink>
-        </Button>
       </Div>
     </Aside>
   );
 }
-// <Button type="nav">
-//   <NavLink to="stats">Statistics</NavLink>
-// </Button>;
 
 export default SideBar;
