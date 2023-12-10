@@ -1,47 +1,83 @@
 import React, { useEffect, useState } from 'react';
 
+import supabase from '../services/supabase';
+
 import { gapi } from 'gapi-script';
 // import Event from './components/Event.js';
 
-const REACT_APP_GOOGLE_API_KEY = 'AIzaSyAbbRFxdeJw2t-7U3cKe6eRdfS5a9JtnKI';
-
-const REACT_APP_GOOGLE_ACCESS_TOKEN =
-  '4/0Adeu5BVUPTo-DVJ-9qirfRIYj2_ILQqm02RWvLHIInHSy8dQXF8qs76ttihwdl_YH9x4ag';
-
-const REACT_APP_CALENDAR_ID =
-  '6urfeejbvf98os9r16sf94eqdc@group.calendar.google.com';
-const calendarID = REACT_APP_CALENDAR_ID;
-const apiKey = REACT_APP_GOOGLE_API_KEY;
-const accessToken = REACT_APP_GOOGLE_ACCESS_TOKEN;
-
+const calendarId = {
+  ihsSoccer: '6urfeejbvf98os9r16sf94eqdc@group.calendar.google.com',
+  Varsity: 'unf92gqn4d6h2hpo4a7hgu26bo@group.calendar.google.com',
+  JV: 'pm01daa6v3kosk9a43c88v2epo@group.calendar.google.com',
+};
+const googleProviderToken =
+  'ya29.a0AfB_byAnKnIKuis5QAMS5xai8Z2wRJIa6wxH-SP638M549yR9oIi8MnnwqhlyA3OutkRM6u_vrHnHGqaHG-63XF-iEp3NAyEKcfQiceiWNz5dWWGsadGdNOMdo6LtCiA3RHfSwH8PHrcS-KZ1lrIydU0jS-1xmqs1RkaCgYKAYASARASFQHGX2Miu92oMg8fXKAechQZqbJUDA0170';
+// THIS IS THE TOKEN I FIRST RECEIVED WHEN ADDING CALENDAR EVENTS.  IF IT STOPS WORKING, SEE Issues.md
+export async function getCalendar() {
+  return {};
+}
+export async function createCalendarEventApi(newEvent) {
+  const event = {
+    summary: `${newEvent.opponent} (${newEvent.gameType})`,
+    description: newEvent.comment,
+    start: {
+      dateTime: newEvent.start,
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    },
+    end: {
+      dateTime: newEvent.end,
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    },
+    location: newEvent.location,
+  };
+  const great = await fetch(
+    `https://www.googleapis.com/calendar/v3/calendars/${
+      calendarId[newEvent.calendar]
+    }/events`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + googleProviderToken,
+      },
+      body: JSON.stringify(event),
+    }
+  )
+    .then((data) => {
+      return data.json();
+    })
+    .then((data) => {
+      return data;
+    });
+  return great;
+}
 // //** declare calendar instance */
 
-function gapiLoadCalendar() {
-  gapi.load('client', initiateCalendar);
-}
-initiateCalendar;
-function initiateCalendar() {
-  gapi.client.init({
-    apiKey: apiKey,
-  });
-}
-gapiLoadCalendar();
-export async function getCalendar({ filter, sortBy }) {
-  gapi.client.load('calendar', 'v3');
+// function gapiLoadCalendar() {
+//   gapi.load('client', initiateCalendar);
+// }
+// initiateCalendar;
+// function initiateCalendar() {
+//   gapi.client.init({
+//     apiKey: apiKey,
+//   });
+// }
+// gapiLoadCalendar();
+// export async function getCalendar({ filter, sortBy }) {
+//   gapi.client.load('calendar', 'v3');
 
-  let response;
+//   let response;
 
-  response = await gapi.client.request({
-    path: `https://www.googleapis.com/calendar/v3/calendars/${calendarID}/events`,
-    params: {
-      orderBr: 'startTime',
-      timeMax: '2023-12-31T08:00:00-05:00',
-      timeMin: '2023-01-01T08:00:00-05:00',
-    },
-  });
+//   response = await gapi.client.request({
+//     path: `https://www.googleapis.com/calendar/v3/calendars/${calendarID}/events`,
+//     params: {
+//       orderBr: 'startTime',
+//       timeMax: '2023-12-31T08:00:00-05:00',
+//       timeMin: '2023-01-01T08:00:00-05:00',
+//     },
+//   });
 
-  return response.result.items;
-}
+//   return response.result.items;
+// }
 
 // export async function getCalendar({ filter, sortBy }) {
 //   const data = gapi.load('client', init);
@@ -78,38 +114,38 @@ export async function getCalendar({ filter, sortBy }) {
 //   console.log(data);
 //   return data;
 // }
-function Calendar() {
-  const [events, setEvents] = useState([]);
-  const getEvents = (calendarID, apiKey) => {
-    function initiate() {
-      gapi.client
-        .init({
-          apiKey: apiKey,
-        })
-        .then(function () {
-          return gapi.client.request({
-            path: `https://www.googleapis.com/calendar/v3/calendars/${calendarID}/events`,
-          });
-        })
-        .then(
-          (response) => {
-            let events = response.result.items;
-            setEvents(events);
-          },
-          function (err) {
-            return [false, err];
-          }
-        );
-    }
-    gapi.load('client', initiate);
-  };
+// function Calendar() {
+//   const [events, setEvents] = useState([]);
+//   const getEvents = (calendarID, apiKey) => {
+//     function initiate() {
+//       gapi.client
+//         .init({
+//           apiKey: apiKey,
+//         })
+//         .then(function () {
+//           return gapi.client.request({
+//             path: `https://www.googleapis.com/calendar/v3/calendars/${calendarID}/events`,
+//           });
+//         })
+//         .then(
+//           (response) => {
+//             let events = response.result.items;
+//             setEvents(events);
+//           },
+//           function (err) {
+//             return [false, err];
+//           }
+//         );
+//     }
+//     gapi.load('client', initiate);
+//   };
 
-  useEffect(() => {
-    const events = getEvents(calendarID, apiKey);
-    setEvents(events);
-  }, []);
-  console.log(events);
-}
+//   useEffect(() => {
+//     const events = getEvents(calendarID, apiKey);
+//     setEvents(events);
+//   }, []);
+//   console.log(events);
+// }
 // const privateKey = CREDENTIALS.private_key.replace(/\\n/g, '\n');
 // // const calendar = console.log(privateKey);
 // const SCOPES = [
@@ -123,7 +159,7 @@ function Calendar() {
 //   SCOPES
 // );
 
-export default Calendar;
+// export default Calendar;
 
 // import React, { useEffect, useState } from 'react';
 // import { google } from 'googleapis';

@@ -1,5 +1,4 @@
 import { google } from 'googleapis';
-
 // const { google } = require('googleapis');
 
 const GOOGLE_CREDENTIALS = {

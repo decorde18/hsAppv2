@@ -1,7 +1,4 @@
 import styled from 'styled-components';
-// import { useState } from 'react';
-
-import { HiSquare2Stack, HiPencil, HiTrash } from 'react-icons/hi2';
 
 import Modal from '../../ui/Modal';
 import Table from '../../ui/Table';
@@ -17,85 +14,109 @@ const Player = styled.div`
 `;
 const Flex = styled.div`
   display: flex;
-  justify-content: space-between;
+  gap: 10px;
 `;
-function CommunicationRow({ player, parents }) {
-  //   const [showForm, setShowForm] = useState(false);
-  const { allPlayersChecked } = player;
-  const { allParentsChecked } = parents;
-  const { parent } = parents;
-  const [playerEmails, setPlayerEmails] = useState([]);
-  const [parentEmails, setParentEmails] = useState([]);
+const FlexLarge = styled.div`
+  display: grid;
+  grid-template-columns: 50% 50%;
+`;
+function CommunicationRow({
+  player,
+  onChangePlayer,
+  onChangeParent,
+  onChangeRow,
+}) {
   const {
     player: {
+      isPlayerVisible,
       playerId,
       grade,
       status,
       teamLevel,
       returningPlayer,
+      isPlayerAdded,
       players: {
         people: { firstName, lastName, email },
       },
     },
   } = player;
-  const [playerRowChecked, setPlayerRowChecked] = useState(allPlayersChecked);
-  const [parentChecked, setParentChecked] = useState(allPlayersChecked);
 
-  useEffect(
-    function () {
-      setPlayerRowChecked(allPlayersChecked);
-    },
-    [allPlayersChecked]
-  );
-  useEffect(
-    function () {
-      setParentChecked(allParentsChecked);
-    },
-    [allParentsChecked]
-  );
+  function handlePlayerCheck(checked) {
+    onChangePlayer({ checked, email, playerId });
+  } //single Player change
+  function handleParentCheck(e, parent) {
+    onChangeParent({
+      checked: e.target.checked,
+      email: parent.parentEmail,
+      playerId,
+      parentId: parent.parentId,
+    });
+  }
+  function handleRowCheck(e) {
+    onChangeRow(e, player);
+  } //Family Clicked
 
-  function handlePlayerRowCheck(e) {
-    setPlayerRowChecked(e.target.checked);
-    if (e.target.checked)
-      setPlayerEmails([...playerEmails, e.target.closest.id]);
-    else
-      setPlayerEmails(
-        playerEmails.filter((email) => email !== e.target.closest.id)
-      );
-    console.log(playerEmails);
-  }
-  function handleParentCheck(e) {
-    setParentChecked(e.target.checked);
-  }
   return (
     <Table.Row id={email}>
-      <div>
-        <input
-          type="checkbox"
-          checked={playerRowChecked}
-          onChange={handlePlayerRowCheck}
-        />
-      </div>
-      <Player>{`${firstName} ${lastName}`}</Player>
+      <FlexLarge>
+        <Flex>
+          <div>
+            <input
+              id="familyCheck"
+              type="checkbox"
+              checked={
+                player.player.isPlayerAdded &&
+                player.player.parents.every((parent) => parent.isParentAdded)
+              }
+              onClick={handleRowCheck}
+              onChange={() => {}}
+            />
+          </div>
+          <div>Family</div>
+        </Flex>
+        <Flex>
+          <div>
+            <input
+              id="parentCheck"
+              type="checkbox"
+              checked={player.player.parents.every(
+                (parent) => parent.isParentAdded
+              )}
+              onClick={handleRowCheck}
+              onChange={() => {}}
+            />
+          </div>
+          <div>Parents</div>
+        </Flex>
+      </FlexLarge>
+      <Flex>
+        <div>
+          <input
+            type="checkbox"
+            checked={isPlayerAdded}
+            onChange={(e) => handlePlayerCheck(e.target.checked)}
+          />
+        </div>
+        <Player>{`${firstName} ${lastName}`}</Player>
+      </Flex>
       <div>{grade}</div>
       <div>{status}</div>
       <div>{teamLevel}</div>
       <div>{returningPlayer ? 'Yes' : 'No'}</div>
-      <div>
-        {parent.map((parent) => (
-          <Flex key={parent.parent}>
+      <FlexLarge>
+        {player.player.parents.map((parent) => (
+          <Flex key={parent.parentId}>
             <div>
-              {`${parent.parents.people.firstName} ${parent.parents.people.lastName}`}
+              <input
+                type="checkbox"
+                checked={parent.isParentAdded}
+                onChange={(e) => handleParentCheck(e, parent)}
+              />
             </div>
-            <input
-              type="checkbox"
-              checked={parentChecked}
-              // TODO FIX ME this changes all parents for the player, not just the one that we click
-              onChange={handleParentCheck}
-            />
+            {`${parent.parentfirstName} ${parent.parentLastName}`}
           </Flex>
         ))}
-      </div>
+      </FlexLarge>
       <div></div>
     </Table.Row>
   );

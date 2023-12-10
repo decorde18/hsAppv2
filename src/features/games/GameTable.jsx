@@ -50,7 +50,12 @@ function GameTable() {
 
   if (isLoadingGames || isLoadingGoals) return <Spinner />;
   if (!seasonGames.length || currentSeason === 'createSeason')
-    return <Empty resource="Games" />;
+    return (
+      <>
+        <Empty resource="Games" />
+        <AddGame />
+      </>
+    );
 
   const gamesWithGoals = seasonGames.map((game) => ({
     ...seasonGames,

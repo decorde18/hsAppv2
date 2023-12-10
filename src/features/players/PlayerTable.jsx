@@ -17,73 +17,43 @@ import Modal from '../../ui/Modal';
 import { HiPencil, HiTrash } from 'react-icons/hi2';
 import MenuFilterSort from '../../ui/MenuFilterSort';
 import {} from '../uniforms/useUniforms';
+//FILTER HELPERS
 import { useSearchParams } from 'react-router-dom';
+import {
+  statusFilterLabel,
+  filterRosterStatus,
+} from '../../utils/filterHelpers';
+import FilterBy from '../../ui/FilterBy';
 
 const StyledDiv = styled.div`
   display: flex;
   gap: 2px;
   justify-content: space-between;
 `;
-const statusFilterLabel = [
-  { value: 0, label: 'No Filter' },
-  { value: 1, label: 'Rostered' },
-  { value: 2, label: 'Trying Out', seasonPhase: 'tryout' },
-  { value: 3, label: 'Interested', seasonPhase: 'pre-Tryout' },
-  { value: 4, label: 'Not Playing' },
-];
 
 function PlayerTable() {
+  let seasonPlayers = [];
+  const [searchParams] = useSearchParams();
   const { currentSeason } = useCurrentSeason();
   const { isLoadingSeason, season } = useSeason();
 
   const { isLoadingPlayerSeasons, playerSeasons } = usePlayerSeasons();
-  const [rosterType, setRosterType] = useState('season');
-  // const [seasonPlayers, setSeasonPlayers] = useState([]);
-  let seasonPlayers = [];
-  const [searchParams, setSearchParams] = useSearchParams();
-  // const [statusFilter, setStatusFilter] = useState();
-
-  // const [unsortedData, setUnsortedData] = useState([]);
-  // const [unfilteredData, setUnfilteredData] = useState([]);
-  // const memo = useMemo(() => <Table />);
   //SET FILTER
   let statusFilter;
   let filteredPlayers = [];
 
   if (isLoadingPlayerSeasons || isLoadingSeason) return <Spinner />;
+  //If no season selected or no players
+  if (!playerSeasons.length || currentSeason === 'createSeason')
+    return <Empty resource="Players" />;
 
   /// FILTER
-  const rosterStatus = searchParams.get('rosterStatus');
-  //SET FILTER IN SEARCH PARAMS
-  function handleFilter({ filter, value }) {
-    searchParams.set(filter, value);
-    setSearchParams(searchParams);
-  }
-  //ON LOAD DEFAULT FILTER STATUS
-  if (!rosterStatus) {
-    const defaultStatusFilter = statusFilterLabel.find(
-      (phase) => phase?.seasonPhase === season.seasonPhase
-    );
-    statusFilter = defaultStatusFilter?.value || 1;
-    filteredPlayers = playerSeasons.filter(
-      (player) =>
-        player?.status ==
-        statusFilterLabel.find((label) => {
-          if (+label.value === statusFilter) return label.label;
-        }).label
-    );
-  } else {
-    //FILTER ON CHANGE
-    if (+rosterStatus === 0) filteredPlayers = playerSeasons;
-    else
-      filteredPlayers = playerSeasons.filter(
-        (player) =>
-          player?.status ==
-          statusFilterLabel.find((label) => {
-            if (+label.value === +rosterStatus) return label.label;
-          }).label
-      );
-  }
+  const rosterStatus = searchParams.get('filterRosterStatus'); //todo maybe move this to helper but needs to be in React function alternatively, read values through js
+
+  const filter = filterRosterStatus(playerSeasons, rosterStatus, season);
+  statusFilter = filter.filterStatus;
+  filteredPlayers = filter.filteredPlayers;
+
   //SORT
   function handleSortClickSeason(e) {
     e.preventDefault();
@@ -109,10 +79,10 @@ function PlayerTable() {
     seasonPlayers = sorted;
   }
 
-  //If no season selected
-  if (!playerSeasons.length || currentSeason === 'createSeason')
-    return <Empty resource="Players" />;
-
+  //todo I am here
+  //todo convert defaultseasonFilter to UI then add to playertable, gametable, etc
+  //todo create defaultFilter function to use wherever needed, playerTable, Communication, etc
+  //todo make sort a new function
   const seasonTable = {
     head: (
       <MenuFilterSort>
@@ -131,21 +101,11 @@ function PlayerTable() {
           <button value="status" name="string" onClick={handleSortClickSeason}>
             Status
           </button>
-          <select
-            value={statusFilter}
-            onChange={(e) =>
-              handleFilter({
-                filter: 'rosterStatus',
-                value: e.target.value,
-              })
-            }
-          >
-            {statusFilterLabel.map((label) => (
-              <option value={label.value} key={label.value}>
-                {label.label}
-              </option>
-            ))}
-          </select>
+          <FilterBy
+            options={statusFilterLabel}
+            id={'filterRosterStatus'}
+            default={statusFilter.value}
+          />
         </div>
         <div>DOB</div>
         <div>Entry Year</div>

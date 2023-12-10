@@ -34,8 +34,14 @@ git push heroku master (once deployed)
 heroku open
 heroku config:set **\***
 
-## Google calendar and add games
+## Finish Player Table
+
+## CommunicationTable Filter (Sorts?)
+
+## Google calendar and edit / delete games
 
 ## Google contacts ?
 
 ## NEED TO UPDATE SEASON SELECTOR WHEN NEW SEASON IS ADDED. IT TAKES TO NEW SEASON< BUT NOT SEASON SELECTOR>
+
+## ADD AUTH TO USERS. who is allowed to do what. currently anyone logged in will be able to add to calendar...Perhaps I need to move the calendar to ihssoccergirls@gmail.com anyway. I can still make them available on my calendar

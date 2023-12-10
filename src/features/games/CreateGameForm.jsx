@@ -4,8 +4,11 @@ import {
   useGames,
   useGamesSeason,
 } from './useGames';
+import { useCreateCalendarEvent } from '../google/useCalendar';
 
 import styled from 'styled-components';
+
+import moment from 'moment';
 
 import Input from '../../ui/Input';
 import Form from '../../ui/Form';
@@ -21,9 +24,10 @@ import Heading from '../../ui/Heading';
 import { useLocations } from '../locations/useLocations';
 import { useSchools } from '../schools/useSchools';
 import Spinner from '../../ui/Spinner';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import ButtonChecked from '../../ui/ButtonChecked';
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
+
 const Header = styled.header`
   display: flex;
   gap: 5rem;
@@ -105,6 +109,8 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
 
   const { errors } = formState;
   const { isCreating, createGame } = useCreateGame();
+  const { createCalendarEvent, isCreatingCalEvent, dataForCalEvent } =
+    useCreateCalendarEvent();
 
   const { isEditing, editGame } = useEditGame();
 
@@ -114,9 +120,51 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
   const [home, setHome] = useState(false);
   const [district, setDistrict] = useState(false);
   const [seasonTime, setSeasonTime] = useState(false);
+  const [gameData, setGameData] = useState();
+  const [calData, setCalData] = useState();
 
-  const isWorking = isCreating || isEditing;
-  if (isLoadingLocations || isLoadingSchools) return <Spinner />;
+  const isWorking = isCreating || isEditing || isCreatingCalEvent;
+  useEffect(() => {
+    if (isWorking) return;
+    if (!gameData || calData !== 'updated') return;
+    //get id of created event
+    //send ID to created event
+    editGame({ newGameData: { calId: dataForCalEvent.id }, id: gameData.id });
+    closeModal();
+    setGameData(); //clear gameData
+    setCalData(); //clear gameData
+  }, [calData, dataForCalEvent, editGame, editId, gameData, isWorking]);
+
+  async function sendToCalendar(data) {
+    data.opponent = schools.find(
+      (school) => +data.opponent === +school.id
+    ).school;
+    data.location = locations.find(
+      (location) => +data.location === +location.id
+    ).name;
+    data.start = momentObj(data.date, data.time);
+    data.end = momentObj(data.date, data.time, 1.5);
+
+    function momentObj(date, time, timeAdded = 0) {
+      // tell moment how to parse the input string
+      const dateTime = moment(data.date + data.time, 'YYYY-MM-DDLT').add(
+        timeAdded,
+        'h'
+      );
+      // conversion
+      return dateTime.format('YYYY-MM-DDTHH:mm:s');
+    }
+    //addToCalendar and get ID
+    const calData = { ...data, calendar: data.teamType };
+
+    await createCalendarEvent(calData);
+    setCalData('updated');
+  }
+
+  function closeModal() {
+    reset();
+    onCloseModal?.();
+  }
 
   function handleOpponentChange(e) {
     const selectedSchool = schools.find(
@@ -182,6 +230,7 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
       comment,
       location,
     }))(data);
+
     if (isEditSession)
       editGame(
         { newGameData: { ...editData }, id: editId },
@@ -198,16 +247,19 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
         { ...data },
         {
           onSuccess: (data) => {
-            reset();
-            onCloseModal?.();
+            setGameData(data);
+            sendToCalendar(data);
           },
         }
       );
     }
   }
+
   function onError(errors) {
     console.log(errors);
   }
+  if (isLoadingLocations || isLoadingSchools || isWorking) return <Spinner />;
+
   return (
     <Form
       onSubmit={handleSubmit(onSubmit, onError)}
