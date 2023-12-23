@@ -48,7 +48,7 @@ function PlayerTable() {
     return <Empty resource="Players" />;
 
   /// FILTER
-  const rosterStatus = searchParams.get('filterRosterStatus'); //todo maybe move this to helper but needs to be in React function alternatively, read values through js
+  const rosterStatus = searchParams.get('filterRosterStatus');
 
   const filter = filterRosterStatus(playerSeasons, rosterStatus, season);
   statusFilter = filter.filterStatus;
@@ -79,10 +79,6 @@ function PlayerTable() {
     seasonPlayers = sorted;
   }
 
-  //todo I am here
-  //todo convert defaultseasonFilter to UI then add to playertable, gametable, etc
-  //todo create defaultFilter function to use wherever needed, playerTable, Communication, etc
-  //todo make sort a new function
   const seasonTable = {
     head: (
       <MenuFilterSort>

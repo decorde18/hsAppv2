@@ -12,8 +12,10 @@ const StyledModal = styled.div`
   background-color: var(--color-grey-0);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-lg);
-  padding: 3.2rem 4rem;
+  padding: 3.2rem 3rem;
   transition: all 0.5s;
+  max-width: 95%;
+  max-height: 95%;
 `;
 
 const Overlay = styled.div`

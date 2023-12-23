@@ -1,5 +1,10 @@
 import { google } from 'googleapis';
+import supabase from './supabase';
 // const { google } = require('googleapis');
+
+// VARSITY_CALENDAR = 'unf92gqn4d6h2hpo4a7hgu26bo@group.calendar.google.com';
+// JV_CALENDAR = 'pm01daa6v3kosk9a43c88v2epo@group.calendar.google.com';
+// TEAM_CALENDAR = '6urfeejbvf98os9r16sf94eqdc@group.calendar.google.com';
 
 const GOOGLE_CREDENTIALS = {
   type: 'service_account',
@@ -42,4 +47,41 @@ const auth = new google.auth.JWT(
   privateKey,
   SCOPES
 );
+export async function loginWithGoogle() {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      scopes: [
+        'https://www.googleapis.com/auth/calendar',
+        'https://www.googleapis.com/auth/spreadsheets',
+      ],
+
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      },
+    },
+  });
+  console.log(data);
+}
+
+// async function googleSignIn() {
+//   const { error } = await supabaseClient.auth.signInWithOAuth({
+//     provider: 'google',
+//     options: {
+//       scopes: [
+//         'https://www.googleapis.com/auth/calendar',
+//         'https://www.googleapis.com/auth/spreadsheets',
+//       ],
+//     },
+//   });
+//   if (error) {
+//     alert('Error logging in to Google provider with Supabase');
+//     console.log(error);
+//   }
+// }
+
+export async function logoutGoogle() {
+  const { error } = await supabase.auth.signOut();
+}
 export const calendar = google.calendar({ version: 'v3', auth });

@@ -34,11 +34,33 @@ git push heroku master (once deployed)
 heroku open
 heroku config:set **\***
 
+## Google calendar and edit games
+
 ## Finish Player Table
 
-## CommunicationTable Filter (Sorts?)
+## fix defaults of new season -id: 23
 
-## Google calendar and edit / delete games
+season: 2024
+schoolYear: "2024-2025"
+classification: "I AAA"
+region: "5"
+district: "10"
+home_location: null \*\*\*
+coach: null
+assistant_coaches: null
+trainer: null
+principal: null
+manager: null
+teamName: null
+gender: null
+teamMascot: "Lady Eagles"
+assistantPrincipals: null
+athleticDirector: null
+created_at: "2023-11-25T16:09:04.356112+00:00"
+updated_at: "2023-11-26T23:28:44.159798+00:00"
+▶ teamLevels 2 items
+seasonPhase: "pre-Tryout"
+people: null
 
 ## Google contacts ?
 

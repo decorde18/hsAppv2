@@ -79,10 +79,10 @@ function UniformRow({ uniform }) {
                 Duplicate
               </Menus.Button>
               <Modal.Open opens="edit">
-                <Menus.Button icon={HiPencil}>edit</Menus.Button>
+                <Menus.Button icon={<HiPencil />}>edit</Menus.Button>
               </Modal.Open>
               <Modal.Open opens="delete">
-                <Menus.Button icon={HiTrash}>delete</Menus.Button>
+                <Menus.Button icon={<HiTrash />}>delete</Menus.Button>
               </Modal.Open>
             </Menus.List>
 

@@ -1,33 +1,35 @@
-import {
-  useCreateGame,
-  useEditGame,
-  useGames,
-  useGamesSeason,
-} from './useGames';
-import { useCreateCalendarEvent } from '../google/useCalendar';
-
-import styled from 'styled-components';
-
+import { useEffect, useState } from 'react';
 import moment from 'moment';
-
-import Input from '../../ui/Input';
-import Form from '../../ui/Form';
-import Button from '../../ui/Button';
-import Textarea from '../../ui/Textarea';
-import FormRow from '../../ui/FormRow';
-
+import styled from 'styled-components';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import { useForm } from 'react-hook-form';
-import Select from '../../ui/Select';
+
+import Form from '../../ui/Form';
+import FormRow from '../../ui/FormRow';
 import Row from '../../ui/Row';
 import Heading from '../../ui/Heading';
+import Input from '../../ui/Input';
+import Select from '../../ui/Select';
+import Button from '../../ui/Button';
+import Textarea from '../../ui/Textarea';
 
+import Calendar from './Calendar';
+import Spinner from '../../ui/Spinner';
+import CreateGameFormError from './CreateGameFormError';
+
+import { useSeason } from '../seasons/useSeasons';
 import { useLocations } from '../locations/useLocations';
 import { useSchools } from '../schools/useSchools';
-import Spinner from '../../ui/Spinner';
-import { useContext, useEffect, useState } from 'react';
-import ButtonChecked from '../../ui/ButtonChecked';
-import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
+import { useCreateGame, useEditGame } from './useGames';
+import { createGoogleCalendarEvent } from '../../services/apiGoogle';
 
+const Div = styled.div`
+  height: 100%;
+`;
+const Center = styled.div`
+  width: 50%;
+  margin: auto;
+`;
 const Header = styled.header`
   display: flex;
   gap: 5rem;
@@ -46,10 +48,20 @@ const StyledSelect = styled.select`
   font-weight: 500;
   box-shadow: var(--shadow-sm);
 `;
+const Flex = styled.div`
+  display: flex;
+  max-height: 90vh;
+`;
+const MainForm = styled.div`
+  width: 70rem;
+  margin: 2rem;
+  overflow-y: auto;
+`;
+
 const seasonTimes = [
   { value: 'preseason', label: 'Pre-Season' },
   { value: 'regular', label: 'Regular Season' },
-  { value: 'postseason', label: 'Post-Season', team: 'varsity' },
+  { value: 'postseason', label: 'Post-Season', team: 'Varsity' },
 ];
 const gameTypes = [
   {
@@ -94,146 +106,145 @@ const gameTypes = [
   },
 ];
 
-function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
-  const { currentSeason } = useCurrentSeason();
-  const { gamesSeason } = useGamesSeason(currentSeason);
-
-  const { isLoadingLocations, locations } = useLocations();
+function CreateGameForm({
+  gameToEdit = {},
+  onCloseModal,
+  googleProviderToken,
+}) {
+  const { isLoadingSeason, season } = useSeason();
+  const { isLoadingLocations, locations } = useLocations(0);
   const { isLoadingSchools, schools } = useSchools();
+
   const { id: editId, ...editValues } = gameToEdit;
   const isEditSession = Boolean(editId);
 
-  const { register, handleSubmit, reset, getValues, formState } = useForm({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    getValues,
+    formState,
+    setValue,
+    watch,
+  } = useForm({
     defaultValues: isEditSession ? editValues : {},
   });
 
-  const { errors } = formState;
   const { isCreating, createGame } = useCreateGame();
-  const { createCalendarEvent, isCreatingCalEvent, dataForCalEvent } =
-    useCreateCalendarEvent();
-
   const { isEditing, editGame } = useEditGame();
+  const [googleUpdating, setGoogleUpdating] = useState(false);
 
-  const [team, setTeam] = useState('varsity');
-  const [classification, setClassification] = useState('');
-  const [location, setLocation] = useState('default');
-  const [home, setHome] = useState(false);
-  const [district, setDistrict] = useState(false);
-  const [seasonTime, setSeasonTime] = useState(false);
-  const [gameData, setGameData] = useState();
-  const [calData, setCalData] = useState();
+  const { errors } = formState;
 
-  const isWorking = isCreating || isEditing || isCreatingCalEvent;
-  useEffect(() => {
-    if (isWorking) return;
-    if (!gameData || calData !== 'updated') return;
-    //get id of created event
-    //send ID to created event
-    editGame({ newGameData: { calId: dataForCalEvent.id }, id: gameData.id });
-    closeModal();
-    setGameData(); //clear gameData
-    setCalData(); //clear gameData
-  }, [calData, dataForCalEvent, editGame, editId, gameData, isWorking]);
+  const isLoading =
+    isLoadingSeason || isLoadingLocations || isLoadingSchools || googleUpdating;
+  const isWorking = isLoading || isCreating || isEditing || googleUpdating;
 
-  async function sendToCalendar(data) {
-    data.opponent = schools.find(
-      (school) => +data.opponent === +school.id
-    ).school;
-    data.location = locations.find(
-      (location) => +data.location === +location.id
-    ).name;
-    data.start = momentObj(data.date, data.time);
-    data.end = momentObj(data.date, data.time, 1.5);
-
-    function momentObj(date, time, timeAdded = 0) {
-      // tell moment how to parse the input string
-      const dateTime = moment(data.date + data.time, 'YYYY-MM-DDLT').add(
-        timeAdded,
-        'h'
+  const [gameOpponent, setGameOpponent] = useState(
+    getValues('opponent') || 'default'
+  );
+  const [gameScheduleType, setGameScheduleType] = useState(
+    getValues('teamType') || 'both'
+  );
+  const [startDate, setStartDate] = useState(new Date()); //state values for Calenader Page
+  const [endDate, setEndDate] = useState(new Date()); //state values for Calenader Page
+  //update gameType array on seasonLoad
+  useEffect(
+    function () {
+      if (!isLoading) return;
+      if (isEditSession) return;
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isLoading]
+  );
+  //updates the opponent state with district, home location, classification
+  useEffect(
+    function () {
+      if (isLoading) return;
+      const opponent = schools.find(
+        (school) => school.id === watch('opponent')
       );
-      // conversion
-      return dateTime.format('YYYY-MM-DDTHH:mm:s');
+      handleSetValue('classification', opponent?.classification || 'default');
+      opponent?.region == season.region && opponent?.district == season.district
+        ? handleSetValue('district', true)
+        : handleSetValue('district', false);
+      handleSetValue('location', opponent?.home_location || 'default');
+      setGameOpponent(opponent);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isLoading, schools, gameOpponent]
+  );
+  //TODO turn this on when ready to update calendar with start and end
+  useEffect(
+    function () {
+      if (isLoading) return;
+      setStartDate(new Date(`8/1/${season.season}`));
+      setEndDate(new Date(`10/31/${season.season}`));
+    },
+    [isLoading]
+  );
+  function handleSelectChange(e) {
+    const name = e.target.name;
+    const value = isNaN(Number(e.target.value))
+      ? e.target.value
+      : Number(e.target.value);
+    if (name.startsWith('gameType')) {
+      gameTypeChange(e);
+      return;
     }
-    //addToCalendar and get ID
-    const calData = { ...data, calendar: data.teamType };
-
-    await createCalendarEvent(calData);
-    setCalData('updated');
+    handleSetValue(name, value);
+    name === 'opponent' && setGameOpponent(value);
   }
-
-  function closeModal() {
-    reset();
-    onCloseModal?.();
-  }
-
-  function handleOpponentChange(e) {
-    const selectedSchool = schools.find(
-      (school) => school.id === +e.target.value
-    );
-    handleLocationChange(
-      selectedSchool.home_location ? selectedSchool.home_location : 'default'
-    );
-    handleClassificationChange(
-      selectedSchool.classification ? selectedSchool.classification : 'default'
-    );
-    //todo set district similarly
-  }
-  function handleLocationChange(val) {
-    val = +val?.target?.value || val;
-    setLocation(val);
-  }
-  function handleClassificationChange(val) {
-    val = val?.target?.value || val;
-    setClassification(val);
-  }
-  //todo create home function
-  function handleHomeTeamChange(e) {
+  function handleButtonClick(e) {
     e.preventDefault();
-    setHome(!home);
+    const name = e.target.name;
+    handleSetValue(name, !getValues(name));
+    name === 'home' && homeChange();
   }
-  //todo handle district when opponent is chosen
-  function handleDistrictChange(e) {
+  function handleTeamButtonChange(e) {
+    //updates the game type
     e.preventDefault();
-    setDistrict(!district);
+    setGameScheduleType(e.target.value);
+    e.target.value !== 'both' && setValue('teamType', e.target.value);
   }
-  function handleTeamTypeChange(e) {
-    setTeam(e.target.value);
-  }
-  //TODO don't hard code Varsity and JV
+  function gameTypeChange(e) {
+    //TODO  can do similar where the default time changes if the other team time changes
+    if (gameScheduleType === 'both')
+      //sets the value for if both, and updates any others with same if they don't already have a value
+      Object.keys(getValues())
+        .filter((val) => val.startsWith('gameType'))
+        .map(
+          (val) =>
+            (getValues(val) === 'default' || e.target.name === val) &&
+            setValue(val, e.target.value)
+        );
 
+    handleSetValue('gameType', e.target.value); //sets the gameType if both or not
+  }
+  function handleSetValue(name, value) {
+    setValue(name, value);
+  }
+  function homeChange() {
+    watch('home')
+      ? handleSetValue('location', season.home_location)
+      : handleSetValue('location', gameOpponent?.home_location);
+  }
   function onSubmit(data) {
-    data = { ...data, seasonTime, season: currentSeason };
-    const editData = (({
-      date,
-      time,
-      district,
-      home,
-      teamType,
-      gameType,
-      seasonTime,
-      season,
-      opponent,
-      classification,
-      comment,
-      location,
-    }) => ({
-      date,
-      time,
-      district,
-      home,
-      teamType,
-      gameType,
-      seasonTime,
-      season,
-      opponent,
-      classification,
-      comment,
-      location,
-    }))(data);
+    data.home = !!data.home;
+    setGoogleUpdating(true);
+    let teamSchedules;
+    const {
+      created_at,
+      goals,
+      locations: loc,
+      schools: sch,
+      ...newData
+    } = data;
 
-    if (isEditSession)
+    if (isEditSession) {
+      sendToCalendar(newData);
       editGame(
-        { newGameData: { ...editData }, id: editId },
+        { newGameData: { ...newData }, id: editId },
         {
           onSuccess: (data) => {
             reset();
@@ -241,204 +252,386 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
           },
         }
       );
-    else {
-      if (data.time === '') delete data.time;
-      createGame(
-        { ...data },
+    } else {
+      gameScheduleType === 'both' //create array of teams to schedule ie JV, V or Both
+        ? (teamSchedules = season.teamLevels)
+        : (teamSchedules = [gameScheduleType]);
+      teamSchedules.forEach((team) => {
+        //iterate through each team we are scheduling,
+        const newData = { ...data };
+        //time & gameType need to be broken into JV and V
+        const separationArray = ['time', 'gameType']; //array of combined fields we need to remove
+        const newArray = separationArray.reduce((acc, cur) => {
+          const curKey = `${cur}${team}`;
+          const curValue = data[curKey];
+          for (const key in newData) {
+            //  delete all keys that are affected by combined fields
+            if (key.startsWith(`${cur}`)) delete newData[key];
+          }
+          return { ...acc, [cur]: curValue }; //add only the value with new key for current team
+        }, []);
+        //add seasonTime based off gameType
+        // const seasonTime = gameType.find(
+        //   (teamType) => teamType.team === team
+        // ).seasonTime;
+        const seasonTime = seasonTimes.find(
+          (tim) =>
+            tim.value ===
+            gameTypes.find((type) => type.value === newArray.gameType)
+              .seasonTime
+        ).label;
+        const teamData = {
+          // all data for team - send to calendar, send to create/edit
+          ...newArray,
+          ...newData,
+          //add teamType
+          teamType: team,
+          //add season
+          season: season.id,
+          seasonTime,
+        };
+        //add calData
+        sendToCalendar(teamData);
+      });
+    }
+    //todo take out the provider token if I can call it from the api (seems to work for delete)
+    async function sendToCalendar(calData) {
+      const googleCalData = { ...calData };
+      !calData.time && delete calData.time;
+      googleCalData.opponent = schools.find(
+        (school) => +calData.opponent === +school.id
+      ).school;
+      googleCalData.location = locations.find(
+        (location) => +calData.location === +location.id
+      ).name;
+      googleCalData.timeZone = 'America/Chicago';
+      if (googleCalData.time) {
+        googleCalData.start = momentObj(calData.date, calData.time);
+        googleCalData.end = momentObj(calData.date, calData.time, 1.5);
+      }
+      // addToCalendar and get ID
+      createGoogleCalendarEvent(
         {
-          onSuccess: (data) => {
-            setGameData(data);
-            sendToCalendar(data);
-          },
-        }
-      );
+          ...googleCalData,
+          calendar: calData.teamType,
+        },
+        isEditSession
+      ).then((data) => {
+        setGoogleUpdating(false);
+        if (isEditSession) return;
+        createGame({ ...calData, teamType: calData.teamType, calId: data.id });
+      });
+
+      function momentObj(date, time, timeAdded = 0) {
+        // tell moment how to parse the input
+        const dateTime = moment(date + time, 'YYYY-MM-DDLT').add(
+          timeAdded,
+          'h'
+        );
+        // conversion
+        return dateTime.format('YYYY-MM-DDTHH:mm:s');
+      }
+
+      // setCalData('updated'); //TODO thisclears forms and also the closeModal
+      return;
     }
   }
-
+  function closeModal() {
+    reset();
+    onCloseModal?.();
+  }
   function onError(errors) {
     console.log(errors);
   }
-  if (isLoadingLocations || isLoadingSchools || isWorking) return <Spinner />;
 
+  if (isLoading || isWorking) return <Spinner />;
+  if (!googleProviderToken) return <CreateGameFormError />;
   return (
-    <Form
-      onSubmit={handleSubmit(onSubmit, onError)}
-      type={onCloseModal ? 'Modal' : 'regular'}
-    >
-      <Row>
-        <Header as="h2" location="center">
-          <span>Team Type </span>
-          <StyledSelect
-            onChange={handleTeamTypeChange}
-            {...register('teamType')}
+    <Div>
+      <Flex>
+        <Calendar startDate={startDate} endDate={endDate} />
+        <MainForm>
+          <Form
+            onSubmit={handleSubmit(onSubmit, onError)}
+            type={closeModal ? 'Modal' : 'regular'}
           >
-            <option value="Varsity">Varsity</option>
-            <option value="JV">JV</option>
-          </StyledSelect>
-        </Header>
-        <FormRow label="Game Type" error={errors?.gameType?.message}>
-          <StyledSelect
-            type="white"
-            {...register('gameType', {
-              validate: (value) =>
-                value !== 'default' || 'Please select a game type',
-            })}
-            defaultValue={'default'}
-            onChange={(e) =>
-              setSeasonTime(
-                e.target.options[e.target.selectedIndex].closest('optgroup')
-                  .label
-              )
-            }
-          >
-            <option value="default" disabled>
-              Please Select Game Type
-            </option>
-            {seasonTimes.map((type) => {
-              if (!type.team || type.team === team)
-                return (
-                  <optgroup id={type.value} key={type.label} label={type.label}>
-                    {gameTypes.map(
-                      (typ) =>
-                        typ.seasonTime === type.value && (
-                          <option value={typ.value} key={typ.value}>
-                            {typ.label}
+            <Center>
+              {isEditSession ? (
+                <Heading as={'h4'}>EDIT GAME</Heading>
+              ) : (
+                <Heading as={'h4'}>CREATE GAME</Heading>
+              )}
+            </Center>
+            {/* Team Type */}
+            <Center>
+              <ButtonGroup>
+                {season.teamLevels.map((team) => {
+                  return (
+                    <Button
+                      key={`${team}Button`}
+                      value={team}
+                      name="gameScheduleType"
+                      variation={
+                        gameScheduleType === team ? 'primary' : 'secondary'
+                      }
+                      onClick={handleTeamButtonChange}
+                    >
+                      {team}
+                    </Button>
+                  );
+                })}
+                {!isEditSession && (
+                  <Button
+                    value="both"
+                    name="gameScheduleType"
+                    variation={
+                      gameScheduleType === 'both' ? 'primary' : 'secondary'
+                    }
+                    onClick={handleTeamButtonChange}
+                  >
+                    BOTH
+                  </Button>
+                )}
+              </ButtonGroup>
+            </Center>
+            {/* date and time */}
+            <FormRow label="Date *" error={errors?.date?.message}>
+              <Input
+                type="date"
+                id="date"
+                disabled={isWorking}
+                {...register('date', { required: 'Please Provide a date' })}
+              />
+            </FormRow>
+            <Row type="horizontal">
+              {season.teamLevels.map((team) => {
+                if (team === gameScheduleType || gameScheduleType === 'both')
+                  return (
+                    <Row type="vertical" key={`${team}Column`}>
+                      <Heading as={'h2'}>{team}</Heading>
+                      <Row>
+                        <Flex>
+                          <FormRow label="Time" error={errors?.time?.message}>
+                            <Input
+                              type="time"
+                              id={
+                                gameScheduleType !== 'both'
+                                  ? 'time'
+                                  : `time${team}`
+                              }
+                              disabled={isWorking}
+                              {...register(
+                                gameScheduleType !== 'both'
+                                  ? 'time'
+                                  : `time${team}`
+                              )}
+                            />
+                          </FormRow>
+                          {watch('time') && (
+                            <div>
+                              INCLUDE UPDATED TIME IF NOT
+                              {moment(
+                                new Date(
+                                  '1970-01-01T' + watch('time').split('-')[0]
+                                )
+                              ).format('LT')}
+                            </div>
+                          )}
+                        </Flex>
+                      </Row>
+                      <FormRow
+                        label="Game Type *"
+                        error={errors?.gameType?.message}
+                      >
+                        <StyledSelect
+                          type="white"
+                          id={
+                            gameScheduleType !== 'both'
+                              ? 'gameType'
+                              : `gameType${team}`
+                          }
+                          {...register(
+                            gameScheduleType !== 'both'
+                              ? 'gameType'
+                              : `gameType${team}`,
+                            {
+                              validate: (value) =>
+                                value !== 'default' ||
+                                'Please select a game type',
+                            }
+                          )}
+                          value={
+                            (gameScheduleType !== 'both'
+                              ? watch('gameType')
+                              : watch(`gameType${team}`)) || 'default'
+                          }
+                          onChange={handleSelectChange}
+                        >
+                          <option value="default" disabled>
+                            Please Select Game Type
                           </option>
-                        )
-                    )}
-                  </optgroup>
-                );
-            })}
-          </StyledSelect>
-        </FormRow>
-
-        <FormRow label="Date *" error={errors?.date?.message}>
-          <Input
-            type="date"
-            id="date"
-            disabled={isWorking}
-            {...register('date', { required: 'Please Provide a date' })}
-          />
-        </FormRow>
-        <FormRow label="Time" error={errors?.time?.message}>
-          <Input
-            type="time"
-            id="time"
-            defaultValue={null}
-            disabled={isWorking}
-            {...register('time')}
-          />
-        </FormRow>
-        <FormRow label="Opponent *" error={errors?.opponent?.message}>
-          <StyledSelect
-            {...register('opponent', {
-              validate: (value) =>
-                value !== 'default' || 'Please select an Opponent',
-            })}
-            type="white"
-            onChange={handleOpponentChange}
-            defaultValue={'default'}
-          >
-            <option value="default" disabled>
-              Please Select an Opponent
-            </option>
-            {schools.map((school) => (
-              <option key={school.id} value={school.id}>
-                {school.school}
-              </option>
-            ))}
-          </StyledSelect>
-        </FormRow>
-        <FormRow label="Class" error={errors?.class?.message}>
-          <StyledSelect
-            type="white"
-            {...register('classification', {
-              validate: (value) =>
-                value !== 'default' || "Please select the opponent's class",
-            })}
-            value={classification}
-            onChange={handleClassificationChange}
-          >
-            <option value="default">
-              Please Select the Opponents&apos; Classification
-            </option>
-            <option value="I AAA">I AAA</option>
-            <option value="I AA">I AA</option>
-            <option value="I A">I A</option>
-            <option value="II AA">II AA</option>
-            <option value="II A">II A</option>
-            <option value="NA">N/A</option>
-          </StyledSelect>
-        </FormRow>
-        <FormRow error={errors?.district?.message}>
-          <ButtonChecked
-            value={district}
-            label={district ? 'District Game' : 'Non-District'}
-            onClick={handleDistrictChange}
-            disabled={isWorking}
-          />
-          <input
-            type="hidden"
-            disabled={isWorking}
-            {...register('district', { value: district })}
-          />
-        </FormRow>
-        <FormRow error={errors?.home?.message}>
-          <input
-            type="hidden"
-            disabled={isWorking}
-            {...register('home', { value: home })}
-          />
-          <ButtonChecked
-            value={home}
-            label={home ? 'Home Team' : 'Away Team'}
-            onClick={handleHomeTeamChange}
-            disabled={isWorking}
-          />
-        </FormRow>
-        <FormRow label="Location *" error={errors?.location?.message}>
-          <StyledSelect
-            type="white"
-            value={location}
-            {...register('location', {
-              validate: (value) =>
-                value !== 'default' || 'Please select a location',
-            })}
-            onChange={handleLocationChange}
-          >
-            <option value="default" disabled>
-              Please Select Location
-            </option>
-            {locations.map((loc) => (
-              <option key={loc.id} value={loc.id}>
-                {loc.name}
-              </option>
-            ))}
-          </StyledSelect>
-        </FormRow>
-
-        <FormRow label="Comment" error={errors?.comment?.message}>
-          <Textarea
-            id="comment"
-            disabled={isWorking}
-            {...register('comment')}
-          />
-        </FormRow>
-      </Row>
-      <FormRow>
-        <Button
-          variation="secondary"
-          type="reset"
-          onClick={() => onCloseModal?.()}
-        >
-          Cancel
-        </Button>
-        <Button disabled={isWorking}>
-          {isEditSession ? 'Edit Game' : 'Create New Game'}
-        </Button>
-      </FormRow>
-    </Form>
+                          {seasonTimes.map((type) => {
+                            if (!type.team || type.team === team)
+                              return (
+                                <optgroup
+                                  id={`${type.value}${team}`}
+                                  key={`${type.label}${team}`}
+                                  label={type.label}
+                                >
+                                  {gameTypes.map(
+                                    (typ) =>
+                                      typ.seasonTime === type.value && (
+                                        <option
+                                          value={typ.value}
+                                          key={`${typ.value}${team}`}
+                                        >
+                                          {typ.label}
+                                        </option>
+                                      )
+                                  )}
+                                </optgroup>
+                              );
+                          })}
+                        </StyledSelect>
+                      </FormRow>
+                    </Row>
+                  );
+              })}
+            </Row>
+            {/* Opponent and opponent details (Class District) */}
+            <Heading as={'h3'}>OPPONENT</Heading>
+            <FormRow label="Opponent *" error={errors?.opponent?.message}>
+              <StyledSelect
+                type="white"
+                id={'opponent'}
+                {...register('opponent', {
+                  validate: (value) =>
+                    value !== 'default' || 'Please select an Opponent',
+                })}
+                onChange={handleSelectChange}
+                defaultValue={'default'}
+              >
+                <option value="default" disabled>
+                  Please Select an Opponent
+                </option>
+                {schools.map((school) => (
+                  <option key={school.id} value={school.id}>
+                    {school.school}
+                  </option>
+                ))}
+              </StyledSelect>
+            </FormRow>
+            {/* Game details */}
+            <Row type="horizontal">
+              <FormRow error={errors?.district?.message}>
+                <Button
+                  size="small"
+                  name="district"
+                  value={watch('district')}
+                  variation={watch('district') ? 'primary' : 'secondary'}
+                  onClick={handleButtonClick}
+                >
+                  {watch('district') ? 'District' : 'Non-District'}
+                </Button>
+                <input
+                  type="hidden"
+                  disabled={isWorking}
+                  {...register('district')}
+                />
+              </FormRow>
+              <FormRow />
+              <FormRow
+                label="Classification"
+                error={errors?.classification?.message}
+              >
+                <StyledSelect
+                  type="white"
+                  id="classification"
+                  {...register('classification', {
+                    validate: (value) =>
+                      value !== 'default' ||
+                      "Please select the opponent's class",
+                  })}
+                  onChange={handleSelectChange}
+                  defaultValue={'default'}
+                >
+                  <option value="default">
+                    Please Select the Opponents&apos; Classification
+                  </option>
+                  <option value="I AAA">I AAA</option>
+                  <option value="I AA">I AA</option>
+                  <option value="I A">I A</option>
+                  <option value="II AA">II AA</option>
+                  <option value="II A">II A</option>
+                  <option value="NA">N/A</option>
+                </StyledSelect>
+              </FormRow>
+            </Row>
+            {/* location  &  Home/Away */}
+            <Row type="horizontal">
+              <FormRow>
+                <Button
+                  name="home"
+                  variation={watch('home') ? 'primary' : 'secondary'}
+                  onClick={handleButtonClick}
+                >
+                  {watch('home') ? 'Home' : 'Away'}
+                </Button>
+                <input
+                  defaultValue={watch('home')}
+                  type="hidden"
+                  disabled={isWorking}
+                  {...register('home')}
+                />
+              </FormRow>
+              <FormRow />
+              <FormRow label="Location *" error={errors?.location?.message}>
+                <StyledSelect
+                  type="white"
+                  id="location"
+                  {...register('location', {
+                    validate: (value) =>
+                      value !== 'default' || 'Please select a location',
+                  })}
+                  onChange={handleSelectChange}
+                  defaultValue={'default'}
+                >
+                  <option value="default" disabled>
+                    Please Select Location
+                  </option>
+                  {locations.map((loc) => (
+                    <option key={loc.id} value={loc.id}>
+                      {loc.name}
+                    </option>
+                  ))}
+                </StyledSelect>
+              </FormRow>
+            </Row>
+            {/* comment */}
+            <FormRow label="Comment" error={errors?.comment?.message}>
+              <Textarea
+                id="comment"
+                disabled={isWorking}
+                {...register('comment')}
+              />
+            </FormRow>
+            {/* submit buttons */}
+            <FormRow>
+              <Button
+                variation="secondary"
+                type="reset"
+                onClick={() => closeModal?.()}
+              >
+                Cancel
+              </Button>
+              <Button disabled={isWorking}>
+                {isEditSession ? 'Edit Game' : 'Create New Game'}
+              </Button>
+            </FormRow>
+          </Form>
+        </MainForm>
+      </Flex>
+    </Div>
   );
 }
-
 export default CreateGameForm;

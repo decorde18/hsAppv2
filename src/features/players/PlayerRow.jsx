@@ -39,10 +39,10 @@ function PlayerRow({ player }) {
             <Menus.Toggle id={playerId} />
             <Menus.List id={playerId}>
               <Modal.Open opens="edit">
-                <Menus.Button icon={HiPencil}>edit</Menus.Button>
+                <Menus.Button icon={<HiPencil />}>edit</Menus.Button>
               </Modal.Open>
               <Modal.Open opens="delete">
-                <Menus.Button icon={HiTrash}>delete</Menus.Button>
+                <Menus.Button icon={<HiTrash />}>delete</Menus.Button>
               </Modal.Open>
             </Menus.List>
 

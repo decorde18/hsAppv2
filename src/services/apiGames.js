@@ -1,4 +1,6 @@
 import supabase from './supabase';
+import { deleteGoogleCalendarEvent } from './apiGoogle';
+import { useSession, useSessionContext } from '@supabase/auth-helpers-react';
 
 export async function getGames({ filter, sortBy }) {
   let query = supabase
@@ -52,18 +54,19 @@ export async function createEditGame(newGame, id) {
   return data;
 }
 
-export async function deleteGame(id) {
+export async function deleteGame({ id, calendar, calId }) {
   const { error } = await supabase.from('games').delete().eq('id', id);
   if (error) {
     console.log(error);
     throw new Error('Game Could Not Be Deleted');
   }
+  deleteGoogleCalendarEvent(calendar, calId);
   return null;
 }
 
 export async function cancelGame(id) {
   //to be played, canceled, forfeit, called early
-  //TODO Future this should be updateGameStatus and takes which status
+  //TODO Future this should be updateGameStatus and takes which status // update calendar
   const { error } = await supabase
     .from('games')
     .update({ status: 'canceled' })

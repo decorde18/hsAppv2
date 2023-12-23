@@ -2,16 +2,20 @@ import styled, { css } from 'styled-components';
 
 const sizes = {
   small: css`
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     padding: 0.4rem 0.8rem;
     text-transform: uppercase;
     font-weight: 600;
     text-align: center;
+    min-width: 10rem;
+    min-height: 4.5rem;
   `,
   medium: css`
     font-size: 1.4rem;
     padding: 1.2rem 1.6rem;
     font-weight: 500;
+    min-width: 10rem;
+    min-height: 4.5rem;
   `,
   large: css`
     font-size: 1.6rem;
@@ -24,6 +28,7 @@ const variations = {
   primary: css`
     color: var(--color-brand-50);
     background-color: var(--color-brand-500);
+    border: 1px solid var(--color-brand-500);
 
     &:hover {
       background-color: var(--color-brand-700);

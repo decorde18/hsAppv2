@@ -3,7 +3,6 @@ import Spinner from '../../ui/Spinner';
 
 import { useGames } from './useGames';
 import { useGoals, useGamePeriods } from './useGames';
-import { useCalendar } from '../google/useCalendar';
 
 import { useContext, useEffect, useState } from 'react';
 import Button from '../../ui/Button';
@@ -26,7 +25,6 @@ function GameTable() {
   // Calendar();
   const { currentSeason } = useCurrentSeason();
   const { isLoadingSeason, season } = useSeason();
-  const { isLoadingCalendar, calendar } = useCalendar();
 
   const [scheduleType, setScheduleType] = useState('season');
   const { isLoadingGames, games } = useGames();
@@ -86,7 +84,7 @@ function GameTable() {
         <AddGame />
       </StyledDiv>
 
-      <Table columns="0.15fr .35fr .4fr 1.75fr 1fr 1fr .5fr 1.5fr .25fr;">
+      <Table columns=".1fr .75fr .75fr 3.5fr .75fr 2.5fr 1fr 2.5fr .1fr">
         <Table.Header>
           <div></div>
           <div>Date</div>

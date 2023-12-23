@@ -24,7 +24,6 @@ function SideBar() {
     <Aside>
       <Div>
         <Button type="sideNav">
-          {' '}
           <NavLink to={`../roster?season=${currentSeason}`} target="_blank">
             Print Roster
           </NavLink>
@@ -61,6 +60,9 @@ function SideBar() {
         </Button>
         <Button type="sideNav">
           <NavLink to={`./uniformSeasons`}>Uniform Seasons</NavLink>
+        </Button>
+        <Button type="sideNav">
+          <NavLink to={`./scheduleHelper`}>Schedule Helper</NavLink>
         </Button>
       </Div>
     </Aside>

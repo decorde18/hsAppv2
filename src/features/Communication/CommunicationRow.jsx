@@ -1,10 +1,6 @@
 import styled from 'styled-components';
 
-import Modal from '../../ui/Modal';
 import Table from '../../ui/Table';
-import Menus from '../../ui/Menus';
-import { format } from 'date-fns';
-import { useEffect, useState } from 'react';
 
 const Player = styled.div`
   font-size: 1.6rem;

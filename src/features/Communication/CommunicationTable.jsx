@@ -1,11 +1,9 @@
-import styled from 'styled-components';
 import Spinner from '../../ui/Spinner';
 import CommunicationRow from './CommunicationRow';
 
-import { usePlayers } from '../players/usePlayers';
 import { usePlayerSeasons } from '../players/usePlayerSeasons';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Button from '../../ui/Button';
 import Table from '../../ui/Table';
 import Empty from '../../ui/Empty';
@@ -122,14 +120,17 @@ function CommunicationTable() {
   function handleAllParentsChecked(e) {
     setAllParentsChecked(e.target.checked ? 'all' : 'none');
     //change parent isParentAdded to e.target.checked
-    //todo I AM HERE add visible parents only to check all
     const addAll = filteredPlayers.map((player) => {
-      return {
-        ...player,
-        parents: player.parents.map((parent) => {
-          return { ...parent, isParentAdded: e.target.checked };
-        }),
-      };
+      if (player.isPlayerVisible) {
+        return {
+          ...player,
+          parents: player.parents.map((parent) => {
+            return { ...parent, isParentAdded: e.target.checked };
+          }),
+        };
+      } else {
+        return { ...player };
+      }
     });
     setFilteredPlayers(addAll);
   }
@@ -166,7 +167,6 @@ function CommunicationTable() {
           } else return player;
         });
       setFilteredPlayers(newFilter);
-      //todo move this to the UseEffect
       if (checked) checkForAll(newFilter);
     }
     function checkForAll(newFilter) {
@@ -259,8 +259,6 @@ function CommunicationTable() {
 
     setFilteredPlayers(rowCheck);
   }
-  //TODO Add filter
-  //TODO update the season filter
 
   return (
     <>
