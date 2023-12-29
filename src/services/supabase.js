@@ -1,5 +1,4 @@
 import { createClient } from '@supabase/supabase-js';
-// import { ThemeSupa } from '@supabase/auth-ui-shared';
 
 export const supabaseUrl = 'https://gppzzqntjnmtbmrgigvw.supabase.co';
 const supabaseKey =

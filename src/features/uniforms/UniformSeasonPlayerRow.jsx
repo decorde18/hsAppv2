@@ -12,7 +12,7 @@ import { usePlayerSeason } from '../players/usePlayerSeasons';
 import { HiSquare2Stack, HiPencil, HiTrash } from 'react-icons/hi2';
 
 import Modal from '../../ui/Modal';
-import ConfirmDelete from '../../ui/ConfirmDelete';
+import ConfirmModal from '../../ui/ConfirmModal';
 import Table from '../../ui/Table';
 import Menus from '../../ui/Menus';
 import { useEffect, useState } from 'react';

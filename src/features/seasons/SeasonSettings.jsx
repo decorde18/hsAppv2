@@ -17,9 +17,8 @@ function SeasonSettings() {
 
   return (
     <Row>
-      <Button type="sideNav">
-        {' '}
-        <NavLink to={`../newseason`}>New Season</NavLink>
+      <Button type="selected" variation="primary">
+        <NavLink to={`../newseason`}>Add New Season</NavLink>
       </Button>
       <Heading as="h1">{`Update ${filteredSeason.season} Season`}</Heading>
       <UpdateSeasonForm season={filteredSeason} />

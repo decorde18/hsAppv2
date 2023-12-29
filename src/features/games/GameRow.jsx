@@ -1,20 +1,16 @@
 import styled, { css } from 'styled-components';
 import { useState } from 'react';
 import Table from '../../ui/Table';
-import { format } from 'date-fns';
 import { formatTime, formatDate } from '../../utils/helpers';
 import Modal from '../../ui/Modal';
 import Menus from '../../ui/Menus';
-import {
-  HiPencil,
-  HiSquare2Stack,
-  HiTrash,
-  HiMiniXMark,
-} from 'react-icons/hi2';
+import { HiPencil, HiTrash, HiMiniXMark } from 'react-icons/hi2';
 import { useDeleteGame, useCancelGame } from './useGames';
-import ConfirmDelete from '../../ui/ConfirmDelete';
-import ConfirmCancel from '../../ui/ConfirmCancel';
+import ConfirmModal from '../../ui/ConfirmModal';
 import CreateGameForm from './CreateGameForm';
+import CreateGoogleSignedInError from '../Calendar/CreateGoogleSignedInError';
+
+import { useSession, useSessionContext } from '@supabase/auth-helpers-react';
 
 const TableRow = styled.div`
   display: grid;
@@ -47,8 +43,12 @@ const Result = styled.div`
 function GameRow({ game }) {
   const { isDeleting, deleteGame } = useDeleteGame();
   const { isCanceling, cancelGame } = useCancelGame();
-  //TODO getOwnScore and opponentScore
-  // const { isLoadingGamePeriods, periods } = useGamePeriods();
+  const { isLoading } = useSessionContext();
+
+  const isWorking = isDeleting || isCanceling || isLoading;
+
+  const session = useSession();
+
   const ownScore = game.goals.filter(
     (goal) => goal?.event === 'Goal Scored'
   ).length;
@@ -105,24 +105,30 @@ function GameRow({ game }) {
           {<CreateGameForm gameToEdit={game} />}
         </Modal.Window>
         <Modal.Window name="cancel">
-          <ConfirmCancel
+          <ConfirmModal
             resourceName="games"
-            disabled={isDeleting}
             onConfirm={() => cancelGame(game.id)}
+            disabled={isWorking}
+            confirmType="cancel"
           />
         </Modal.Window>
         <Modal.Window name="delete">
-          <ConfirmDelete
-            resourceName="games"
-            onConfirm={() =>
-              deleteGame({
-                id: game.id,
-                calendar: game.teamType,
-                calId: game.calId,
-              })
-            }
-            disabled={isDeleting}
-          />
+          {!session?.provider_token ? (
+            <CreateGoogleSignedInError />
+          ) : (
+            <ConfirmModal
+              resourceName="games"
+              onConfirm={() =>
+                deleteGame({
+                  id: game.id,
+                  calendar: game.teamType,
+                  calId: game.calId,
+                })
+              }
+              disabled={isWorking}
+              confirmType="delete"
+            />
+          )}
         </Modal.Window>
       </Modal>
     </Table.Row>

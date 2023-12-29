@@ -7,7 +7,9 @@ function AddUniformSeasonPlayer() {
     <div>
       <Modal>
         <Modal.Open opens="uniform-season-player-form">
-          <Button>Add New Uniform Season</Button>
+          <Button type="selected" variation="primary">
+            Add New Uniform Season
+          </Button>
         </Modal.Open>
         <Modal.Window name="uniform-season-player-form">
           <UniformSeasonPlayerCreateForm />

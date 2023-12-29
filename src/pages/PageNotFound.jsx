@@ -1,7 +1,7 @@
 import { styled } from 'styled-components';
-import Footer from '../components/Footer';
-import Header from '../ui/Header';
-// import AppLayout from '../ui/AppLayout';
+import Footer from '../features/layout/Footer';
+import Header from '../features/layout/Header';
+import BackButton from '../ui/BackButton';
 
 const Div = styled.div`
   display: grid;
@@ -17,11 +17,18 @@ const Div2 = styled.div`
 `;
 function PageNotFound() {
   return (
-    <Div>
-      <Header type="nonApp" />
-      <Div2>SORRY THIS PAGE IS NOT FOUND </Div2>
-      <Footer />
-    </Div>
+    <>
+      <Div>
+        <Header type="nonApp" />
+        <Div2>
+          SORRY THIS PAGE IS NOT FOUND
+          <div>
+            <BackButton />
+          </div>
+        </Div2>
+        <Footer />
+      </Div>
+    </>
   );
 }
 

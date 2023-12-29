@@ -30,7 +30,6 @@ export async function createEditParent(newParent, id) {
 }
 
 export async function deleteParent(id) {
-  //TODO ask for delete Person in People
   const { error } = await supabase.from('parents').delete().eq('id', id);
   if (error) {
     console.log(error);

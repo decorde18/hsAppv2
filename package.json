@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@ericz1803/react-google-calendar": "^4.3.1",
+    "@react-oauth/google": "^0.12.1",
     "@react-pdf/renderer": "^3.1.12",
     "@reduxjs/toolkit": "^1.9.5",
     "@supabase/auth-helpers-react": "^0.4.2",
@@ -36,6 +37,7 @@
     "react-datetime-picker": "^5.5.3",
     "react-dom": "^18.2.0",
     "react-google-calendar-api": "^2.3.0",
+    "react-google-one-tap-login": "^0.1.1",
     "react-hook-form": "^7.49.2",
     "react-hot-toast": "^2.4.1",
     "react-icons": "^4.10.1",

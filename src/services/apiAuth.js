@@ -48,3 +48,20 @@ export async function updateCurrentUser({ password, fullName, avatar }) {
   if (error2) throw new Error(error2.message);
   return updatedUser;
 }
+
+export async function googleSignIn() {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      scopes: [
+        'https://www.googleapis.com/auth/calendar',
+        'https://www.googleapis.com/auth/spreadsheets',
+      ],
+      redirectTo: 'http://localhost:5173/app',
+    },
+  });
+  if (error) {
+    alert('Error logging in to Google provider with Supabase');
+    throw new Error(error.message);
+  } else return data;
+}

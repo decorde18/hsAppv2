@@ -7,7 +7,9 @@ function AddUniformJersey() {
     <div>
       <Modal>
         <Modal.Open opens="uniform-jersey-form">
-          <Button>Add New UniformJersey</Button>
+          <Button type="selected" variation="primary">
+            Add New UniformJersey
+          </Button>
         </Modal.Open>
         <Modal.Window name="uniform-jersey-form">
           <UniformJerseyCreateForm />

@@ -13,7 +13,7 @@ export async function getPlayers() {
     .order('entryYear', { ascending: true })
     .order('lastName', { foreignTable: 'people', ascending: true })
     .order('firstName', { foreignTable: 'people', ascending: true });
-  //todo fixme these aren't ordering and I don't know why
+
   if (error) {
     console.log(error);
     throw new Error('Players Could Not Be Loaded');
@@ -39,7 +39,6 @@ export async function createEditPlayer(newPlayer, id) {
 }
 
 export async function deletePlayer(id) {
-  //TODO ask for delete Person in People
   const { error } = await supabase.from('players').delete().eq('id', id);
   if (error) {
     console.log(error);

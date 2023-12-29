@@ -65,22 +65,6 @@ export async function loginWithGoogle() {
   console.log(data);
 }
 
-// async function googleSignIn() {
-//   const { error } = await supabaseClient.auth.signInWithOAuth({
-//     provider: 'google',
-//     options: {
-//       scopes: [
-//         'https://www.googleapis.com/auth/calendar',
-//         'https://www.googleapis.com/auth/spreadsheets',
-//       ],
-//     },
-//   });
-//   if (error) {
-//     alert('Error logging in to Google provider with Supabase');
-//     console.log(error);
-//   }
-// }
-
 export async function logoutGoogle() {
   const { error } = await supabase.auth.signOut();
 }

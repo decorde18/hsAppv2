@@ -3,7 +3,7 @@ import Spinner from '../../ui/Spinner';
 import PeopleRow from './PeopleRow';
 import { usePeople } from './usePeople';
 import { useEffect, useState } from 'react';
-import Button from '../../components/Button';
+import Button from '../../ui/Button';
 import { useQuery } from '@tanstack/react-query';
 
 const Table = styled.div`

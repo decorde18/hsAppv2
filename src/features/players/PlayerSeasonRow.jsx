@@ -8,12 +8,12 @@ import { HiSquare2Stack, HiPencil, HiTrash } from 'react-icons/hi2';
 import Form from '../../ui/Form';
 import FormRow from '../../ui/FormRow';
 import Input from '../../ui/Input';
-import ConfirmDelete from '../../ui/ConfirmDelete';
+import ConfirmModal from '../../ui/ConfirmModal';
 import Modal from '../../ui/Modal';
 import Table from '../../ui/Table';
 import Menus from '../../ui/Menus';
 import { format } from 'date-fns';
-import CreatePlayerForm from './CreatePlayerForm';
+import CreatePlayerForm from './CreatePlayerModalForm';
 import { formatDate } from '../../utils/helpers';
 import { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -29,7 +29,6 @@ const values = {
 const Div = styled.div`
   display: flex;
 `;
-
 const ButtonChecked = styled.button`
   border: none;
   border-radius: var(--border-radius-sm);
@@ -67,7 +66,6 @@ const Player = styled.div`
   /* font-family: 'Sono'; */
 `;
 
-//TODO get from season settings
 const teamLevels = [
   { value: 1, team: 'Varsity' },
   { value: 2, team: 'JV' },
@@ -128,11 +126,10 @@ function PlayerSeasonRow({ playerSeason }) {
     updateSetting({ returningPlayer: !returningPlayer, id: playerSeason.id });
     setReturningPlayer(!returningPlayer);
   }
-  //todo i am here fix role=row from rowin cabin
-  //todo then menus in playerrow
+
   return (
     <>
-      <TableRow role="row">
+      <TableRow>
         <Player>{`${people.firstName} ${people.lastName}`}</Player>
         <select
           defaultValue={playerSeason.status}
@@ -207,10 +204,11 @@ function PlayerSeasonRow({ playerSeason }) {
               </Modal.Window>
 
               <Modal.Window name="delete">
-                <ConfirmDelete
+                <ConfirmModal
                   resourceName="player"
                   disabled={isDeleting}
                   onConfirm={() => deletePlayer(player.id)}
+                  confirmType="delete"
                 />
               </Modal.Window>
             </Menus.Menu>

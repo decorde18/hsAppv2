@@ -29,18 +29,15 @@ const variations = {
     color: var(--color-brand-50);
     background-color: var(--color-brand-500);
     border: 1px solid var(--color-brand-500);
-
-    &:hover {
-      background-color: var(--color-brand-700);
-    }
   `,
   secondary: css`
     color: var(--color-grey-500);
     background: var(--color-grey-0);
     border: 1px solid var(--color-grey-200);
-
     &:hover {
-      background-color: var(--color-grey-50);
+      color: var(--color-brand--1);
+      font-weight: 700;
+      background-color: var(--color-brand-500);
     }
   `,
   danger: css`
@@ -51,21 +48,24 @@ const variations = {
       background-color: var(--color-red-800);
     }
   `,
+  back: css`
+    font-weight: 600;
+    background: none;
+    border: 1px solid currentColor;
+  `,
 };
 const types = {
   selected: css`
-    background-color: var(--color-grey-0);
-    color: var(--color-dark--2);
-  `,
-  sideNav: css`
-    width: 100%;
-    background-color: var(--color-grey-0);
-    color: var(--color-brand--2);
     &:hover {
-      color: var(--color-brand--1);
+      background-color: var(--color-brand-700);
       font-weight: 700;
-      background-color: var(--color-brand-500);
+      font-size: 1.5rem;
     }
+  `,
+  fullWidth: css`
+    width: 100%;
+    /* background-color: var(--color-grey-0);
+    color: var(--color-brand--2); */
   `,
 };
 const Button = styled.button`

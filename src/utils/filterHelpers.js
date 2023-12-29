@@ -17,7 +17,6 @@ export const defaultRosterStatus = (season) => {
     ) || statusFilterLabel.find((status) => status.value === 1);
   return filterStatus;
 };
-
 export function filterRosterStatus(playerSeasons, rosterStatus, season) {
   const filterStatus =
     statusFilterLabel.find((status) => {
@@ -33,7 +32,6 @@ export function filterRosterStatus(playerSeasons, rosterStatus, season) {
       : playerSeasons.filter((player) => player.status === filterStatus.label);
   return { filterStatus, filteredPlayers };
 }
-
 export function defaultVisiblePlayers(players, parents, season) {
   return players.map((player) => {
     return {

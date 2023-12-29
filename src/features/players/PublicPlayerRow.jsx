@@ -1,12 +1,12 @@
 import styled from 'styled-components';
 
-import CreatePlayerForm from './CreatePlayerForm';
+import CreatePlayerForm from './CreatePlayerModalForm';
 
 import { useDeletePlayer } from './useDeletePlayer';
 
 import { HiPencil, HiTrash } from 'react-icons/hi2';
 
-import ConfirmDelete from '../../ui/ConfirmDelete';
+import ConfirmModal from '../../ui/ConfirmModal';
 import Modal from '../../ui/Modal';
 import Table from '../../ui/Table';
 import Menus from '../../ui/Menus';

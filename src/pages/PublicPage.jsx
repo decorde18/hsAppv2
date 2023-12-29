@@ -1,6 +1,7 @@
 import { styled } from 'styled-components';
-import Header from '../ui/Header';
-import Footer from '../components/Footer';
+import Header from '../features/layout/Header';
+import Footer from '../features/layout/Footer';
+import { NavLink } from 'react-router-dom';
 
 const StyledPublicPage = styled.div`
   display: grid;
@@ -8,16 +9,26 @@ const StyledPublicPage = styled.div`
   height: 100vh;
   grid-template-rows: 15rem 1fr auto;
 `;
-//TODO create a PageNav page (if we want from the top)
-
+const Main = styled.main`
+  margin: auto;
+`;
+const StyledNav = styled.a`
+  color: blue;
+  text-decoration: underline;
+`;
 function PublicPage() {
   return (
     <StyledPublicPage>
       <Header type="nonApp" />
-      <main>
-        This is the main section. It will include all things on the landing
-        page. This page is before you are logged in
-      </main>
+      <Main>
+        <h1>
+          <span>New Players, please </span>
+          <StyledNav>
+            <NavLink to="../newplayer">SIGN UP</NavLink>
+          </StyledNav>
+          <span> to get on our email list</span>
+        </h1>
+      </Main>
       <Footer />
     </StyledPublicPage>
   );

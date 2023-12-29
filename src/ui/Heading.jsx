@@ -19,6 +19,7 @@ const Heading = styled.h1`
       font-size: 2rem;
       font-weight: 400;
     `}
+
   ${(props) =>
     props.as === 'h4' &&
     css`
@@ -42,6 +43,11 @@ const Heading = styled.h1`
     props.location === 'left' &&
     css`
       text-align: left;
+    `}
+      ${(props) =>
+    props.case === 'upper' &&
+    css`
+      text-transform: uppercase;
     `}
     line-height:1.4
 `;

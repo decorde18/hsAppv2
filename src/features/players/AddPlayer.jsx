@@ -1,5 +1,5 @@
 import Button from '../../ui/Button';
-import CreatePlayerForm from './CreatePlayerForm';
+import CreatePlayerForm from './CreatePlayerModalForm';
 import Modal from '../../ui/Modal';
 
 function AddPlayer() {
@@ -7,7 +7,9 @@ function AddPlayer() {
     <div>
       <Modal>
         <Modal.Open opens="player-form">
-          <Button>Add New Player</Button>
+          <Button type="selected" variation="primary">
+            Add New Player
+          </Button>
         </Modal.Open>
         <Modal.Window name="player-form">
           <CreatePlayerForm />

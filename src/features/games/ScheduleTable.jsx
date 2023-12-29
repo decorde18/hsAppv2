@@ -15,10 +15,8 @@ const Right = styled.div`
 
 function ScheduleTable() {
   //TODO FUTURE ---need to create context provider in App for recent season... currently it is read in SeasonSelector, move to App --- if no searchParam, use Recent once it loads
-  // const { isLoadingRecent, recentSeason } = useRecentSeason();
   const [searchParams] = useSearchParams();
 
-  // if (!searchParams.get('season')) searchParams.set('season', recentSeason.id);
   const season = searchParams.get('season');
   const { isLoadingSeason, season: seasonApi } = useSeason(season);
   const { isLoadingGamesSeason, gamesSeason } = useGamesSeason(season);

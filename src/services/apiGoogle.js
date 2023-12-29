@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import supabase from './supabase';
 
 import { gapi } from 'gapi-script';
+import { addDays } from '../utils/helpers';
 
 const calendarId = {
   ihsSoccer: '6urfeejbvf98os9r16sf94eqdc@group.calendar.google.com',
@@ -24,8 +25,73 @@ export async function getCalendar(newEvent) {
   }
   return {};
 }
-export async function createGoogleCalendarEvent(newEvent, edit) {
+export async function createEditGoogleCalendarEvent(newEvent, edit) {
+  const { startDateTime, endDateTime, allDay, calendar, calId } = newEvent;
+  const { data: session, error } = await supabase.auth.getSession();
+  const googleProviderToken = session.session.provider_token;
+
+  const start = !allDay && startDateTime;
+  const end = !allDay && endDateTime;
+  const startDate = allDay && startDateTime.split('T')[0];
+  const endDate = allDay && addDays(endDateTime.split('T')[0], 1);
+
+  const event = {
+    summary: newEvent.summary,
+    description: newEvent.description,
+    location: newEvent.location,
+    ...(start && {
+      start: {
+        dateTime: start,
+        timeZone: 'America/Chicago',
+      },
+      end: {
+        dateTime: end,
+        timeZone: 'America/Chicago',
+      },
+    }),
+    ...(!start && {
+      start: {
+        date: startDate,
+      },
+      end: {
+        date: endDate,
+      },
+    }),
+  };
+
+  try {
+    return await fetch(
+      edit
+        ? `https://www.googleapis.com/calendar/v3/calendars/${calendarId[calendar]}/events/${calId}`
+        : `https://www.googleapis.com/calendar/v3/calendars/${
+            calendarId[newEvent.calendar]
+          }/events`,
+      {
+        method: edit ? 'PUT' : 'POST',
+        headers: {
+          Authorization: 'Bearer ' + googleProviderToken,
+        },
+        body: JSON.stringify(event),
+      }
+    )
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else
+          console.log(
+            `Calendar entry Could Not Be ${edit ? 'Edited' : 'Created'}`
+          );
+      })
+      .then((data) => {
+        return data;
+      });
+  } catch (error) {
+    console.error('Promise rejected');
+  }
+}
+export async function createEditGoogleCalendarGame(newEvent, edit) {
   const { start, end, date, calendar, calId } = newEvent;
+
   const { data: session, error } = await supabase.auth.getSession();
   const googleProviderToken = session.session.provider_token;
 
@@ -47,11 +113,9 @@ export async function createGoogleCalendarEvent(newEvent, edit) {
     ...(!start && {
       start: {
         date,
-        timeZone: 'America/Chicago',
       },
       end: {
         date,
-        timeZone: 'America/Chicago',
       },
     }),
   };

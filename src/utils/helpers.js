@@ -1,5 +1,6 @@
 import { formatDistance, parseISO } from 'date-fns';
 import { differenceInDays } from 'date-fns/esm';
+import moment from 'moment';
 
 // We want to make this function work for both Date objects and strings (which come from Supabase)
 export const subtractDates = (dateStr1, dateStr2) =>
@@ -12,7 +13,6 @@ export const formatDistanceFromNow = (dateStr) =>
     .replace('about ', '')
     .replace('in', 'In');
 
-// Supabase needs an ISO date string. However, that string will be different on every render because the MS or SEC have changed, which isn't good. So we use this trick to remove any time
 export const getToday = function (options = {}) {
   const today = new Date();
 
@@ -30,10 +30,10 @@ export const formatCurrency = (value) =>
   );
 
 export const formatTime = (time, noSeconds) => {
+  time = time.split(' ').length > 1 ? convert12To24(time) : time;
   const timeArr = time.split('+');
 
   time = timeArr[0].split(':'); // convert to array
-
   // fetch
   var hours = Number(time[0]);
   var minutes = Number(time[1]);
@@ -57,6 +57,21 @@ export const formatTime = (time, noSeconds) => {
   timeValue += hours >= 12 ? ' PM' : ' AM'; // get AM/PM
   return timeValue;
 };
+function convert12To24(time12) {
+  // Split the time into hours and minutes
+  let [hours, minutes, seconds] = time12.split(':');
+  // Check if the time is in PM
+  if (time12.endsWith('PM')) {
+    // If it is, add 12 to the hours
+    hours = parseInt(hours) + 12;
+  }
+  // If the hours are now greater than 23, set them to 0
+  if (hours > 23) {
+    hours = 0;
+  }
+  // Return the time in 24-hour format
+  return `${hours}:${minutes}:${seconds.slice(0, 2) || '00'}`;
+}
 export function formatDate(dt) {
   // David Added function because format converts dates to time zone so they are off by half a day
   const year = dt.getUTCFullYear();
@@ -72,3 +87,25 @@ export function formatDate(dt) {
     return number > 9 ? number : '0' + number;
   }
 }
+export function momentObj(date, time, timeAdded = 0) {
+  // tell moment how to parse the input
+  const dateTime = moment(date + time, 'YYYY-MM-DDLT').add(timeAdded, 'h');
+  // conversion
+  return dateTime.format('YYYY-MM-DDTHH:mm:s');
+}
+export function addDays(date, numberOfDays) {
+  const newDate = moment(date).add(numberOfDays, 'days');
+  return newDate.format('YYYY-MM-DD');
+}
+// TIME AND DATE HELPER
+// new Date().toLocaleTimeString(); // 11:18:48 AM
+// //---
+// new Date().toLocaleDateString(); // 11/16/2015
+// //---
+// new Date().toLocaleString(); // 11/16/2015, 11:18:48 PM
+
+// 4 hours later
+// new Date(new Date().getTime() + 4*60*60*1000).toLocaleTimeString(); // 3:18:48 PM or 15:18:48
+
+//2 days later
+// new Date(new Date().getTime() - 2*24*60*60*1000).toLocaleDateString() // 11/14/2015

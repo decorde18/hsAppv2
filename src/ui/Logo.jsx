@@ -8,6 +8,7 @@ const Img = styled.img`
   padding-top: 0.25rem;
   padding-left: 0.25rem;
   height: 15rem;
+  z-index: 1;
 `;
 function Logo() {
   return (

@@ -13,15 +13,17 @@ import Select from '../../ui/Select';
 import Button from '../../ui/Button';
 import Textarea from '../../ui/Textarea';
 
-import Calendar from './Calendar';
+import Calendar from '../Calendar/Calendar';
 import Spinner from '../../ui/Spinner';
-import CreateGameFormError from './CreateGameFormError';
+import CreateGoogleSignedInError from '../Calendar/CreateGoogleSignedInError';
+
+import { useSession, useSessionContext } from '@supabase/auth-helpers-react';
 
 import { useSeason } from '../seasons/useSeasons';
 import { useLocations } from '../locations/useLocations';
 import { useSchools } from '../schools/useSchools';
 import { useCreateGame, useEditGame } from './useGames';
-import { createGoogleCalendarEvent } from '../../services/apiGoogle';
+import { createEditGoogleCalendarGame } from '../../services/apiGoogle';
 
 const Div = styled.div`
   height: 100%;
@@ -106,11 +108,10 @@ const gameTypes = [
   },
 ];
 
-function CreateGameForm({
-  gameToEdit = {},
-  onCloseModal,
-  googleProviderToken,
-}) {
+function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
+  const { isLoading: isLoadingSupabase } = useSessionContext();
+  const session = useSession();
+
   const { isLoadingSeason, season } = useSeason();
   const { isLoadingLocations, locations } = useLocations(0);
   const { isLoadingSchools, schools } = useSchools();
@@ -137,7 +138,11 @@ function CreateGameForm({
   const { errors } = formState;
 
   const isLoading =
-    isLoadingSeason || isLoadingLocations || isLoadingSchools || googleUpdating;
+    isLoadingSeason ||
+    isLoadingLocations ||
+    isLoadingSchools ||
+    googleUpdating ||
+    isLoadingSupabase;
   const isWorking = isLoading || isCreating || isEditing || googleUpdating;
 
   const [gameOpponent, setGameOpponent] = useState(
@@ -168,13 +173,13 @@ function CreateGameForm({
       opponent?.region == season.region && opponent?.district == season.district
         ? handleSetValue('district', true)
         : handleSetValue('district', false);
-      handleSetValue('location', opponent?.home_location || 'default');
+      !watch('home') &&
+        handleSetValue('location', opponent?.home_location || 'default');
       setGameOpponent(opponent);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [isLoading, schools, gameOpponent]
   );
-  //TODO turn this on when ready to update calendar with start and end
   useEffect(
     function () {
       if (isLoading) return;
@@ -208,7 +213,6 @@ function CreateGameForm({
     e.target.value !== 'both' && setValue('teamType', e.target.value);
   }
   function gameTypeChange(e) {
-    //TODO  can do similar where the default time changes if the other team time changes
     if (gameScheduleType === 'both')
       //sets the value for if both, and updates any others with same if they don't already have a value
       Object.keys(getValues())
@@ -235,12 +239,12 @@ function CreateGameForm({
     let teamSchedules;
     const {
       created_at,
+      updated_at,
       goals,
       locations: loc,
       schools: sch,
       ...newData
     } = data;
-
     if (isEditSession) {
       sendToCalendar(newData);
       editGame(
@@ -262,7 +266,7 @@ function CreateGameForm({
         //time & gameType need to be broken into JV and V
         const separationArray = ['time', 'gameType']; //array of combined fields we need to remove
         const newArray = separationArray.reduce((acc, cur) => {
-          const curKey = `${cur}${team}`;
+          const curKey = teamSchedules.length > 1 ? `${cur}${team}` : [cur];
           const curValue = data[curKey];
           for (const key in newData) {
             //  delete all keys that are affected by combined fields
@@ -270,16 +274,13 @@ function CreateGameForm({
           }
           return { ...acc, [cur]: curValue }; //add only the value with new key for current team
         }, []);
-        //add seasonTime based off gameType
-        // const seasonTime = gameType.find(
-        //   (teamType) => teamType.team === team
-        // ).seasonTime;
         const seasonTime = seasonTimes.find(
           (tim) =>
             tim.value ===
             gameTypes.find((type) => type.value === newArray.gameType)
               .seasonTime
         ).label;
+        console.log(seasonTime);
         const teamData = {
           // all data for team - send to calendar, send to create/edit
           ...newArray,
@@ -294,7 +295,6 @@ function CreateGameForm({
         sendToCalendar(teamData);
       });
     }
-    //todo take out the provider token if I can call it from the api (seems to work for delete)
     async function sendToCalendar(calData) {
       const googleCalData = { ...calData };
       !calData.time && delete calData.time;
@@ -310,7 +310,7 @@ function CreateGameForm({
         googleCalData.end = momentObj(calData.date, calData.time, 1.5);
       }
       // addToCalendar and get ID
-      createGoogleCalendarEvent(
+      createEditGoogleCalendarGame(
         {
           ...googleCalData,
           calendar: calData.teamType,
@@ -319,7 +319,11 @@ function CreateGameForm({
       ).then((data) => {
         setGoogleUpdating(false);
         if (isEditSession) return;
-        createGame({ ...calData, teamType: calData.teamType, calId: data.id });
+        createGame({
+          ...calData,
+          teamType: calData.teamType,
+          calId: data.id,
+        }).then(() => closeModal());
       });
 
       function momentObj(date, time, timeAdded = 0) {
@@ -332,7 +336,6 @@ function CreateGameForm({
         return dateTime.format('YYYY-MM-DDTHH:mm:s');
       }
 
-      // setCalData('updated'); //TODO thisclears forms and also the closeModal
       return;
     }
   }
@@ -345,7 +348,7 @@ function CreateGameForm({
   }
 
   if (isLoading || isWorking) return <Spinner />;
-  if (!googleProviderToken) return <CreateGameFormError />;
+  if (!session?.provider_token) return <CreateGoogleSignedInError />;
   return (
     <Div>
       <Flex>

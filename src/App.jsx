@@ -11,7 +11,7 @@ import Account from './pages/Account';
 import Login from './pages/Login';
 import PageNotFound from './pages/PageNotFound';
 import GlobalStyles from './styles/GlobalStyles';
-import AppLayout from './ui/AppLayout';
+import AppLayout from './features/layout/AppLayout';
 import AppLayoutPdf from './ui/AppLayoutPdf';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -27,6 +27,7 @@ import Players from './pages/Players';
 import People from './pages/People';
 import Communication from './pages/Communication';
 import Games from './pages/Games';
+import Events from './pages/Events';
 import Season from './pages/Season';
 
 import NewSeason from './pages/NewSeason';
@@ -78,6 +79,7 @@ function App() {
                 <Route path="people" element={<People />} />
                 <Route path="communication" element={<Communication />} />
                 <Route path="games" element={<Games />} />
+                <Route path="events" element={<Events />} />
                 <Route path="newseason" element={<NewSeason />} />
                 <Route path="uniforms" element={<Uniforms />} />
                 <Route path="uniformJerseys" element={<UniformJerseys />} />

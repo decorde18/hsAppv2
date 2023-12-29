@@ -1,10 +1,10 @@
 import supabase from './supabase';
 import { deleteGoogleCalendarEvent } from './apiGoogle';
-import { useSession, useSessionContext } from '@supabase/auth-helpers-react';
 
+const table = 'games';
 export async function getGames({ filter, sortBy }) {
   let query = supabase
-    .from('games')
+    .from(table)
     .select('*, schools(*), locations(*)')
     .order('date', {
       ascending: true,
@@ -22,7 +22,7 @@ export async function getGames({ filter, sortBy }) {
 }
 export async function getGamesSeason(seasonId) {
   const { data: games, error } = await supabase
-    .from('games')
+    .from(table)
     .select('*, schools(*), locations(*)')
     .eq('season', seasonId)
     .order('date', { ascending: true })
@@ -36,7 +36,7 @@ export async function getGamesSeason(seasonId) {
 }
 
 export async function createEditGame(newGame, id) {
-  let query = supabase.from('games');
+  let query = supabase.from(table);
   //create game
   if (!id) query = query.insert([{ ...newGame }]);
   //edit game
@@ -49,13 +49,13 @@ export async function createEditGame(newGame, id) {
 
   if (error) {
     console.log(error);
-    throw new Error('Game Could Not Be Created');
+    throw new Error('Game Could Not Be Created or Edited');
   }
   return data;
 }
 
 export async function deleteGame({ id, calendar, calId }) {
-  const { error } = await supabase.from('games').delete().eq('id', id);
+  const { error } = await supabase.from(table).delete().eq('id', id);
   if (error) {
     console.log(error);
     throw new Error('Game Could Not Be Deleted');
@@ -66,9 +66,9 @@ export async function deleteGame({ id, calendar, calId }) {
 
 export async function cancelGame(id) {
   //to be played, canceled, forfeit, called early
-  //TODO Future this should be updateGameStatus and takes which status // update calendar
+
   const { error } = await supabase
-    .from('games')
+    .from(table)
     .update({ status: 'canceled' })
     .eq('id', id)
     .select();

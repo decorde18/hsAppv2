@@ -1,45 +1,50 @@
-## TO START NEW PROJECT
+## //TODO FIXME !!!
 
-npm init
-npm i node-sass --save-dev ## sass save-dev dev dependencies. save just dependencies not dev
-##need to run the sass script (and define on new project)
+- create Player Form
+- scheeduleTable - see the todos
+- apiPlayers - sort order not working
+- usePlayerSeasons -see todos
+- apiGames - updateGames - not only cancelGame but updateGameStatus and takes which status - update calendar
 
-npm install
-npm update
+## //TODO FIXME !!
 
-npm start
-npm run watch:js
-npm run watch:jsGameStats
-npm run watch:jsStats
+- playerseason row - get JV, V from season settings
+  -sidebar hihlighted when clicked
 
-npm run build:js
-npm run build:jsGameStats
-npm run build:jsStats
-git init (only first time)
-git status
-git add -A
-git commit -m "Comment for which commit this is"
-git remote add origin https://github.com/decorde18/hsApp.git (after creating a repository in GitHub)
+## //TODO FIXME !
 
-must do the npm builds
+- NEED TO UPDATE SEASON SELECTOR WHEN NEW SEASON IS ADDED. IT TAKES TO NEW SEASON< BUT NOT SEASON SELECTOR>
+- fix defaults of new season -id: 23 (not all transfered) - see details below
+- auto selecting classification??? can't seem to make it not work again
 
-## /!!!!\*\*\* /change package.json to "start": "node server.js", \*\*\*
+## TODO NEXT !!!
 
-git push origin master
-git pull origin master is the opposite to pull the code to another computer
-git push heroku master (once deployed)
+- Pagination
+  -Filters
 
-## if asks for heroku password - Run `heroku login` to update your credentials, then retry the git command.
+## TODO NEXT !!
 
-heroku open
-heroku config:set **\***
+- create add another on create events, players, games
+- update schools with new classifications and districts
+- all-time vs current season tabs
 
-## Google calendar and edit games
+## TODO NEXT !
 
-## Finish Player Table
+- calendar funtionality - set start and end date - advance months, etc
+- delete parent, delete person too? - same with player, etc
 
-## fix defaults of new season -id: 23
+## - TODO POSSIBLY
 
+- create games, set JV time based on V time or vice versus
+  -Google contacts ?
+  -Create Events - on table, add seasonphase?
+
+## TODO FUTURE
+
+- create helper functions for all Date events (send to google calendar, with time, without time, etc)
+  -in CreateGameForm/CreateEventForm, I use StyledSelect instead of my Select Component because I need to pass the arguments into the options but because I have default values, I created it differently. Can I recreate the StyledSelects with new options?
+
+details ---
 season: 2024
 schoolYear: "2024-2025"
 classification: "I AAA"
@@ -61,9 +66,3 @@ updated_at: "2023-11-26T23:28:44.159798+00:00"
 ▶ teamLevels 2 items
 seasonPhase: "pre-Tryout"
 people: null
-
-## Google contacts ?
-
-## NEED TO UPDATE SEASON SELECTOR WHEN NEW SEASON IS ADDED. IT TAKES TO NEW SEASON< BUT NOT SEASON SELECTOR>
-
-## ADD AUTH TO USERS. who is allowed to do what. currently anyone logged in will be able to add to calendar...Perhaps I need to move the calendar to ihssoccergirls@gmail.com anyway. I can still make them available on my calendar

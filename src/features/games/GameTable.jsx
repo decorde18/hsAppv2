@@ -30,7 +30,6 @@ function GameTable() {
   const { isLoadingGames, games } = useGames();
 
   const [seasonGames, setSeasonGames] = useState([]);
-  const [searchParams, setSearchParams] = useSearchParams();
 
   const { isLoadingGoals, goals } = useGoals(currentSeason);
 
@@ -42,9 +41,7 @@ function GameTable() {
     [games, isLoadingGames, isLoadingSeason, seasonGames]
   );
 
-  function handleOnToggle(val) {
-    setScheduleType(val);
-  }
+  function handleOnToggle(val) {}
 
   if (isLoadingGames || isLoadingGoals) return <Spinner />;
   if (!seasonGames.length || currentSeason === 'createSeason')

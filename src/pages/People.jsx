@@ -15,7 +15,11 @@ function People() {
       </Row>
       <Row>
         <PeopleTable />
-        <Button onClick={() => setShowForm((show) => !show)}>
+        <Button
+          type="selected"
+          variation="primary"
+          onClick={() => setShowForm((show) => !show)}
+        >
           Add new Person
         </Button>
         {showForm && <CreatePeopleForm />}

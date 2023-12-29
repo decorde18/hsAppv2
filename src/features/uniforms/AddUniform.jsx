@@ -7,7 +7,9 @@ function AddUniform() {
     <div>
       <Modal>
         <Modal.Open opens="uniform-form">
-          <Button>Add New Uniform</Button>
+          <Button type="selected" variation="primary">
+            Add New Uniform
+          </Button>
         </Modal.Open>
         <Modal.Window name="uniform-form">
           <UniformCreateForm />

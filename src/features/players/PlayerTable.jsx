@@ -136,7 +136,7 @@ function PlayerTable() {
     columns: '0.2fr 2fr 1fr .2fr;',
   };
 
-  const isSeason = true; //TODO this will allow season vs. all-time - needs to be created, some things are added below
+  const isSeason = true;
   return (
     <>
       <StyledDiv>
