@@ -22,7 +22,7 @@ export function useCreateParent() {
   const { mutate: createParent, isLoading: isCreating } = useMutation({
     mutationFn: createEditParent,
     onSuccess: () => {
-      toast.success('New Parent successfully created');
+      // toast.success('New Parent successfully created');
       queryClient.invalidateQueries({ queries: ['parents'] });
     },
     onError: (err) => toast.error(err.message),

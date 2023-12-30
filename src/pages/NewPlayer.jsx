@@ -1,11 +1,7 @@
 import CreatePlayerForm from '../features/players/CreatePlayerForm';
 
 function NewPlayer() {
-  return (
-    <>
-      <CreatePlayerForm />
-    </>
-  );
+  return <CreatePlayerForm />;
 }
 
 export default NewPlayer;

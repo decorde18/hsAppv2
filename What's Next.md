@@ -41,8 +41,10 @@
 
 ## TODO FUTURE
 
+- combine usePeople functions into 1, same with players
 - create helper functions for all Date events (send to google calendar, with time, without time, etc)
-  -in CreateGameForm/CreateEventForm, I use StyledSelect instead of my Select Component because I need to pass the arguments into the options but because I have default values, I created it differently. Can I recreate the StyledSelects with new options?
+- in CreateGameForm/CreateEventForm, I use StyledSelect instead of my Select Component because I need to pass the arguments into the options but because I have default values, I created it differently. Can I recreate the StyledSelects with new options?
+- create file upload page for team pics, player pics, etc - see https://www.youtube.com/watch?v=HvOvdD2nX1k
 
 details ---
 season: 2024

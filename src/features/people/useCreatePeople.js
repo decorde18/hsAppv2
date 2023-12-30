@@ -7,7 +7,7 @@ export function useCreatePeople() {
   const { mutate: createPeople, isLoading: isCreating } = useMutation({
     mutationFn: createEditPeople,
     onSuccess: () => {
-      toast.success('New Person successfully created');
+      // toast.success('New Person successfully created');
       queryClient.invalidateQueries({ queries: ['people'] });
     },
     onError: (err) => toast.error(err.message),
