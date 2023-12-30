@@ -20,6 +20,11 @@ import Input from '../../ui/Input';
 import Row from '../../ui/Row';
 import Spinner from '../../ui/Spinner';
 import toast from 'react-hot-toast';
+import { createEditPeople } from '../../services/apiPeople';
+import {
+  createEditParent,
+  createEditPlayerParent,
+} from '../../services/apiParents';
 
 const Background = styled.div`
   position: absolute;
@@ -106,7 +111,6 @@ function CreatePlayerForm() {
     isCreatingPlayerParent ||
     isCreatingPlayerSeason ||
     isLoadingSeasons;
-
   function onSubmit(data) {
     const { grade, parents, previousSchool, ...playerPersonData } = data;
     // - convert grade to entryYear
@@ -139,34 +143,45 @@ function CreatePlayerForm() {
                     seasonId: currentSeason,
                     grade,
                   });
-                  createParents(data.id);
+                  parents
+                    .slice()
+                    .forEach((parent) => createParents(parent, data.id));
+                  // createParents(data.id);
                 },
               }
             ),
         }
       );
     }
-    function createParents(playerId) {
-      parents.map((parent) =>
-        createPeople(
-          //create people records for each parent
-          { ...parent },
-          {
-            onSuccess: (data) =>
-              createParent(
-                // - take people id and add to parentArray and create parent for each parent
-                { peopleId: data.id },
-                {
-                  onSuccess: (data) =>
-                    createPlayerParent(
-                      //take player id and parent id for each parent and add to playerParent
-                      { player: playerId, parent: data.id }
-                    ),
-                }
-              ),
-          }
-        )
-      );
+    function createParents(parent, playerId) {
+      // useMutation won't allow onSuccess calls for each iteration. I can't figure out a different solution so I have to go straigh to API Calls
+      createEditPeople({ ...parent })
+        .then((data) => createEditParent({ peopleId: data.id }))
+        .then((data) =>
+          createEditPlayerParent({ player: playerId, parent: data.id })
+        );
+      // createPeople(
+      //   //create people records for each parent
+      //   { ...parent },
+      //   {
+      //     onSuccess: (data) =>
+      //       createParent(
+      //         // - take people id and add to parentArray and create parent for each parent
+      //         { peopleId: data.id },
+      //         {
+      //           onSuccess: (data) =>
+      //             createPlayerParent(
+      //               { player: playerId, parent: data.id },
+      //               {
+      //                 onSuccess: (data) => {
+      //                   return;
+      //                 },
+      //               }
+      //             ),
+      //         }
+      //       ),
+      //   }
+      // );
     }
   }
   function onError(errors) {
@@ -177,7 +192,6 @@ function CreatePlayerForm() {
   const previousSeason =
     seasons.find((season) => season.id === currentSeason).season - 1;
   const teamPicUrl = `${supabaseUrl}/storage/v1/object/public/teampics/independence${previousSeason}.jpg`;
-
   return (
     <>
       <Background imgurl={teamPicUrl} />

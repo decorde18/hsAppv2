@@ -280,7 +280,6 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
             gameTypes.find((type) => type.value === newArray.gameType)
               .seasonTime
         ).label;
-        console.log(seasonTime);
         const teamData = {
           // all data for team - send to calendar, send to create/edit
           ...newArray,

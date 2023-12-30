@@ -19,7 +19,6 @@ function CurrentSeasonProvider({ children }) {
   function updateRecentSeason(season) {
     setRecentSeason(season);
   }
-
   return (
     <CurrentSeasonContext.Provider
       value={{

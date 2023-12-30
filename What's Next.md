@@ -1,5 +1,6 @@
 ## //TODO FIXME !!!
 
+- can't reach newPlayer with incognito
 - create Player Form
 - scheeduleTable - see the todos
 - apiPlayers - sort order not working
@@ -45,26 +46,26 @@
 - create helper functions for all Date events (send to google calendar, with time, without time, etc)
 - in CreateGameForm/CreateEventForm, I use StyledSelect instead of my Select Component because I need to pass the arguments into the options but because I have default values, I created it differently. Can I recreate the StyledSelects with new options?
 - create file upload page for team pics, player pics, etc - see https://www.youtube.com/watch?v=HvOvdD2nX1k
-
-details ---
-season: 2024
-schoolYear: "2024-2025"
-classification: "I AAA"
-region: "5"
-district: "10"
-home_location: null \*\*\*
-coach: null
-assistant_coaches: null
-trainer: null
-principal: null
-manager: null
-teamName: null
-gender: null
-teamMascot: "Lady Eagles"
-assistantPrincipals: null
-athleticDirector: null
-created_at: "2023-11-25T16:09:04.356112+00:00"
-updated_at: "2023-11-26T23:28:44.159798+00:00"
-▶ teamLevels 2 items
-seasonPhase: "pre-Tryout"
-people: null
+- useMutation in create playerForm does not run on create parents because of iterations. If you can understand the useMutation hook later on as a developer, fix it
+  details ---
+  season: 2024
+  schoolYear: "2024-2025"
+  classification: "I AAA"
+  region: "5"
+  district: "10"
+  home_location: null \*\*\*
+  coach: null
+  assistant_coaches: null
+  trainer: null
+  principal: null
+  manager: null
+  teamName: null
+  gender: null
+  teamMascot: "Lady Eagles"
+  assistantPrincipals: null
+  athleticDirector: null
+  created_at: "2023-11-25T16:09:04.356112+00:00"
+  updated_at: "2023-11-26T23:28:44.159798+00:00"
+  ▶ teamLevels 2 items
+  seasonPhase: "pre-Tryout"
+  people: null
