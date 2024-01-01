@@ -60,9 +60,9 @@ const Header = styled.header`
   padding: 0 1rem;
 `;
 const Div2 = styled.div`
-  padding: 0 5rem;
+  padding: 1rem 5rem;
   border-radius: var(--border-radius-lg);
-  height: 100vh;
+  /* height: 100vh; */
   min-width: 95rem;
 `;
 const StyledSelect = styled.select`
@@ -183,8 +183,7 @@ function CreatePlayerForm() {
       return <Spinner />;
     }
     toast.success('Thanks for your submission');
-    setFormerParent([{ index: 0, parentId: 'default' }]);
-    reset();
+    resetForm();
 
     function createAPlayer(playerData) {
       return createPeople(
@@ -274,6 +273,10 @@ function CreatePlayerForm() {
             : { ...former }
         )
     );
+  }
+  function resetForm() {
+    setFormerParent([{ index: 0, parentId: 'default' }]);
+    reset();
   }
   function onError(errors) {
     console.log(errors);
@@ -503,7 +506,7 @@ function CreatePlayerForm() {
               </section>
             ))}
             <FormRow>
-              <Button variation="secondary" type="reset">
+              <Button variation="secondary" type="reset" onClick={resetForm}>
                 Cancel
               </Button>
               <Button disabled={isWorking}>Add to Email List</Button>

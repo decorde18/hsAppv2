@@ -1,8 +1,7 @@
 ## //TODO FIXME !!!
 
-- make new Player form nicer
 - validate that no new player is already in system, likewise with parent
-- create Player Form
+
 - scheeduleTable - see the todos
 - apiPlayers - sort order not working
 - usePlayerSeasons -see todos
