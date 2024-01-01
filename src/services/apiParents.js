@@ -1,7 +1,14 @@
 import supabase from './supabase';
 
 export async function getParents() {
-  let { data: parents, error } = await supabase.from('parents').select('*');
+  let { data: parents, error } = await supabase.from('parents').select(
+    `*,
+    people(*)
+  `
+  );
+  // .order('lastName', { referencedTable: 'people' })
+  // .order('firstName', { referencedTable: 'people', ascending: true });
+
   if (error) {
     console.log(error);
     throw new Error('Parents Could Not Be Loaded');

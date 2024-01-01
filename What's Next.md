@@ -1,6 +1,7 @@
 ## //TODO FIXME !!!
 
-- can't reach newPlayer with incognito
+- make new Player form nicer
+- validate that no new player is already in system, likewise with parent
 - create Player Form
 - scheeduleTable - see the todos
 - apiPlayers - sort order not working

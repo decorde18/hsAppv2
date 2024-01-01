@@ -11,8 +11,8 @@ export async function getPlayers() {
   `
     )
     .order('entryYear', { ascending: true })
-    .order('lastName', { foreignTable: 'people', ascending: true })
-    .order('firstName', { foreignTable: 'people', ascending: true });
+    .order('lastName', { referencedTable: 'people', ascending: true })
+    .order('firstName', { referencedTable: 'people', ascending: true });
 
   if (error) {
     console.log(error);

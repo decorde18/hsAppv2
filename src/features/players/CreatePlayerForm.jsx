@@ -1,4 +1,4 @@
-import { styled } from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useForm, useFieldArray } from 'react-hook-form';
 
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
@@ -8,13 +8,14 @@ import { useSeasons } from '../seasons/useSeasons';
 import { useCreatePeople } from '../people/useCreatePeople';
 import { useCreatePlayerSeason } from './usePlayerSeasons';
 import { useCreatePlayer } from './useCreatePlayer';
-import { useCreateParent, useCreatePlayerParent } from '../parents/useParents';
-
-import Logo from '../../ui/Logo';
+// import { useCreateParent, useCreatePlayerParent } from '../parents/useParents';
+import { useGetPlayerParents, useParents } from '../parents/useParents';
+import { usePlayers } from '../players/usePlayers';
 
 import Button from '../../ui/Button';
 import Form from '../../ui/Form';
 import FormRow from '../../ui/FormRow';
+import FormRowVertical from '../../ui/FormRowVertical';
 import Heading from '../../ui/Heading';
 import Input from '../../ui/Input';
 import Row from '../../ui/Row';
@@ -25,6 +26,8 @@ import {
   createEditParent,
   createEditPlayerParent,
 } from '../../services/apiParents';
+import { useState } from 'react';
+import Select from '../../ui/Select';
 
 const Background = styled.div`
   position: absolute;
@@ -38,19 +41,29 @@ const Background = styled.div`
   overflow: hidden;
   z-index: -1;
 `;
-const Div = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin: 0 auto;
+const Container = styled.div`
+  margin: 0;
   max-width: 100rem;
-  background-color: rgba(255, 255, 255, 0.774);
-  border-radius: 50px;
+  background-color: var(--color-grey-0);
+  border: 1px solid var(--color-grey-100);
+  border-radius: var(--border-radius-lg);
+  max-height: 95vh;
+  overflow: auto;
+  opacity: 0.9;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  position: absolute;
+  /* padding: 2.5vh 0; */
+`;
+const Header = styled.header`
+  padding: 0 1rem;
 `;
 const Div2 = styled.div`
-  margin: 0px auto 10rem auto;
-  border-radius: 50px;
-  overflow: auto;
-  padding: 3rem;
+  padding: 0 5rem;
+  border-radius: var(--border-radius-lg);
+  height: 100vh;
+  min-width: 95rem;
 `;
 const StyledSelect = styled.select`
   font-size: 1.4rem;
@@ -64,6 +77,20 @@ const StyledSelect = styled.select`
   background-color: var(--color-grey-0);
   font-weight: 500;
   box-shadow: var(--shadow-sm);
+`;
+// const Center = styled.div`
+//   width: 50%;
+//   margin: auto;
+// `;
+const Flex = styled.div`
+  width: 100%;
+  display: flex;
+  gap: 1rem;
+`;
+const VerticalGap = styled.div`
+  height: 2rem;
+  margin: 2rem;
+  border-top: 1px solid var(--color-grey-100);
 `;
 
 const gradeArray = [
@@ -96,21 +123,52 @@ function CreatePlayerForm() {
 
   const { currentSeason } = useCurrentSeason();
   const { isLoadingSeasons, seasons } = useSeasons();
+  const { isLoadingPlayers, players } = usePlayers();
+  const { isLoadingParents, parents } = useParents();
 
   const { isCreatingPeople, createPeople } = useCreatePeople();
   const { isCreatingPlayer, createPlayer } = useCreatePlayer();
-  const { isCreatingParent, createParent } = useCreateParent();
-  const { isCreatingPlayerParent, createPlayerParent } =
-    useCreatePlayerParent();
+  // const { isCreatingParent, createParent } = useCreateParent();
+  // const { isCreatingPlayerParent, createPlayerParent } =
+  //   useCreatePlayerParent();
   const { isCreatingPlayerSeason, createPlayerSeason } =
     useCreatePlayerSeason();
   const isWorking =
     isCreatingPeople ||
     isCreatingPlayer ||
-    isCreatingParent ||
-    isCreatingPlayerParent ||
+    // isCreatingParent ||
+    // isCreatingPlayerParent ||
     isCreatingPlayerSeason ||
-    isLoadingSeasons;
+    isLoadingSeasons ||
+    isLoadingPlayers ||
+    isLoadingParents;
+
+  const [formerParent, setFormerParent] = useState([
+    { index: 0, parentId: 'default' },
+  ]);
+
+  function handleSelect(e) {
+    //todo I am here, condense and refactor this code
+    //todo on remove parent, that id must be removed in state --- that also  means all index after must  be lowered by one
+    const value = e.target.value;
+    const index = +e.target.name;
+    const parent = parents.find((parent) => parent.id === +value);
+    //on change, we need to update the state with the index and value
+    //we must also setValue - if default to null, otherwise to values
+    setFormerParent(
+      formerParent.map((former) =>
+        former.index === index
+          ? { ...former, parentId: parent ? +value : 'default' }
+          : { ...former }
+      )
+    );
+    if (value === 'default') return;
+    setValue(`parents[${index}].firstName`, parent.people.firstName);
+    setValue(`parents[${index}].lastName`, parent.people.lastName);
+    setValue(`parents[${index}].email`, parent.people.email);
+
+    return;
+  }
   function onSubmit(data) {
     const { grade, parents, previousSchool, ...playerPersonData } = data;
     // - convert grade to entryYear
@@ -125,6 +183,7 @@ function CreatePlayerForm() {
       return <Spinner />;
     }
     toast.success('Thanks for your submission');
+    setFormerParent([{ index: 0, parentId: 'default' }]);
     reset();
 
     function createAPlayer(playerData) {
@@ -145,7 +204,18 @@ function CreatePlayerForm() {
                   });
                   parents
                     .slice()
-                    .forEach((parent) => createParents(parent, data.id));
+                    // .forEach((parent) => createParents(parent, data.id));
+                    .forEach((parent, index) => {
+                      const formerP = formerParent.find(
+                        (former) => former.index === index
+                      );
+                      formerP.parentId !== 'default'
+                        ? addPlayerParent({
+                            player: data.id,
+                            parent: formerP.parentId,
+                          })
+                        : createParents(parent, data.id);
+                    });
                   // createParents(data.id);
                 },
               }
@@ -158,7 +228,8 @@ function CreatePlayerForm() {
       createEditPeople({ ...parent })
         .then((data) => createEditParent({ peopleId: data.id }))
         .then((data) =>
-          createEditPlayerParent({ player: playerId, parent: data.id })
+          // createEditPlayerParent({ player: playerId, parent: data.id })
+          addPlayerParent({ player: playerId, parent: data.id })
         );
       // createPeople(
       //   //create people records for each parent
@@ -183,140 +254,252 @@ function CreatePlayerForm() {
       //   }
       // );
     }
+    function addPlayerParent({ player, parent }) {
+      createEditPlayerParent({ player, parent });
+    }
+  }
+
+  function addParent(index) {
+    setFormerParent([...formerParent, { index, parentId: 'default' }]);
+    append({ firstName: '', lastName: '', email: '' });
+  }
+  function removeParent(index) {
+    remove(index);
+    setFormerParent(
+      formerParent
+        .filter((former) => former.index !== index)
+        .map((former) =>
+          former.index > index
+            ? { ...former, index: former.index - 1 }
+            : { ...former }
+        )
+    );
   }
   function onError(errors) {
     console.log(errors);
   }
-
   if (isWorking) return <Spinner />;
+
   const previousSeason =
     seasons.find((season) => season.id === currentSeason).season - 1;
   const teamPicUrl = `${supabaseUrl}/storage/v1/object/public/teampics/independence${previousSeason}.jpg`;
+
+  const sortedParents = parents
+    .sort(function (a, b) {
+      if (a.people.firstName < b.people.firstName) {
+        return -1;
+      }
+      if (a.people.firstName > b.people.firstName) {
+        return 1;
+      }
+      return 0;
+    })
+    .sort(function (a, b) {
+      if (a.people.lastName < b.people.lastName) {
+        return -1;
+      }
+      if (a.people.lastName > b.people.lastName) {
+        return 1;
+      }
+      return 0;
+    });
+
+  const parentSelectArray = sortedParents.reduce(
+    (acc, parent) =>
+      (acc = [
+        ...acc,
+        {
+          value: parent.id,
+          label: `${parent.people.firstName} ${parent.people.lastName}`,
+        },
+      ]),
+    [{ value: 'default', label: 'Select if a returning parent' }]
+  );
+
   return (
     <>
       <Background imgurl={teamPicUrl} />
-      <Logo />
-      <Div>
-        <Heading as="h1" case="upper" location="center">
-          new player form
-        </Heading>
+      <Container>
         <Div2>
           <Form onSubmit={handleSubmit(onSubmit, onError)}>
+            <Header>
+              <Heading as="h1" case="upper" location="center">
+                new player form
+              </Heading>
+            </Header>
             <Row>
               <Heading as="h2">Player Information</Heading>
             </Row>
-            <FormRow label="First Name *" error={errors?.firstName?.message}>
-              <Input
-                type="text"
-                id="firstName"
-                {...register('firstName', {
-                  required: 'We need the player first name',
-                })}
-                disabled={isWorking}
-              />
-            </FormRow>
-            <FormRow label="Last Name *" error={errors?.lastName?.message}>
-              <Input
-                type="text"
-                id="lastName"
-                {...register('lastName', {
-                  required: 'We need the player last name',
-                })}
-                disabled={isWorking}
-              />
-            </FormRow>
-            <FormRow label="Rising Grade *" error={errors?.grade?.message}>
-              <StyledSelect
-                {...register('grade', {
-                  required: true,
-                })}
-                disabled={isWorking}
+            <Flex>
+              <FormRowVertical
+                label="First Name *"
+                error={errors?.firstName?.message}
               >
-                {gradeArray.map((grade) => (
-                  <option key={`gradeSelect${grade.value}`} value={grade.value}>
-                    {grade.label}
-                  </option>
-                ))}
-              </StyledSelect>
-            </FormRow>
-            <FormRow
-              label="Previous School"
-              error={errors?.previousSchool?.message}
-            >
-              <Input
-                type="text"
-                id="previousSchool"
-                {...register('previousSchool', {
-                  required: false,
-                })}
-                disabled={isWorking}
-              />
-            </FormRow>
-            <FormRow label="Email" error={errors?.email?.message}>
-              <Input
-                type="email"
-                id="email"
-                {...register('email', {
-                  required: false,
-                })}
-                disabled={isWorking}
-              />
-            </FormRow>
+                <Input
+                  type="text"
+                  id="firstName"
+                  {...register('firstName', {
+                    required: 'We need the player first name',
+                  })}
+                  disabled={isWorking}
+                />
+              </FormRowVertical>
+              <FormRowVertical
+                label="Last Name *"
+                error={errors?.lastName?.message}
+              >
+                <Input
+                  type="text"
+                  id="lastName"
+                  {...register('lastName', {
+                    required: 'We need the player last name',
+                  })}
+                  disabled={isWorking}
+                />
+              </FormRowVertical>
+              <FormRowVertical label="Email" error={errors?.email?.message}>
+                <Input
+                  type="email"
+                  id="email"
+                  {...register('email', {
+                    required: false,
+                  })}
+                  disabled={isWorking}
+                />
+              </FormRowVertical>
+            </Flex>
+            <Flex>
+              <FormRowVertical
+                label="Rising Grade *"
+                error={errors?.grade?.message}
+              >
+                <StyledSelect
+                  {...register('grade', {
+                    required: true,
+                  })}
+                  disabled={isWorking}
+                >
+                  {gradeArray.map((grade) => (
+                    <option
+                      key={`gradeSelect${grade.value}`}
+                      value={grade.value}
+                    >
+                      {grade.label}
+                    </option>
+                  ))}
+                </StyledSelect>
+              </FormRowVertical>
+              <FormRowVertical
+                label="Previous School"
+                error={errors?.previousSchool?.message}
+              >
+                <Input
+                  type="text"
+                  id="previousSchool"
+                  {...register('previousSchool', {
+                    required: false,
+                  })}
+                  disabled={isWorking}
+                />
+              </FormRowVertical>
+            </Flex>
+            <VerticalGap />
             <Row>
               <Heading as="h2">Parent Information</Heading>
             </Row>
             {fields.map((field, index) => (
               <section key={field.id}>
-                <FormRow
-                  label="First Name *"
-                  error={errors?.parentfirstName?.message}
-                >
-                  <Input
-                    type="text"
-                    placeholder={`Enter Parent ${index + 1} First Name`}
-                    {...register(`parents.${index}.firstName`, {
-                      required: 'We need a parent first name',
-                    })}
-                    disabled={isWorking}
+                <Flex>
+                  <Select
+                    options={parentSelectArray}
+                    name={index}
+                    onChange={handleSelect}
                   />
-                </FormRow>
-                <FormRow
-                  label="Last Name *"
-                  error={errors?.parentlastName?.message}
-                >
-                  <Input
-                    type="text"
-                    placeholder={`Enter Parent ${index + 1} Last Name`}
-                    {...register(`parents.${index}.lastName`, {
-                      required: 'We need a parent last name',
-                    })}
-                    disabled={isWorking}
-                  />
-                </FormRow>
-                <FormRow label="Email *" error={errors?.parentemail?.message}>
-                  <Input
-                    type="email"
-                    placeholder={`Enter Parent ${index + 1} Email`}
-                    disabled={isWorking}
-                    {...register(`parents.${index}.email`, {
-                      required: 'We need a parent Email',
-                    })}
-                  />
-                </FormRow>
-                <div>
-                  {fields.length !== 1 && (
-                    <button onClick={() => remove(index)}>Remove Parent</button>
-                  )}
-                  {fields.length - 1 === index && (
-                    <button
-                      onClick={() =>
-                        append({ firstName: '', lastName: '', email: '' })
+                </Flex>
+                <Flex>
+                  <FormRowVertical
+                    label="First Name *"
+                    name="pfirstName"
+                    error={errors.parents?.[index]?.firstName.message}
+                  >
+                    <Input
+                      type="text"
+                      placeholder={`Enter Parent ${index + 1} First Name`}
+                      {...register(`parents.${index}.firstName`, {
+                        required: 'We need a parent first name',
+                      })}
+                      disabled={
+                        isWorking ||
+                        formerParent.filter(
+                          (parent) =>
+                            parent.index === index &&
+                            parent.parentId !== 'default'
+                        ).length > 0
                       }
-                    >
-                      Add Parent
-                    </button>
-                  )}
-                </div>
+                    />
+                  </FormRowVertical>
+                  <FormRowVertical
+                    label="Last Name *"
+                    error={errors.parents?.[index]?.lastName.message}
+                  >
+                    <Input
+                      type="text"
+                      placeholder={`Enter Parent ${index + 1} Last Name`}
+                      {...register(`parents.${index}.lastName`, {
+                        required: 'We need a parent last name',
+                      })}
+                      disabled={
+                        isWorking ||
+                        formerParent.filter(
+                          (parent) =>
+                            parent.index === index &&
+                            parent.parentId !== 'default'
+                        ).length > 0
+                      }
+                    />
+                  </FormRowVertical>
+                  <FormRowVertical
+                    label="Email *"
+                    error={errors.parents?.[index]?.email.message}
+                  >
+                    <Input
+                      type="email"
+                      placeholder={`Enter Parent ${index + 1} Email`}
+                      disabled={
+                        isWorking ||
+                        formerParent.filter(
+                          (parent) =>
+                            parent.index === index &&
+                            parent.parentId !== 'default'
+                        ).length > 0
+                      }
+                      {...register(`parents.${index}.email`, {
+                        required: 'We need a parent Email',
+                      })}
+                    />
+                  </FormRowVertical>
+                </Flex>
+                <Flex>
+                  <div>
+                    {fields.length !== 1 && (
+                      <Button
+                        variation="danger"
+                        onClick={() => removeParent(index)}
+                      >
+                        Remove Parent
+                      </Button>
+                    )}
+                    {fields.length - 1 === index && (
+                      <Button
+                        variation="primary"
+                        onClick={() => addParent(index + 1)}
+                      >
+                        Add Parent
+                      </Button>
+                    )}
+                  </div>
+                </Flex>
+                <VerticalGap />
               </section>
             ))}
             <FormRow>
@@ -327,7 +510,7 @@ function CreatePlayerForm() {
             </FormRow>
           </Form>
         </Div2>
-      </Div>
+      </Container>
     </>
   );
 }

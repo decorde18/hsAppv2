@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 import { useRecentSeason } from '../seasons/useSeasons';
+import Logo from '../../ui/Logo';
 
 function PublicPages() {
   // ON LOAD  UPDATE THE RECENT AND CURRENT IN LOCAL AND CONTEXT PROVIDER
@@ -22,7 +23,11 @@ function PublicPages() {
       isLoadingRecent,
     ]
   );
-  return <div></div>;
+  return (
+    <div>
+      <Logo />
+    </div>
+  );
 }
 
 export default PublicPages;
