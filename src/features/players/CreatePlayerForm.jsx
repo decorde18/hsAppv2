@@ -36,10 +36,17 @@ const Background = styled.div`
   width: 100%;
   height: 100%;
   background-image: ${(props) => `url(${props.imgurl})`};
-  background-size: contain;
+  background-position: center;
+  background-size: cover;
   opacity: 0.5;
   overflow: hidden;
   z-index: -1;
+
+  @media (min-width: 768px) {
+    background-position: top;
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
 `;
 const Container = styled.div`
   margin: 0;
