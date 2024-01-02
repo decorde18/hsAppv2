@@ -36,13 +36,16 @@ const Background = styled.div`
   width: 100%;
   height: 100%;
   background-image: ${(props) => `url(${props.imgurl})`};
-  background-position: center;
-  background-size: cover;
   opacity: 0.5;
   overflow: hidden;
   z-index: -1;
-
   @media (min-width: 768px) {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
+  @media only screen and (max-width: 62.5em) {
     background-position: top;
     background-size: contain;
     background-repeat: no-repeat;
