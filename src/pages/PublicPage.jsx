@@ -12,7 +12,7 @@ const StyledPublicPage = styled.div`
 const Main = styled.main`
   margin: auto;
 `;
-const StyledNav = styled.a`
+const StyledNav = styled.span`
   color: blue;
   text-decoration: underline;
 `;
