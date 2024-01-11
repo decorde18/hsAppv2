@@ -43,7 +43,7 @@ import Uniforms from './pages/Uniforms';
 import UniformJerseys from './pages/UniformJerseys';
 import UniformSeasons from './pages/UniformSeasons';
 import UniformSeasonPlayers from './pages/UniformSeasonPlayers';
-import ScheduleHelper from './features/games/ScheduleHelper';
+import ScheduleHelper from './pages/ScheduleHelper';
 
 const queryClient = new QueryClient({
   defaultOptions: {

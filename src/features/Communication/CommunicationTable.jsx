@@ -56,7 +56,6 @@ function CommunicationTable() {
       isLoadingSeason,
       playerParents,
       playerSeasons,
-
       season,
     ]
   );
@@ -261,68 +260,66 @@ function CommunicationTable() {
   }
 
   return (
-    <>
-      <Menus>
-        <input defaultValue={playerEmails} />
-        <input defaultValue={parentEmails} />
-        <Table columns={'1.4fr 2fr .25fr 1fr 1fr .25fr 2.5fr  .2fr;'}>
-          <Table.Header>
-            <>
-              <div>
-                <input
-                  type="checkbox"
-                  checked={allPlayersChecked === 'all'}
-                  onChange={handleAllPlayerChecked}
-                />
-                <p>Players</p>
-              </div>
-              <div>Player</div>
-              <div>Grade</div>
-              <div>
-                Status
-                <Select
-                  options={statusFilterLabel}
-                  type="white"
-                  onChange={handleFilterChange}
-                  value={statusFilter.value}
-                  id={'filterRosterStatus'}
-                ></Select>
-                {/* <FilterBy
+    <Menus>
+      <input defaultValue={playerEmails} />
+      <input defaultValue={parentEmails} />
+      <Table columns={'1.4fr 2fr .25fr 1fr 1fr .25fr 2.5fr  .2fr;'}>
+        <Table.Header>
+          <>
+            <div>
+              <input
+                type="checkbox"
+                checked={allPlayersChecked === 'all'}
+                onChange={handleAllPlayerChecked}
+              />
+              <p>Players</p>
+            </div>
+            <div>Player</div>
+            <div>Grade</div>
+            <div>
+              Status
+              <Select
+                options={statusFilterLabel}
+                type="white"
+                onChange={handleFilterChange}
+                value={statusFilter.value}
+                id={'filterRosterStatus'}
+              ></Select>
+              {/* <FilterBy
                   options={statusFilterLabel}
                   id={'filterRosterStatus'}
                   default={statusFilter.value}
                 /> */}
-              </div>
-              <div>Team</div>
-              <div>Returner</div>
-              <div>
-                <input
-                  type="checkbox"
-                  checked={allParentsChecked === 'all'}
-                  onChange={handleAllParentsChecked}
-                />
-                <span>Parents</span>
-              </div>
-              <div></div>
-            </>
-          </Table.Header>
-          <Table.Body
-            data={filteredPlayers}
-            render={(player) =>
-              player.isPlayerVisible ? (
-                <CommunicationRow
-                  player={{ player }}
-                  key={player.id}
-                  onChangePlayer={handlePlayerChange}
-                  onChangeParent={handleParentChange}
-                  onChangeRow={handleRowClick}
-                />
-              ) : null
-            }
-          />
-        </Table>
-      </Menus>
-    </>
+            </div>
+            <div>Team</div>
+            <div>Returner</div>
+            <div>
+              <input
+                type="checkbox"
+                checked={allParentsChecked === 'all'}
+                onChange={handleAllParentsChecked}
+              />
+              <span>Parents</span>
+            </div>
+            <div></div>
+          </>
+        </Table.Header>
+        <Table.Body
+          data={filteredPlayers}
+          render={(player) =>
+            player.isPlayerVisible ? (
+              <CommunicationRow
+                player={{ player }}
+                key={player.id}
+                onChangePlayer={handlePlayerChange}
+                onChangeParent={handleParentChange}
+                onChangeRow={handleRowClick}
+              />
+            ) : null
+          }
+        />
+      </Table>
+    </Menus>
   );
 }
 

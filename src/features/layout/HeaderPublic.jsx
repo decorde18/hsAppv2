@@ -1,4 +1,4 @@
-import Logo from '../../ui/Logo';
+import Logo from '../../../Logo';
 import { styled } from 'styled-components';
 
 const StyledHeader = styled.header`

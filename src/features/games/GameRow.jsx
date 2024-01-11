@@ -43,11 +43,11 @@ const Result = styled.div`
 function GameRow({ game }) {
   const { isDeleting, deleteGame } = useDeleteGame();
   const { isCanceling, cancelGame } = useCancelGame();
-  const { isLoading } = useSessionContext();
+  const { isLoading } = useSessionContext(); //needed for Google Calendar
 
   const isWorking = isDeleting || isCanceling || isLoading;
 
-  const session = useSession();
+  const session = useSession(); //needed for Google Calendar
 
   const ownScore = game.goals.filter(
     (goal) => goal?.event === 'Goal Scored'

@@ -13,6 +13,7 @@ import { useGetPlayerParents, useParents } from '../parents/useParents';
 import { usePlayers } from '../players/usePlayers';
 
 import Button from '../../ui/Button';
+import Select from '../../ui/Select';
 import Form from '../../ui/Form';
 import FormRow from '../../ui/FormRow';
 import FormRowVertical from '../../ui/FormRowVertical';
@@ -27,7 +28,6 @@ import {
   createEditPlayerParent,
 } from '../../services/apiParents';
 import { useState } from 'react';
-import Select from '../../ui/Select';
 
 const Background = styled.div`
   position: absolute;

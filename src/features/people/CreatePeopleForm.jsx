@@ -7,42 +7,46 @@ import FormRow from '../../ui/FormRow';
 
 import { useForm } from 'react-hook-form';
 import { useCreatePeople } from './useCreatePeople';
-// import { useEditPeople } from './useEditPeople';
+import { useEditPeople } from './useEditPeople';
+import { useCreateCoach } from '../coaches/useCoaches';
 
-function CreatePeopleForm({ personToEdit = {} }) {
-  // const { id: editId, ...editValues } = personToEdit;
-  // const isEditSession = Boolean(editId);
-  const isEditSession = null;
-  // const { register, handleSubmit, reset, getValues, formState } = useForm({
-  //   defaultValues: isEditSession ? editValues : {},
-  // });
+function CreatePeopleForm({ personToEdit = {}, onCloseModal, schoolToAddTo }) {
+  const { id: editId, ...editValues } = personToEdit;
+  const isEditSession = Boolean(editId);
   const { register, handleSubmit, reset, getValues, formState } = useForm({
-    defaultValues: {},
+    defaultValues: isEditSession ? editValues : {},
   });
   const { errors } = formState;
   const { isCreating, createPeople } = useCreatePeople();
-  // const queryClient = useQueryClient();
-  // const { isEditing, editPeople } = useEditPeople();
-  // const isWorking = isCreating || isEditing;
-  const isWorking = isCreating;
+  const { isEditing, editPeople } = useEditPeople();
+  const { createCoach, isCreating: isCreatingCoach } = useCreateCoach();
+  const isWorking = isCreating || isEditing || isCreatingCoach;
   function onSubmit(data) {
-    // mutate(data); //no image needed
-    // const image = typeof data.image === 'string' ? data.image : data.image[0];
-    // if (isEditSession)
-    //   editPeople(
-    //     { newPeopleData: { ...data, image }, id: editId },
-    //     { onSuccess: (data) => reset() }
-    //   );
-    // else
-    createPeople(
-      // { ...data, image: data.image[0] },
-      data,
-      { onSuccess: (data) => reset() }
-    );
+    if (isEditSession)
+      editPeople(
+        { newPeopleData: { ...data }, id: editId },
+        { onSuccess: (data) => reset() }
+      );
+    else
+      createPeople(
+        { ...data },
+        {
+          onSuccess: (data) => {
+            if (schoolToAddTo)
+              createCoach({ coach: data.id, team: schoolToAddTo, girls: true });
+            closeModal();
+          },
+        }
+      );
   }
   function onError(errors) {
     console.log(errors);
   }
+  function closeModal() {
+    reset();
+    onCloseModal?.();
+  }
+
   return (
     <Form onSubmit={handleSubmit(onSubmit, onError)}>
       <FormRow label="Title" error={errors?.title?.message}>
@@ -95,7 +99,11 @@ function CreatePeopleForm({ personToEdit = {} }) {
       </FormRow>
 
       <FormRow>
-        <Button variation="secondary" type="reset">
+        <Button
+          variation="secondary"
+          type="reset"
+          onClick={() => closeModal?.()}
+        >
           Cancel
         </Button>
         <Button disabled={isWorking}>

@@ -15,20 +15,24 @@ export async function getPeople() {
     console.log(error);
     throw new Error('People Could Not Be Loaded');
   }
-  return { people, error };
+  return people;
 }
 export async function createEditPeople(newPerson, id) {
   let query = supabase.from('people');
   //create person
   if (!id) query = query.insert({ ...newPerson }).select();
   //edit person
-  if (id) query = query.update({ newPerson }).eq('id', id).select();
+  if (id)
+    query = query
+      .update({ ...newPerson })
+      .eq('id', id)
+      .select();
 
   const { data, error } = await query.select().single();
 
   if (error) {
     console.log(error);
-    throw new Error('Person Could Not Be Created');
+    throw new Error('Person Could Not Be Created or Edited');
   }
   return data;
 }

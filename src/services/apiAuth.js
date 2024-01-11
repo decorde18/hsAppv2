@@ -57,7 +57,7 @@ export async function googleSignIn() {
         'https://www.googleapis.com/auth/calendar',
         'https://www.googleapis.com/auth/spreadsheets',
       ],
-      redirectTo: 'http://localhost:5173/app',
+      // redirectTo: 'http://localhost:5173/app',
     },
   });
   if (error) {

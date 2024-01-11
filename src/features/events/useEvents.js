@@ -34,7 +34,7 @@ export function useCreateEvent() {
     mutationFn: createEditEvent,
     onSuccess: () => {
       toast.success('New Event successfully created');
-      queryClient.invalidateQueries({ queries: ['event'] });
+      queryClient.invalidateQueries({ queries: ['events'] });
     },
     onError: (err) => toast.error(err.message),
   });
@@ -47,7 +47,7 @@ export function useEditEvent() {
     mutationFn: ({ newEventData, id }) => createEditEvent(newEventData, id),
     onSuccess: () => {
       toast.success('New Event successfully edited');
-      queryClient.invalidateQueries({ queries: ['event'] });
+      queryClient.invalidateQueries({ queries: ['events'] });
     },
     onError: (err) => toast.error(err.message),
   });

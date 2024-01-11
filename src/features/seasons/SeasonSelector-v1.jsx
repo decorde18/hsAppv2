@@ -1,5 +1,5 @@
 import { useLoaderData } from 'react-router-dom';
-import { usePlayers } from '../../contexts/PlayersContexts';
+// import { usePlayers } from '../../contexts/PlayersContexts';
 import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
 import { getSeason } from './seasonSlice';

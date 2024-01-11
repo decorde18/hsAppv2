@@ -7,6 +7,11 @@ import {
   cancelGame as cancelGameApi,
   getPeriods,
 } from '../../services/apiGames';
+import {
+  getScheduleHelpers,
+  createEditScheduleHelper,
+  deleteScheduleHelper as deleteScheduleHelperApi,
+} from '../../services/apiScheduleHelper';
 
 import { getGoals } from '../../services/apiStats';
 import { toast } from 'react-hot-toast';
@@ -126,4 +131,63 @@ export function useCancelGame(gameId) {
     onError: (err) => toast.error(err.message),
   });
   return { isCanceling, cancelGame };
+}
+
+export function useScheduleHelper() {
+  const { currentSeason } = useCurrentSeason();
+  //Filter by season
+
+  const filter =
+    !currentSeason || currentSeason === 'all'
+      ? null
+      : { field: 'season', value: currentSeason };
+
+  const {
+    isLoading: isLoadingScheduleHelpers,
+    data: scheduleHelpers,
+    error,
+  } = useQuery({
+    queryKey: ['scheduleHelpers', filter],
+    queryFn: () => getScheduleHelpers({ filter }),
+  });
+
+  return { isLoadingScheduleHelpers, error, scheduleHelpers };
+}
+export function useCreateScheduleHelper() {
+  const queryClient = useQueryClient();
+  const { mutate: createScheduleHelper, isLoading: isCreating } = useMutation({
+    mutationFn: createEditScheduleHelper,
+    onSuccess: () => {
+      toast.success('New Schedule Helper successfully created');
+      queryClient.invalidateQueries({ queries: ['scheduleHelper'] });
+    },
+    onError: (err) => toast.error(err.message),
+  });
+
+  return { createScheduleHelper, isCreating };
+}
+export function useEditScheduleHelper() {
+  const queryClient = useQueryClient();
+  const { mutate: editScheduleHelper, isLoading: isEditing } = useMutation({
+    mutationFn: createEditScheduleHelper,
+    onSuccess: () => {
+      // toast.success('New Schedule Helper successfully edited');
+      queryClient.invalidateQueries({ queries: ['scheduleHelper'] });
+    },
+    onError: (err) => toast.error(err.message),
+  });
+  return { editScheduleHelper, isEditing };
+}
+export function useDeleteScheduleHelper() {
+  const queryClient = useQueryClient();
+  const { isLoading: isDeleting, mutate: deleteScheduleHelper } = useMutation({
+    mutationFn: deleteScheduleHelperApi,
+    onSuccess: () => {
+      // toast.success(`Schedule Helper  successfully deleted`);
+      queryClient.invalidateQueries({ queryKey: ['scheduleHelpers'] });
+    },
+
+    onError: (err) => toast.error(err.message),
+  });
+  return { isDeleting, deleteScheduleHelper };
 }

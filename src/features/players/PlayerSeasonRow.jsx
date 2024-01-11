@@ -12,7 +12,6 @@ import ConfirmModal from '../../ui/ConfirmModal';
 import Modal from '../../ui/Modal';
 import Table from '../../ui/Table';
 import Menus from '../../ui/Menus';
-import { format } from 'date-fns';
 import CreatePlayerForm from './CreatePlayerModalForm';
 import { formatDate } from '../../utils/helpers';
 import { useEffect, useState } from 'react';

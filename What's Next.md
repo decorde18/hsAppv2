@@ -20,6 +20,7 @@
 
 ## TODO NEXT !!!
 
+- schedule Helper - email functionality --include check all of each subHeading - add JV/V/both ? - on change to scheduled, go to create game - when scheduled, button to go to game
 - Pagination
   -Filters
 
