@@ -1,11 +1,9 @@
 import { useLoaderData } from 'react-router-dom';
-// import { usePlayers } from '../../contexts/PlayersContexts';
 import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
 import { getSeason } from './seasonSlice';
 import { getSeasons } from '../../services/apiSeasons';
 
-//useSelector is how we read state from the store
 function SeasonSelector() {
   const seasons = useLoaderData();
   const recentSeasonYear = seasons.reduce(
@@ -16,7 +14,6 @@ function SeasonSelector() {
     (season) => +season.season === +recentSeasonYear
   );
   const [currentSeason, setCurrentSeason] = useState(+recentSeason.id);
-  // const seasons = useSelector((state) => console.log(state));
   const dispatch = useDispatch();
 
   function handleSeasonChange(e) {
@@ -41,7 +38,6 @@ function SeasonSelector() {
   );
 }
 export async function loader() {
-  // const seasons = await getSeasons();
   const seasons = getSeasons();
   return seasons;
 }

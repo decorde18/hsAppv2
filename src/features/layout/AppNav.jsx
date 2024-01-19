@@ -8,8 +8,11 @@ const Ul = styled.ul`
   justify-content: center;
   background-color: var(--color-light--2);
   border-radius: 7px;
-  margin: 1rem;
+  margin: 2rem;
   padding: 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 `;
 
 const Li = styled.li``;

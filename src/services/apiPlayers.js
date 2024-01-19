@@ -1,9 +1,11 @@
 // import supabase, { supabaseUrl } from './supabase';
 import supabase from './supabase';
-
+const table = 'players';
+const table2 = 'playerSeasons';
+const table3 = 'player_seasons_with_numbers';
 export async function getPlayers() {
   const { data: players, error } = await supabase
-    .from('players')
+    .from(table)
     .select(
       `
     *,
@@ -21,7 +23,7 @@ export async function getPlayers() {
   return players;
 }
 export async function createEditPlayer(newPlayer, id) {
-  let query = supabase.from('players');
+  let query = supabase.from(table);
   //create player
   if (!id) query = query.insert([{ ...newPlayer }]);
   //edit player
@@ -37,9 +39,8 @@ export async function createEditPlayer(newPlayer, id) {
   }
   return data;
 }
-
 export async function deletePlayer(id) {
-  const { error } = await supabase.from('players').delete().eq('id', id);
+  const { error } = await supabase.from(table).delete().eq('id', id);
   if (error) {
     console.log(error);
     throw new Error('Player Could Not Be Deleted');
@@ -50,7 +51,7 @@ export async function deletePlayer(id) {
 export async function getPlayerSeasons({ filter, sortBy }) {
   if (filter.value === 'createSeason') return {};
   let query = supabase
-    .from('playerSeasons')
+    .from(table2)
     .select(
       `
     *,
@@ -72,7 +73,7 @@ export async function getPlayerSeasons({ filter, sortBy }) {
 }
 export async function getPlayerSeason(seasonId) {
   const { data: playerSeason, error } = await supabase
-    .from('playerSeasons')
+    .from(table2)
     .select(
       `
     *,
@@ -93,7 +94,7 @@ export async function getPlayerSeason(seasonId) {
 }
 export async function createPlayerSeasons(newPlayerSeason) {
   const { data, error } = await supabase
-    .from('playerSeasons')
+    .from(table2)
     .insert([{ ...newPlayerSeason }])
     .select();
   if (error) {
@@ -104,7 +105,7 @@ export async function createPlayerSeasons(newPlayerSeason) {
 }
 export async function updatePlayerSeason({ id, ...updateField }) {
   const { data, error } = await supabase
-    .from('playerSeasons')
+    .from(table2)
     .update(updateField)
     .eq('id', id)
     .select();
@@ -113,4 +114,27 @@ export async function updatePlayerSeason({ id, ...updateField }) {
     throw new Error('Player Season Could Not Be updated');
   }
   return data;
+}
+export async function deletePlayerSeasonApi(id) {
+  const { error } = await supabase.from(table2).delete().eq('id', id);
+  if (error) {
+    console.log(error);
+    throw new Error('Player Season Could Not Be Deleted');
+  }
+  return null;
+}
+
+export async function getPlayerSeasonWithNumbers(seasonId) {
+  const { data: playerSeasonWithNumber, error } = await supabase
+    .from(table3)
+    .select(`*`)
+    .eq('seasonId', seasonId)
+    .order('grade', { ascending: false })
+    .order('status', { ascending: true });
+
+  if (error) {
+    console.log(error);
+    throw new Error('Player Seasons Could Not Be Loaded');
+  }
+  return playerSeasonWithNumber;
 }

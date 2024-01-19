@@ -7,3 +7,5 @@ cancel/small x - HiMiniXMark,
 user - HiOutlineUser
 settings/3 dots - HiEllipsisVertical
 close x - HiXMark
+triangle down - HiChevronDown , triangle up- HiChevronUp, HiChevronUpDown
+HiOutlineChartBar stats

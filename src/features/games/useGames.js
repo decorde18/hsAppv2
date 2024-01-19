@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+  getGame,
   getGames,
   getGamesSeason,
   createEditGame,
@@ -17,6 +18,18 @@ import { getGoals } from '../../services/apiStats';
 import { toast } from 'react-hot-toast';
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 
+export function useGame(gameId) {
+  const {
+    isLoading: isLoadingGame,
+    data: game,
+    error,
+  } = useQuery({
+    queryKey: ['game'],
+    queryFn: () => getGame({ gameId }),
+  });
+
+  return { isLoadingGame, error, game };
+}
 export function useGames() {
   const { currentSeason } = useCurrentSeason();
   //Filter by season

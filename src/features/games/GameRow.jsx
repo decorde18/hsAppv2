@@ -4,13 +4,19 @@ import Table from '../../ui/Table';
 import { formatTime, formatDate } from '../../utils/helpers';
 import Modal from '../../ui/Modal';
 import Menus from '../../ui/Menus';
-import { HiPencil, HiTrash, HiMiniXMark } from 'react-icons/hi2';
+import {
+  HiPencil,
+  HiTrash,
+  HiMiniXMark,
+  HiOutlineChartBar,
+} from 'react-icons/hi2';
 import { useDeleteGame, useCancelGame } from './useGames';
 import ConfirmModal from '../../ui/ConfirmModal';
 import CreateGameForm from './CreateGameForm';
 import CreateGoogleSignedInError from '../Calendar/CreateGoogleSignedInError';
 
 import { useSession, useSessionContext } from '@supabase/auth-helpers-react';
+import { NavLink } from 'react-router-dom';
 
 const TableRow = styled.div`
   display: grid;
@@ -93,6 +99,12 @@ function GameRow({ game }) {
             <Modal.Open opens="edit">
               <Menus.Button icon={<HiPencil />}>edit</Menus.Button>
             </Modal.Open>
+            {/* <Modal.Open opens="stats"> */}
+
+            <Menus.Button icon={<HiOutlineChartBar />}>
+              <NavLink to={`../Game?gameId=${game.id}`}>Stats</NavLink>
+            </Menus.Button>
+            {/* </Modal.Open> */}
             <Modal.Open opens="cancel">
               <Menus.Button icon={<HiMiniXMark />}>cancel</Menus.Button>
             </Modal.Open>

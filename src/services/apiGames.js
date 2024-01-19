@@ -2,6 +2,21 @@ import supabase from './supabase';
 import { deleteGoogleCalendarEvent } from './apiGoogle';
 
 const table = 'games';
+export async function getGame({ gameId }) {
+  let query = supabase
+    .from(table)
+    .select('*, schools(*), locations(*)')
+    .eq('id', gameId)
+    .single();
+
+  const { data: game, error } = await query;
+
+  if (error) {
+    console.log(error);
+    throw new Error('Game Could Not Be Loaded');
+  }
+  return game;
+}
 export async function getGames({ filter, sortBy }) {
   let query = supabase
     .from(table)

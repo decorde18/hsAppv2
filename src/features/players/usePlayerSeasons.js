@@ -5,6 +5,8 @@ import {
   getPlayerSeasons,
   updatePlayerSeason,
   createPlayerSeasons,
+  deletePlayerSeasonApi,
+  getPlayerSeasonWithNumbers,
 } from '../../services/apiPlayers';
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 
@@ -47,7 +49,7 @@ export function useUpdatePlayerSeason() {
   const { mutate: updateSetting, isLoading: isUpdating } = useMutation({
     mutationFn: updatePlayerSeason,
     onSuccess: () => {
-      toast.success('Successfully edited');
+      // toast.success('Successfully edited');
       queryClient.invalidateQueries({ queries: ['settings'] });
     },
     onError: (err) => toast.error(err.message),
@@ -69,4 +71,32 @@ export function useCreatePlayerSeason() {
     });
 
   return { createPlayerSeason, isCreatingPlayerSeason };
+}
+
+export function useDeletePlayerSeason() {
+  const queryClient = useQueryClient(); //from App
+  const { isLoading: isDeleting, mutate: deletePlayerSeason } = useMutation({
+    mutationFn: deletePlayerSeasonApi, //Same
+    onSuccess: () => {
+      toast.success(`PlayerSeason  successfully deleted`);
+      queryClient.invalidateQueries({
+        queryKey: ['players', 'seasons', 'playerSeasons'],
+      }); // this
+    },
+
+    onError: (err) => toast.error(err.message),
+  });
+  return { isDeleting, deletePlayerSeason };
+}
+
+export function usePlayerSeasonWithNumber(seasonId) {
+  const {
+    isLoading: isLoadingPlayerSeasonWithNumber,
+    data: playerSeasonWithNumber,
+    error,
+  } = useQuery({
+    queryKey: ['playerSeasonWithNumber'],
+    queryFn: () => getPlayerSeasonWithNumbers(seasonId),
+  });
+  return { isLoadingPlayerSeasonWithNumber, error, playerSeasonWithNumber };
 }

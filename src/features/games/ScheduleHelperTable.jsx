@@ -1,25 +1,28 @@
 import styled from 'styled-components';
 import Spinner from '../../ui/Spinner';
 
-import Table from '../../ui/Table';
-import Menus from '../../ui/Menus';
+import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
+
 import {
   useScheduleHelper,
   useCreateScheduleHelper,
   useEditScheduleHelper,
   useDeleteScheduleHelper,
 } from './useGames';
-import { statusArray, likelihoodArray } from './ScheduleHelperArrays';
-
-import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 import { useSeasons } from '../seasons/useSeasons';
 import { useSchools } from '../schools/useSchools';
 import { useCoaches } from '../coaches/useCoaches';
 
 import ScheduleHelperRow from './ScheduleHelperRow';
+
+import Table from '../../ui/Table';
+import Menus from '../../ui/Menus';
 import Button from '../../ui/Button';
 import Checkbox from '../../ui/Checkbox';
 import Heading from '../../ui/Heading';
+
+import { statusArray, likelihoodArray } from './ScheduleHelperArrays';
+
 import { useState } from 'react';
 
 const StyledDiv = styled.div`
@@ -79,6 +82,7 @@ function ScheduleHelperTable() {
   if (isWorking) return <Spinner />;
   return (
     <Menus>
+      {/* Menus is needed anytime you have menus in the subrows */}
       <Table columns=" 1.25fr 1.25fr .75fr .75fr 1fr .25fr .25fr">
         <Table.Header>
           <div>Opponent</div>

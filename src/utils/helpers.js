@@ -109,3 +109,16 @@ export function addDays(date, numberOfDays) {
 
 //2 days later
 // new Date(new Date().getTime() - 2*24*60*60*1000).toLocaleDateString() // 11/14/2015
+
+export function flattenObject(obj, prefix = '') {
+  let flattened = {};
+  for (let key in obj) {
+    const value = obj[key];
+    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      Object.assign(flattened, flattenObject(value, prefix + key + '.'));
+    } else {
+      flattened[prefix + key] = value;
+    }
+  }
+  return flattened;
+}

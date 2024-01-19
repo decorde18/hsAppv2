@@ -18,7 +18,7 @@ import {
   filterRosterStatus,
   defaultRosterStatus,
 } from '../../utils/filterHelpers';
-import FilterBy from '../../ui/FilterBy';
+// import FilterBy from '../../ui/FilterBy';
 import Select from '../../ui/Select';
 
 function CommunicationTable() {
@@ -43,6 +43,7 @@ function CommunicationTable() {
     function () {
       if (isLoadingPlayerParents || isLoadingPlayerSeasons || isLoadingSeason)
         return;
+      //default filter
       const defaultPlayers = defaultVisiblePlayers(
         playerSeasons,
         playerParents,
@@ -285,11 +286,6 @@ function CommunicationTable() {
                 value={statusFilter.value}
                 id={'filterRosterStatus'}
               ></Select>
-              {/* <FilterBy
-                  options={statusFilterLabel}
-                  id={'filterRosterStatus'}
-                  default={statusFilter.value}
-                /> */}
             </div>
             <div>Team</div>
             <div>Returner</div>

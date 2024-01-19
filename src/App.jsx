@@ -44,6 +44,7 @@ import UniformJerseys from './pages/UniformJerseys';
 import UniformSeasons from './pages/UniformSeasons';
 import UniformSeasonPlayers from './pages/UniformSeasonPlayers';
 import ScheduleHelper from './pages/ScheduleHelper';
+import Game from './pages/Game';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -79,6 +80,7 @@ function App() {
                 <Route path="people" element={<People />} />
                 <Route path="communication" element={<Communication />} />
                 <Route path="games" element={<Games />} />
+                <Route path="game" element={<Game />} />
                 <Route path="events" element={<Events />} />
                 <Route path="newseason" element={<NewSeason />} />
                 <Route path="uniforms" element={<Uniforms />} />
