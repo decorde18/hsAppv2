@@ -13,7 +13,7 @@ const StyledButton = styled.div`
   cursor: pointer;
   vertical-align: middle;
   width: 100%;
-  padding: 0.1rem;
+  padding: 0.15rem;
   margin: 0.2rem;
   text-align: center;
   border-radius: 0.5rem;

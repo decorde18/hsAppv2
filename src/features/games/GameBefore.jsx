@@ -95,10 +95,7 @@ function GameBefore({ game }) {
   useEffect(() => {
     //add playerGame if they are not already added
     if (isLoadingPlayerSeasonWithNumber || isLoadingPlayerGames) return;
-    const eligiblePlayers = playerSeasonWithNumber.filter(
-      (player) => player.status === 'Rostered'
-    );
-    eligiblePlayers.map((player) => {
+    playerSeasonWithNumber.map((player) => {
       if (!playerGames.find((game) => player.playerId === game.player))
         addPlayerGame({
           game: game.id,
