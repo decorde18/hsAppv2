@@ -46,12 +46,12 @@ export const formatTime = (time, noSeconds) => {
     timeValue = '' + hours;
   } else if (hours > 12) {
     timeValue = '' + (hours - 12);
-  } else if (hours == 0) {
+  } else if (hours === 0) {
     timeValue = '12';
   }
 
   timeValue += minutes < 10 ? ':0' + minutes : ':' + minutes; // get minutes
-  noSeconds
+  timeValue = noSeconds
     ? timeValue
     : (timeValue += seconds < 10 ? ':0' + seconds : ':' + seconds); // get seconds
   timeValue += hours >= 12 ? ' PM' : ' AM'; // get AM/PM
