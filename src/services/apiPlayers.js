@@ -9,12 +9,12 @@ export async function getPlayers() {
     .select(
       `
     *,
-    people (*)
+    people!inner(*)
   `
     )
     .order('entryYear', { ascending: true })
-    .order('lastName', { referencedTable: 'people', ascending: true })
-    .order('firstName', { referencedTable: 'people', ascending: true });
+    .order('people.lastName', { ascending: true })
+    .order('people.firstName', { ascending: true });
 
   if (error) {
     console.log(error);

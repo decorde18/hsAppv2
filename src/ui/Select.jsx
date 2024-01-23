@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 
 const StyledSelect = styled.select`
-  font-size: 1.4rem;
-  padding: 0.75rem 1.1rem;
+  font-size: 1.6rem;
+  padding: 0.5rem 1rem;
   border: 1px solid
     ${(props) =>
       props.type === 'white'
@@ -17,7 +17,7 @@ const StyledSelect = styled.select`
     props.type === 'dark' ? 'var(--color-brand-50)' : 'var(--color-grey-700)'};
   font-weight: 500;
   box-shadow: var(--shadow-sm);
-  width: 100%;
+  ${(props) => (props.width === 0 ? null : 'width: 100%')};
 `;
 function Select({ options, value, onChange, register, ...props }) {
   return (

@@ -7,7 +7,7 @@ import { usePeople } from '../people/usePeople';
 import { useCoaches } from '../coaches/useCoaches';
 
 import Modal from '../../ui/Modal';
-import ConfirmModal from '../../ui/ConfirmModal';
+import ModalConfirm from '../../ui/ModalConfirm';
 import Table from '../../ui/Table';
 import Menus from '../../ui/Menus';
 import Select from '../../ui/Select';
@@ -121,7 +121,7 @@ function ScheduleHelperRow({
             onChange={handleSelectChange}
             options={[
               { label: 'No Coach Listed', value: 'default' },
-              // { label: 'ADD A COACH NOT LISTED', value: 'add' },
+              // { label: 'ADD A COACH NOT LISTED', value: 'addAnother' },
               ...sortedCoaches.map((coach) => ({
                 label: `${coach.people.firstName} ${coach.people.lastName}`,
                 value: coach.coach,
@@ -156,7 +156,12 @@ function ScheduleHelperRow({
         disabled={isWorking}
         placeholder={scheduleHelper.notes}
       />
-      <Checkbox $small label="" onChange={handleChange} checked={isChecked} />
+      <Checkbox
+        size="small"
+        label=""
+        onChange={handleChange}
+        checked={isChecked}
+      />
       <Modal>
         <Menus.Menu>
           <Menus.Toggle id={scheduleHelper.id} />
@@ -170,7 +175,7 @@ function ScheduleHelperRow({
           </Menus.List>
         </Menus.Menu>
         <Modal.Window name="delete">
-          <ConfirmModal
+          <ModalConfirm
             resourceName="scheduleHelper"
             onConfirm={closeModal}
             disabled={isWorking}

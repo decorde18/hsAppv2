@@ -9,9 +9,10 @@ import {
   HiTrash,
   HiMiniXMark,
   HiOutlineChartBar,
+  HiVideoCamera,
 } from 'react-icons/hi2';
 import { useDeleteGame, useCancelGame } from './useGames';
-import ConfirmModal from '../../ui/ConfirmModal';
+import ModalConfirm from '../../ui/ModalConfirm';
 import CreateGameForm from './CreateGameForm';
 import CreateGoogleSignedInError from '../Calendar/CreateGoogleSignedInError';
 
@@ -99,12 +100,18 @@ function GameRow({ game }) {
             <Modal.Open opens="edit">
               <Menus.Button icon={<HiPencil />}>edit</Menus.Button>
             </Modal.Open>
-            {/* <Modal.Open opens="stats"> */}
-
-            <Menus.Button icon={<HiOutlineChartBar />}>
-              <NavLink to={`../Game?gameId=${game.id}`}>Stats</NavLink>
-            </Menus.Button>
-            {/* </Modal.Open> */}
+            {/* <Modal.Open opens="departureTime"> //TODO probably need to add to edit game or full departure time page with all games to         enter */}
+            <NavLink to={`/protected/Game?gameId=${game.id}`} target="_blank">
+              <Menus.Button icon={<HiOutlineChartBar />}>Stats</Menus.Button>
+            </NavLink>
+            {game.veoLink && (
+              <NavLink
+                to={`https://app.veo.co/matches/${game.veoLink}/`}
+                target="_blank"
+              >
+                <Menus.Button icon={<HiVideoCamera />}>Veo Link</Menus.Button>
+              </NavLink>
+            )}
             <Modal.Open opens="cancel">
               <Menus.Button icon={<HiMiniXMark />}>cancel</Menus.Button>
             </Modal.Open>
@@ -116,8 +123,11 @@ function GameRow({ game }) {
         <Modal.Window name="edit">
           {<CreateGameForm gameToEdit={game} />}
         </Modal.Window>
+        {/* <Modal.Window name="departureTime">
+          {<DepartureTimeForm gameToEdit={game} />} 
+        </Modal.Window> */}
         <Modal.Window name="cancel">
-          <ConfirmModal
+          <ModalConfirm
             resourceName="games"
             onConfirm={() => cancelGame(game.id)}
             disabled={isWorking}
@@ -128,7 +138,7 @@ function GameRow({ game }) {
           {!session?.provider_token ? (
             <CreateGoogleSignedInError />
           ) : (
-            <ConfirmModal
+            <ModalConfirm
               resourceName="games"
               onConfirm={() =>
                 deleteGame({

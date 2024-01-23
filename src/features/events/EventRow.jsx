@@ -10,7 +10,7 @@ import {
   HiMiniXMark,
 } from 'react-icons/hi2';
 import { useDeleteEvent } from './useEvents';
-import ConfirmModal from '../../ui/ConfirmModal';
+import ModalConfirm from '../../ui/ModalConfirm';
 import CreateEventForm from './CreateEventForm';
 import CreateGoogleSignedInError from '../Calendar/CreateGoogleSignedInError';
 import { useSession, useSessionContext } from '@supabase/auth-helpers-react';
@@ -74,7 +74,7 @@ function EventRow({ event }) {
           {!session?.provider_token ? (
             <CreateGoogleSignedInError />
           ) : (
-            <ConfirmModal
+            <ModalConfirm
               resourceName="event"
               onConfirm={() =>
                 deleteEvent({

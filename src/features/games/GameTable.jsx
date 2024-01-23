@@ -54,11 +54,11 @@ function GameTable() {
 
   const gamesWithGoals = seasonGames.map((game) => ({
     ...seasonGames,
-    goals: goals.filter((goal) => goal.periodId.gameId.id === game.id),
+    goals: goals.filter((goal) => goal.periodId.game.id === game.id),
   }));
   const gamesSeasonWithGoals = seasonGames.map((game) => ({
     ...game,
-    goals: goals.filter((goal) => goal.periodId.gameId.id == game.id),
+    goals: goals.filter((goal) => goal.periodId.game.id == game.id),
   }));
 
   return (

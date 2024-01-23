@@ -2,7 +2,7 @@ import supabase from './supabase';
 import { deleteGoogleCalendarEvent } from './apiGoogle';
 
 const table = 'games';
-export async function getGame({ gameId }) {
+export async function getGame(gameId) {
   let query = supabase
     .from(table)
     .select('*, schools(*), locations(*)')

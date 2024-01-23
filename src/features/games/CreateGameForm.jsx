@@ -248,7 +248,7 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
     if (isEditSession) {
       sendToCalendar(newData);
       editGame(
-        { newGameData: { ...newData }, id: editId },
+        { newData: { ...newData }, id: editId },
         {
           onSuccess: (data) => {
             reset();
@@ -305,8 +305,15 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
       ).name;
       googleCalData.timeZone = 'America/Chicago';
       if (googleCalData.time) {
-        googleCalData.start = momentObj(calData.date, calData.time);
-        googleCalData.end = momentObj(calData.date, calData.time, 1.5);
+        googleCalData.start = convertToGoogleDateTime(
+          calData.date,
+          calData.time
+        );
+        googleCalData.end = convertToGoogleDateTime(
+          calData.date,
+          calData.time,
+          1.5
+        );
       }
       // addToCalendar and get ID
       createEditGoogleCalendarGame(
@@ -325,7 +332,7 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
         }).then(() => closeModal());
       });
 
-      function momentObj(date, time, timeAdded = 0) {
+      function convertToGoogleDateTime(date, time, timeAdded = 0) {
         // tell moment how to parse the input
         const dateTime = moment(date + time, 'YYYY-MM-DDLT').add(
           timeAdded,

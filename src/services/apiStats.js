@@ -4,7 +4,7 @@ export async function getGoals({ filter, sortBy }) {
   if (filter.value === 'createSeason') return {};
   let query = supabase
     .from('stoppages')
-    .select('*,periodId!inner(id, gameId!inner(id, season))');
+    .select('*,periodId!inner(id, game!inner(id, season))');
   //Filter
   if (filter !== null)
     query = query.eq(filter.field, filter.value).like('event', '%Goal%');

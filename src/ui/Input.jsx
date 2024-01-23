@@ -1,11 +1,25 @@
 import styled from 'styled-components';
 
-export const Input = styled.input`
+const defaultAnimationValues = {
+  size: 15,
+};
+
+export const StyledInput = styled.input`
   border: 1px solid var(--color-grey-300);
   background-color: var(--color-grey-0);
   border-radius: var(--border-radius-sm);
   box-shadow: var(--shadow-sm);
-  padding: 0.8rem 1.2rem;
-  min-width: 150px;
+  font-size: 1.6rem;
+  padding: 0.5rem 1rem;
+  width: ${(props) => props.size}rem;
 `;
+
+const Input = ({ size = defaultAnimationValues.size, ...props }) => {
+  return (
+    <div>
+      <StyledInput size={size} {...props} />
+    </div>
+  );
+};
+
 export default Input;

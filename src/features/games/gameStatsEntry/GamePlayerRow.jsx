@@ -1,9 +1,9 @@
 import styled from 'styled-components';
 
-import Row from '../../ui/Row';
-import { flattenObject } from '../../utils/helpers';
-import Menus from '../../ui/Menus';
-import Button from '../../ui/Button';
+import Row from '../../../ui/Row';
+import { flattenObject } from '../../../utils/helpers';
+import Menus from '../../../ui/Menus';
+import Button from '../../../ui/Button';
 
 const StyledButton = styled.div`
   display: inline-block;
@@ -35,7 +35,13 @@ const StyledButtonAuxSmall = styled.div`
   width: 2rem;
 `;
 
-function GamePlayerRow({ data, handleOnToggle, status, updateStatus }) {
+function GamePlayerRow({
+  data,
+  handleOnToggle,
+  status,
+  updateStatus,
+  disabled,
+}) {
   const { playerS, playerG } = data;
 
   function handleClick(newStatus) {
@@ -48,6 +54,7 @@ function GamePlayerRow({ data, handleOnToggle, status, updateStatus }) {
         <StyledButtonRow>
           <StyledButtonMain
             onClick={() => handleOnToggle(status, playerG.player)}
+            disabled={disabled}
           >
             <StyledButtonAux>{playerS.number}</StyledButtonAux>
             <div>{playerS.fullname}</div>

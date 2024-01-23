@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import Button from './Button';
 import Heading from './Heading';
 
-const StyledConfirmModal = styled.div`
+const StyledModalConfirm = styled.div`
   width: 40rem;
   display: flex;
   flex-direction: column;
@@ -19,7 +19,7 @@ const StyledConfirmModal = styled.div`
     gap: 1.2rem;
   }
 `;
-function ConfirmModal({
+function ModalConfirm({
   resourceName,
   onConfirm,
   disabled,
@@ -27,12 +27,14 @@ function ConfirmModal({
   confirmType,
 }) {
   return (
-    <StyledConfirmModal>
+    <StyledModalConfirm>
       <Heading as="h3" case="upper">
         {confirmType} {resourceName}
       </Heading>
-      {confirmType === 'add' ? (
+      {confirmType === 'addAnother' ? (
         <p>Would you like to add another?</p>
+      ) : confirmType === 'create' ? (
+        <p>There are no {resourceName}. Would you like to create them?</p>
       ) : (
         <p>
           Are you sure you want to {confirmType} this {resourceName}?
@@ -50,8 +52,8 @@ function ConfirmModal({
           Yes
         </Button>
       </div>
-    </StyledConfirmModal>
+    </StyledModalConfirm>
   );
 }
 
-export default ConfirmModal;
+export default ModalConfirm;

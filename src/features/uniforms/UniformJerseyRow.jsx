@@ -11,7 +11,7 @@ import {
 import { HiSquare2Stack, HiPencil, HiTrash } from 'react-icons/hi2';
 
 import Modal from '../../ui/Modal';
-import ConfirmModal from '../../ui/ConfirmModal';
+import ModalConfirm from '../../ui/ModalConfirm';
 import Table from '../../ui/Table';
 import Menus from '../../ui/Menus';
 import { useState } from 'react';
@@ -86,7 +86,7 @@ function UniformJerseyRow({ uniformJersey }) {
             </Modal.Window>
 
             <Modal.Window name="delete">
-              <ConfirmModal
+              <ModalConfirm
                 resourceName="uniforms"
                 disabled={isDeleting}
                 onConfirm={() => deleteUniformJersey(id)}

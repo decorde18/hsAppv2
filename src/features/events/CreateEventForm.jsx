@@ -21,7 +21,7 @@ import { useLocations } from '../locations/useLocations';
 import { createEditGoogleCalendarEvent } from '../../services/apiGoogle';
 // import { calendar } from 'googleapis/build/src/apis/calendar';
 
-import { momentObj } from '../../utils/helpers';
+import { convertToGoogleDateTime } from '../../utils/helpers';
 
 const Div = styled.div`
   height: 100%;
@@ -161,8 +161,8 @@ function CreateEventForm({ eventToEdit = {}, onCloseModal }) {
     async function sendToCalendar(calData) {
       const { calendarType, startDateTime, endDateTime, ...googleCalData } =
         calData;
-      googleCalData.startDateTime = momentObj(startDateTime);
-      googleCalData.endDateTime = momentObj(endDateTime);
+      googleCalData.startDateTime = convertToGoogleDateTime(startDateTime);
+      googleCalData.endDateTime = convertToGoogleDateTime(endDateTime);
       googleCalData.calendar =
         calendarType === 'all' ? 'ihsSoccer' : calendarType;
       //send to googleAPI and return calId

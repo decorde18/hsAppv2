@@ -31,7 +31,7 @@ function UpdateUserDataForm() {
   return (
     <Form onSubmit={handleSubmit}>
       <FormRow label="Email address">
-        <Input value={email} disabled />
+        <Input value={email} disabled size="25" />
       </FormRow>
       <FormRow label="Full name">
         <Input
@@ -40,6 +40,7 @@ function UpdateUserDataForm() {
           onChange={(e) => setFullName(e.target.value)}
           id="fullName"
           disabled={isUpdating}
+          size="35"
         />
       </FormRow>
       <FormRow label="Avatar image">

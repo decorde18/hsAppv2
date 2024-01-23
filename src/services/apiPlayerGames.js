@@ -32,14 +32,14 @@ export async function getPlayerGames() {
   }
   return playerGames;
 }
-export async function createEditPlayerGame({ playerGameData, id }) {
+export async function createEditPlayerGame({ newData, id }) {
   let query = supabase.from(table);
   //create player
-  if (!id) query = query.insert([{ ...playerGameData }]);
+  if (!id) query = query.insert([{ ...newData }]);
   //edit player
   if (id)
     query = query
-      .update({ ...playerGameData })
+      .update({ ...newData })
       .eq('id', id)
       .select();
   const { data, error } = await query.select().single();

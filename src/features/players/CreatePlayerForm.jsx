@@ -355,6 +355,7 @@ function CreatePlayerForm() {
                     required: 'We need the player first name',
                   })}
                   disabled={isWorking}
+                  size="25"
                 />
               </FormRowVertical>
               <FormRowVertical
@@ -368,6 +369,7 @@ function CreatePlayerForm() {
                     required: 'We need the player last name',
                   })}
                   disabled={isWorking}
+                  size="25"
                 />
               </FormRowVertical>
               <FormRowVertical label="Email" error={errors?.email?.message}>
@@ -378,6 +380,7 @@ function CreatePlayerForm() {
                     required: false,
                   })}
                   disabled={isWorking}
+                  size="25"
                 />
               </FormRowVertical>
             </Flex>
@@ -413,6 +416,7 @@ function CreatePlayerForm() {
                     required: false,
                   })}
                   disabled={isWorking}
+                  size="25"
                 />
               </FormRowVertical>
             </Flex>
@@ -449,6 +453,7 @@ function CreatePlayerForm() {
                             parent.parentId !== 'default'
                         ).length > 0
                       }
+                      size="25"
                     />
                   </FormRowVertical>
                   <FormRowVertical
@@ -469,6 +474,7 @@ function CreatePlayerForm() {
                             parent.parentId !== 'default'
                         ).length > 0
                       }
+                      size="25"
                     />
                   </FormRowVertical>
                   <FormRowVertical
@@ -489,6 +495,7 @@ function CreatePlayerForm() {
                       {...register(`parents.${index}.email`, {
                         required: 'We need a parent Email',
                       })}
+                      size="25"
                     />
                   </FormRowVertical>
                 </Flex>

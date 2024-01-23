@@ -17,15 +17,19 @@ import {
 import { getGoals } from '../../services/apiStats';
 import { toast } from 'react-hot-toast';
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
+import { useSearchParams } from 'react-router-dom';
 
-export function useGame(gameId) {
+export function useGame() {
+  const [searchParams] = useSearchParams();
+  const gameId = searchParams.get('gameId');
+
   const {
     isLoading: isLoadingGame,
     data: game,
     error,
   } = useQuery({
     queryKey: ['game'],
-    queryFn: () => getGame({ gameId }),
+    queryFn: () => getGame(gameId),
   });
 
   return { isLoadingGame, error, game };
@@ -79,9 +83,9 @@ export function useCreateGame() {
 export function useEditGame() {
   const queryClient = useQueryClient();
   const { mutate: editGame, isLoading: isEditing } = useMutation({
-    mutationFn: ({ newGameData, id }) => createEditGame(newGameData, id),
+    mutationFn: ({ newData, id }) => createEditGame(newData, id),
     onSuccess: () => {
-      toast.success('New Game successfully edited');
+      // toast.success('Game successfully edited');
       queryClient.invalidateQueries({ queries: ['games'] });
     },
     onError: (err) => toast.error(err.message),
@@ -110,7 +114,7 @@ export function useGoals() {
   const filter =
     !currentSeason || currentSeason === 'all'
       ? null
-      : { field: 'periodId.gameId.season', value: currentSeason };
+      : { field: 'periodId.game.season', value: currentSeason };
 
   const {
     isLoading: isLoadingGoals,

@@ -80,7 +80,6 @@ function App() {
                 <Route path="people" element={<People />} />
                 <Route path="communication" element={<Communication />} />
                 <Route path="games" element={<Games />} />
-                <Route path="game" element={<Game />} />
                 <Route path="events" element={<Events />} />
                 <Route path="newseason" element={<NewSeason />} />
                 <Route path="uniforms" element={<Uniforms />} />
@@ -105,6 +104,7 @@ function App() {
                 <Route path="scheduleTSSAA" element={<ScheduleTSSAA />} />
                 <Route path="rosterTSSAA" element={<RosterTSSAA />} />
                 <Route path="account" element={<Account />} />
+                <Route path="game" element={<Game />} />
               </Route>
 
               <Route path="login" element={<Login />} />

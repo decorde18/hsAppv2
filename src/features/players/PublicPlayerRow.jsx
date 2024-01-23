@@ -6,7 +6,7 @@ import { useDeletePlayer } from './useDeletePlayer';
 
 import { HiPencil, HiTrash } from 'react-icons/hi2';
 
-import ConfirmModal from '../../ui/ConfirmModal';
+import ModalConfirm from '../../ui/ModalConfirm';
 import Modal from '../../ui/Modal';
 import Table from '../../ui/Table';
 import Menus from '../../ui/Menus';

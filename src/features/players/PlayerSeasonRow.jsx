@@ -8,7 +8,7 @@ import Select from '../../ui/Select';
 import Switch from '../../ui/Switch';
 import Menus from '../../ui/Menus';
 import Modal from '../../ui/Modal';
-import ConfirmModal from '../../ui/ConfirmModal';
+import ModalConfirm from '../../ui/ModalConfirm';
 
 import { useUpdatePlayerSeason } from './usePlayerSeasons';
 
@@ -139,7 +139,7 @@ function PlayerSeasonRow({ playerSeason }) {
           </Modal.Window>
 
           {/* <Modal.Window name="delete">
-            <ConfirmModal
+            <ModalConfirm
               resourceName="player"
               disabled={isDeleting}
               onConfirm={() => deletePlayer(playerId)}

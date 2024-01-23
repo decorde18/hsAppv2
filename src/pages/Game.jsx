@@ -1,28 +1,101 @@
+import styled from 'styled-components';
+
 import { useSearchParams } from 'react-router-dom';
 
 import Spinner from '../ui/Spinner';
-import GameBefore from '../features/games/GameBefore';
-import GameDuring from '../features/games/GameDuring';
-import GameAfter from '../features/games/GameAfter';
+import GameBefore from '../features/games/gameStatsEntry/GameBefore';
+import GameDuring from '../features/games/gameStatsEntry/GameDuring';
+import GameAfter from '../features/games/gameStatsEntry/GameAfter';
+import GameHeader from '../features/games/gameStatsEntry/GameHeader';
+import GameSettings from '../features/games/gameStatsEntry/GameSettings';
 
-import { useGame } from '../features/games/useGames';
+import { useGame, useEditGame } from '../features/games/useGames';
+import { usePlayerGames } from '../features/players/usePlayerGames';
+import { usePeriods } from '../features/games/gameStatsEntry/usePeriods';
+import { useMinorEvents } from '../features/games/gameStatsEntry/useMinorEvents';
+import { useStoppages } from '../features/games/gameStatsEntry/useStoppages';
+import { useSubs } from '../features/games/gameStatsEntry/useSubs';
+
+import GameStatsEdit from '../features/games/gameStatsEntry/GameStatsEdit';
 
 function Game() {
   const [searchParams] = useSearchParams();
-  const gameId = searchParams.get('gameId');
-  const { isLoadingGame, game } = useGame(gameId);
+  const edit = searchParams.get('edit');
+  const { isLoadingGame, game } = useGame();
+  const { editGame, isEditing } = useEditGame();
+  const { isLoadingPeriods, periods } = usePeriods();
+  const { isLoadingMinorEvents, minorEvents } = useMinorEvents();
+  const { isLoadingStoppages, stoppages } = useStoppages();
+  const { isLoadingSubs, subs } = useSubs();
+  const { isLoadingPlayerGames, playerGames } = usePlayerGames();
 
-  const isWorking = isLoadingGame;
+  const isWorking =
+    isLoadingGame ||
+    isLoadingPlayerGames ||
+    isLoadingPeriods ||
+    isLoadingMinorEvents ||
+    isLoadingStoppages ||
+    isLoadingSubs;
 
   if (isWorking) return <Spinner />;
+  const props = {
+    game,
+    editGame,
+    isEditingGame: isEditing,
+    playerGames,
+    periods,
+    minorEvents,
+    stoppages,
+    subs,
+  };
   return (
     <>
-      {game.status === 'to be played' ? (
-        <GameBefore game={game} />
+      {edit ? (
+        <>
+          <GameHeader game={game} />
+          <GameStatsEdit props={props} />
+        </>
+      ) : game.status === 'to be played' ? (
+        <>
+          <GameHeader game={game} />
+          <GameSettings
+            game={game}
+            editGame={editGame}
+            isEditingGame={isEditing}
+            playerGames={playerGames}
+            expand={false}
+          />
+          <GameBefore
+            game={game}
+            editGame={editGame}
+            isEditingGame={isEditing}
+            playerGames={playerGames}
+          />
+        </>
       ) : game.status === 'started' ? (
-        <GameDuring game={game} />
+        <GameDuring
+          game={game}
+          // editGame={editGame}
+          // isEditingGame={isEditing}
+          // playerGames={playerGames}
+          // periods={periods}
+        />
       ) : (
-        <GameAfter game={game} />
+        <>
+          <GameHeader game={game} />
+          <GameSettings
+            game={game}
+            editGame={editGame}
+            isEditingGame={isEditing}
+            playerGames={playerGames}
+            expand={false}
+          />
+          <GameAfter
+            game={game}
+            playerGames={playerGames}
+            editGame={editGame}
+          />
+        </>
       )}
     </>
   );

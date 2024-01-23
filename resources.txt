@@ -9,3 +9,36 @@ settings/3 dots - HiEllipsisVertical
 close x - HiXMark
 triangle down - HiChevronDown , triangle up- HiChevronUp, HiChevronUpDown
 HiOutlineChartBar stats
+
+      <Heading as="h5" case="upper" location="center">
+
+<Row type="horizontal" justify="center">
+
+<Button type="selected" variation="primary"> type = selected  fullWidth
+
+ Input = ({ size = defaultAnimationValues.size, ...props }) SIZE IN REM
+
+<Select options= label, value{gkSelectArray}type="dark"
+onChange={updateGK}   value={playerGameStatus.gkStarter || 0}
+id={'gkStarter'}
+disabled={isUpdating}
+/>
+
+ Collapsible({ children, animation = defaultAnimationValues, open }
+
+ Checkbox = ({
+  label,
+  checked,
+  onChange,
+  size = defaultAnimationValues.size,
+  ...props
+}
+Switch({ checked, onChange, name, disabled })
+
+ModalConfirm({
+  resourceName,
+  onConfirm,
+  disabled,
+  onCloseModal,
+  confirmType,
+})
