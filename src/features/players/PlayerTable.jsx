@@ -40,19 +40,26 @@ const StyledDiv = styled.div`
 `;
 
 function PlayerTable() {
+  // download all time players
+  // download season players
+  // set default filter (if needed)
+  // set default sort
+
   let seasonPlayers = [];
   const [searchParams] = useSearchParams();
   const { currentSeason } = useCurrentSeason();
   const { isLoadingSeason, season } = useSeason();
 
   const { isLoadingPlayerSeasons, playerSeasons } = usePlayerSeasons();
+  const { isLoadingPlayers, players } = usePlayers();
   const [sortValues, setSortValues] = useState([]);
   //SET FILTER
   let statusFilter;
   let filteredPlayers = [];
   let playerSeasonData = [];
 
-  if (isLoadingPlayerSeasons || isLoadingSeason) return <Spinner />;
+  if (isLoadingPlayerSeasons || isLoadingSeason || isLoadingPlayers)
+    return <Spinner />;
   //If no season selected or no players
   if (!playerSeasons?.length || currentSeason === 'createSeason')
     return <Empty resource="Players" />;
@@ -227,7 +234,7 @@ function PlayerTable() {
     // console.log(sortedValues);
     playerSeasonData = sortedValues;
   }
-
+  console.log(players);
   return (
     <>
       <StyledDiv>

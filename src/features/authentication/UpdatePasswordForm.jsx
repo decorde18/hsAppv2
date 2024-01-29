@@ -36,7 +36,6 @@ function UpdatePasswordForm() {
           })}
         />
       </FormRow>
-
       <FormRow
         label="Confirm password"
         error={errors?.passwordConfirm?.message}

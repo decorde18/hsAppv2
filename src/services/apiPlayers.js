@@ -10,11 +10,12 @@ export async function getPlayers() {
       `
     *,
     people!inner(*)
-  `
+    `
     )
-    .order('entryYear', { ascending: true })
-    .order('people.lastName', { ascending: true })
-    .order('people.firstName', { ascending: true });
+    .order('entryYear', { ascending: true });
+  // .order('people.lastName', { ascending: true });
+  // .order('people.lastName', { ascending: true })
+  // .order('people.firstName', { ascending: true });
 
   if (error) {
     console.log(error);

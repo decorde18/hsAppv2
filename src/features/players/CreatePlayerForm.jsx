@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { useForm, useFieldArray } from 'react-hook-form';
 
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
@@ -9,7 +9,7 @@ import { useCreatePeople } from '../people/useCreatePeople';
 import { useCreatePlayerSeason } from './usePlayerSeasons';
 import { useCreatePlayer } from './useCreatePlayer';
 // import { useCreateParent, useCreatePlayerParent } from '../parents/useParents';
-import { useGetPlayerParents, useParents } from '../parents/useParents';
+import { useParents } from '../parents/useParents';
 import { usePlayers } from '../players/usePlayers';
 
 import Button from '../../ui/Button';
@@ -88,10 +88,6 @@ const StyledSelect = styled.select`
   font-weight: 500;
   box-shadow: var(--shadow-sm);
 `;
-// const Center = styled.div`
-//   width: 50%;
-//   margin: auto;
-// `;
 const Flex = styled.div`
   width: 100%;
   display: flex;
@@ -110,21 +106,13 @@ const gradeArray = [
   { label: '12th', value: 12 },
 ];
 function CreatePlayerForm() {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    getValues,
-    formState,
-    watch,
-    control,
-    setValue,
-  } = useForm({
-    defaultValues: {
-      grade: '9',
-      parents: [{ firstName: '', lastName: '', email: '' }],
-    },
-  });
+  const { register, handleSubmit, reset, formState, control, setValue } =
+    useForm({
+      defaultValues: {
+        grade: '9',
+        parents: [{ firstName: '', lastName: '', email: '' }],
+      },
+    });
   const { errors } = formState;
   const { fields, append, remove } = useFieldArray({
     name: 'parents',
@@ -133,7 +121,7 @@ function CreatePlayerForm() {
 
   const { currentSeason } = useCurrentSeason();
   const { isLoadingSeasons, seasons } = useSeasons();
-  const { isLoadingPlayers, players } = usePlayers();
+  const { isLoadingPlayers } = usePlayers();
   const { isLoadingParents, parents } = useParents();
 
   const { isCreatingPeople, createPeople } = useCreatePeople();
@@ -180,6 +168,7 @@ function CreatePlayerForm() {
     return;
   }
   function onSubmit(data) {
+    console.log(data);
     const { grade, parents, previousSchool, ...playerPersonData } = data;
     // - convert grade to entryYear
     const entryYear =
@@ -351,11 +340,15 @@ function CreatePlayerForm() {
                 <Input
                   type="text"
                   id="firstName"
-                  {...register('firstName', {
-                    required: 'We need the player first name',
-                  })}
+                  name="firstName"
                   disabled={isWorking}
                   size="25"
+                  register={{
+                    ...register('firstName', {
+                      required: 'We need the player first name',
+                    }),
+                  }}
+                  ref={null}
                 />
               </FormRowVertical>
               <FormRowVertical
@@ -365,22 +358,28 @@ function CreatePlayerForm() {
                 <Input
                   type="text"
                   id="lastName"
-                  {...register('lastName', {
-                    required: 'We need the player last name',
-                  })}
+                  register={{
+                    ...register('lastName', {
+                      required: 'We need the player last name',
+                    }),
+                  }}
                   disabled={isWorking}
                   size="25"
+                  ref={null}
                 />
               </FormRowVertical>
               <FormRowVertical label="Email" error={errors?.email?.message}>
                 <Input
                   type="email"
                   id="email"
-                  {...register('email', {
-                    required: false,
-                  })}
+                  register={{
+                    ...register('email', {
+                      required: false,
+                    }),
+                  }}
                   disabled={isWorking}
                   size="25"
+                  ref={null}
                 />
               </FormRowVertical>
             </Flex>
@@ -412,11 +411,14 @@ function CreatePlayerForm() {
                 <Input
                   type="text"
                   id="previousSchool"
-                  {...register('previousSchool', {
-                    required: false,
-                  })}
+                  register={{
+                    ...register('previousSchool', {
+                      required: false,
+                    }),
+                  }}
                   disabled={isWorking}
                   size="25"
+                  ref={null}
                 />
               </FormRowVertical>
             </Flex>
@@ -442,9 +444,11 @@ function CreatePlayerForm() {
                     <Input
                       type="text"
                       placeholder={`Enter Parent ${index + 1} First Name`}
-                      {...register(`parents.${index}.firstName`, {
-                        required: 'We need a parent first name',
-                      })}
+                      register={{
+                        ...register(`parents.${index}.firstName`, {
+                          required: 'We need a parent first name',
+                        }),
+                      }}
                       disabled={
                         isWorking ||
                         formerParent.filter(
@@ -454,6 +458,7 @@ function CreatePlayerForm() {
                         ).length > 0
                       }
                       size="25"
+                      ref={null}
                     />
                   </FormRowVertical>
                   <FormRowVertical
@@ -463,9 +468,11 @@ function CreatePlayerForm() {
                     <Input
                       type="text"
                       placeholder={`Enter Parent ${index + 1} Last Name`}
-                      {...register(`parents.${index}.lastName`, {
-                        required: 'We need a parent last name',
-                      })}
+                      register={{
+                        ...register(`parents.${index}.lastName`, {
+                          required: 'We need a parent last name',
+                        }),
+                      }}
                       disabled={
                         isWorking ||
                         formerParent.filter(
@@ -475,6 +482,7 @@ function CreatePlayerForm() {
                         ).length > 0
                       }
                       size="25"
+                      ref={null}
                     />
                   </FormRowVertical>
                   <FormRowVertical
@@ -492,10 +500,13 @@ function CreatePlayerForm() {
                             parent.parentId !== 'default'
                         ).length > 0
                       }
-                      {...register(`parents.${index}.email`, {
-                        required: 'We need a parent Email',
-                      })}
+                      register={{
+                        ...register(`parents.${index}.email`, {
+                          required: 'We need a parent Email',
+                        }),
+                      }}
                       size="25"
+                      ref={null}
                     />
                   </FormRowVertical>
                 </Flex>

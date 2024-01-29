@@ -1,5 +1,7 @@
 ## //TODO FIXME !!!
 
+seasonselector -
+
 - validate that no new player is already in system, likewise with parent
 
 - scheeduleTable - see the todos

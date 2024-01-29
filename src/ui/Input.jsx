@@ -14,12 +14,8 @@ export const StyledInput = styled.input`
   width: ${(props) => props.size}rem;
 `;
 
-const Input = ({ size = defaultAnimationValues.size, ...props }) => {
-  return (
-    <div>
-      <StyledInput size={size} {...props} />
-    </div>
-  );
+const Input = ({ size = defaultAnimationValues.size, register, ...props }) => {
+  return <StyledInput {...register} size={size} {...props} />;
 };
 
 export default Input;
