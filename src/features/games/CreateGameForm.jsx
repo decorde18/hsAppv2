@@ -409,7 +409,9 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
                 type="date"
                 id="date"
                 disabled={isWorking}
-                {...register('date', { required: 'Please Provide a date' })}
+                register={{
+                  ...register('date', { required: 'Please Provide a date' }),
+                }}
               />
             </FormRow>
             <Row type="horizontal">
@@ -429,11 +431,13 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
                                   : `time${team}`
                               }
                               disabled={isWorking}
-                              {...register(
-                                gameScheduleType !== 'both'
-                                  ? 'time'
-                                  : `time${team}`
-                              )}
+                              register={{
+                                ...register(
+                                  gameScheduleType !== 'both'
+                                    ? 'time'
+                                    : `time${team}`
+                                ),
+                              }}
                             />
                           </FormRow>
                           {watch('time') && (
