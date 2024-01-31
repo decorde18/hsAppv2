@@ -168,7 +168,6 @@ function CreatePlayerForm() {
     return;
   }
   function onSubmit(data) {
-    console.log(data);
     const { grade, parents, previousSchool, ...playerPersonData } = data;
     // - convert grade to entryYear
     const entryYear =

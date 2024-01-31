@@ -1,5 +1,5 @@
-import styled, { css } from 'styled-components';
-import { HiPencil, HiTrash } from 'react-icons/hi2';
+import styled from 'styled-components';
+import { HiPencil } from 'react-icons/hi2';
 
 import Table from '../../ui/Table';
 import Row from '../../ui/Row';
@@ -8,7 +8,6 @@ import Select from '../../ui/Select';
 import Switch from '../../ui/Switch';
 import Menus from '../../ui/Menus';
 import Modal from '../../ui/Modal';
-import ModalConfirm from '../../ui/ModalConfirm';
 
 import { useUpdatePlayerSeason } from './usePlayerSeasons';
 

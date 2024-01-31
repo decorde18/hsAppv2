@@ -6,4 +6,8 @@ const supabaseKey =
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+function loginWithProvider() {}
+
+function logoutWithProvider() {}
+
 export default supabase;

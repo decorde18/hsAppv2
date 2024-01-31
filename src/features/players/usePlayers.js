@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getPlayerSeasons, getPlayers } from '../../services/apiPlayers';
+import { getPlayers } from '../../services/apiPlayers';
 
 export function usePlayers() {
   const {

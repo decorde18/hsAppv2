@@ -1,14 +1,12 @@
 import { useState } from 'react';
 import Empty from '../../ui/Empty';
 import Menus from '../../ui/Menus';
-import Select from '../../ui/Select';
 import Spinner from '../../ui/Spinner';
 import Table from '../../ui/Table';
 import UniformSeasonPlayerRow from './UniformSeasonPlayerRow';
 import {
   useUniformSeasonPlayers,
   useUniformSeason,
-  useUniforms,
   useUniformJerseys,
 } from './useUniforms';
 import { styled } from 'styled-components';

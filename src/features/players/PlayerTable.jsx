@@ -9,15 +9,11 @@ import { useSeason } from '../seasons/useSeasons';
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 
 import PlayerSeasonRow from './PlayerSeasonRow';
-import PlayerRow from './PlayerRow';
 
-import Button from '../../ui/Button';
 import Table from '../../ui/Table';
 import Empty from '../../ui/Empty';
 import Menus from '../../ui/Menus';
-import Modal from '../../ui/Modal';
 import HeaderSortFilter from '../../ui/HeaderSortFilter';
-import MenuFilterSort from '../../ui/MenuFilterSort';
 import { flattenObject } from '../../utils/helpers';
 
 import AddPlayer from './AddPlayer';
@@ -25,10 +21,7 @@ import AddPlayer from './AddPlayer';
 
 //FILTER HELPERS
 import { useSearchParams } from 'react-router-dom';
-import {
-  statusFilterLabel,
-  filterRosterStatus,
-} from '../../utils/filterHelpers';
+import { filterRosterStatus } from '../../utils/filterHelpers';
 
 import { useEffect, useState } from 'react';
 import Players from '../../pages/Players';
