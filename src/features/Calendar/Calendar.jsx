@@ -26,7 +26,7 @@ function Calendar({ startDate, endDate }) {
 
   const { isLoadingGamesSeason, gamesSeason } = useGamesSeason(currentSeason);
   const { isLoadingEvents, events } = useEvents(currentSeason);
-
+  const isLoading = isLoadingEvents || isLoadingGamesSeason;
   function calendar(start, end) {
     //calendar builder
     start = new Date(start);
@@ -78,7 +78,7 @@ function Calendar({ startDate, endDate }) {
       };
     });
 
-    if (isLoadingGamesSeason) return <></>;
+    if (isLoading) return <></>;
 
     const empty = Array(dates[0].weekDay)
       .fill()
