@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useGamesSeason } from '../games/useGames';
 import { useEvents } from '../events/useEvents';
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
+import Spinner from '../../ui/Spinner';
 
 const CalendarDiv = styled.div`
   display: grid;
@@ -78,8 +79,7 @@ function Calendar({ startDate, endDate }) {
       };
     });
 
-    if (isLoading) return <></>;
-
+    if (isLoading) return <Spinner />;
     const empty = Array(dates[0].weekDay)
       .fill()
       .map((_, i) => {
