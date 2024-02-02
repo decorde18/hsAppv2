@@ -36,6 +36,7 @@ function Calendar({ startDate, endDate }) {
     const dateArray = Array(numberOfDays) //create array with the dates needed
       .fill()
       .map((_, i) => new Date(new Date(start).setDate(start.getDate() + i)));
+
     const allDates = dateArray.map((date) => {
       //make the date arry into object of months, days, day
       return {
@@ -47,6 +48,8 @@ function Calendar({ startDate, endDate }) {
         day: date.getDate(),
       };
     });
+    if (isLoading) return <Spinner />;
+
     const games = gamesSeason.map((calEvent) => {
       //get games
       const date = new Date(
@@ -79,7 +82,6 @@ function Calendar({ startDate, endDate }) {
       };
     });
 
-    if (isLoading) return <Spinner />;
     const empty = Array(dates[0].weekDay)
       .fill()
       .map((_, i) => {
