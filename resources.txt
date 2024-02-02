@@ -14,7 +14,7 @@ HiOutlineChartBar stats
 
 <Row type="horizontal" justify="center">
 
-<Button type="selected" variation="primary"> type = selected  fullWidth
+<Button size='medium type="selected" variation="primary"> type = selected  fullWidth
 
  Input = ({ size = defaultAnimationValues.size, ...props }) SIZE IN REM
 

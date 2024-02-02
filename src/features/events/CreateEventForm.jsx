@@ -226,9 +226,11 @@ function CreateEventForm({ eventToEdit = {}, onCloseModal }) {
                 type="text"
                 id="summary"
                 disabled={isWorking}
-                {...register('summary', {
-                  required: 'This field is required',
-                })}
+                register={{
+                  ...register('summary', {
+                    required: 'This field is required',
+                  }),
+                }}
               />
             </FormRow>
             <FormRow
@@ -239,9 +241,11 @@ function CreateEventForm({ eventToEdit = {}, onCloseModal }) {
                 type="datetime-local"
                 id="startDateTime"
                 disabled={isWorking}
-                {...register('startDateTime', {
-                  required: 'Please Provide a date and Time',
-                })}
+                register={{
+                  ...register('startDateTime', {
+                    required: 'Please Provide a date and Time',
+                  }),
+                }}
               />
             </FormRow>
             <FormRow label="End Date *" error={errors?.endDateTime?.message}>
@@ -249,9 +253,11 @@ function CreateEventForm({ eventToEdit = {}, onCloseModal }) {
                 type="datetime-local"
                 id="endDateTime"
                 disabled={isWorking}
-                {...register('endDateTime', {
-                  required: 'Please Provide a date and Time',
-                })}
+                register={{
+                  ...register('endDateTime', {
+                    required: 'Please Provide a date and Time',
+                  }),
+                }}
               />
             </FormRow>
             <FormRow error={errors?.allDay?.message}>

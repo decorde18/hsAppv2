@@ -36,6 +36,7 @@ function AppNav() {
         return (
           <Li key={`${button.name}btn`}>
             <Button
+              size="large"
               variation={active === button.name ? 'primary' : 'secondary'}
               onClick={handleToggle}
             >

@@ -5,6 +5,7 @@ import Input from '../../ui/Input';
 import SpinnerMini from '../../ui/SpinnerMini';
 import FormRowVertical from '../../ui/FormRowVertical';
 import { useLogin } from './useLogin';
+import { googleSignIn } from '../../services/apiAuth';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -24,7 +25,9 @@ function LoginForm() {
       }
     );
   }
-
+  function handleGoogleSignIn() {
+    googleSignIn();
+  }
   return (
     <Form onSubmit={handleSubmit}>
       <FormRowVertical label="Email address">
@@ -54,6 +57,12 @@ function LoginForm() {
       <FormRowVertical>
         <Button size="large" disabled={isLoading}>
           {!isLoading ? 'Login' : <SpinnerMini />}
+        </Button>
+      </FormRowVertical>
+
+      <FormRowVertical>
+        <Button size="large" disabled={isLoading} onClick={handleGoogleSignIn}>
+          {!isLoading ? 'Google' : <SpinnerMini />}
         </Button>
       </FormRowVertical>
     </Form>

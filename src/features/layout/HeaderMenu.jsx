@@ -2,7 +2,8 @@ import { styled } from 'styled-components';
 import { useSession, useSessionContext } from '@supabase/auth-helpers-react';
 
 import { useNavigate } from 'react-router-dom';
-import { useGoogleSignIn } from '../authentication/useLogin';
+// import { useGoogleSignIn } from '../authentication/useLogin';
+import { googleSignIn } from '../../services/apiAuth';
 import Logout from '../authentication/Logout';
 import { useUser } from '../authentication/useUser';
 import UserAvatar from '../authentication/UserAvatar';
@@ -16,10 +17,11 @@ function HeaderMenu() {
   const { isLoading: isLoadingSupabase } = useSessionContext();
   const { user } = useUser();
   const session = useSession();
-  const { googleSignIn, isLoading: isLoadingGoogle } = useGoogleSignIn();
+  // const { googleSignIn, isLoading: isLoadingGoogle } = useGoogleSignIn();
 
   const navigate = useNavigate();
-  const isLoading = isLoadingGoogle || isLoadingSupabase;
+  // const isLoading = isLoadingGoogle || isLoadingSupabase;
+  const isLoading = isLoadingSupabase;
   function handleGoogleSignIn() {
     googleSignIn();
   }

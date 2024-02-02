@@ -77,6 +77,9 @@ function Calendar({ startDate, endDate }) {
         games: games.filter((game) => day.date === game.date),
       };
     });
+
+    if (isLoadingGamesSeason) return <></>;
+
     const empty = Array(dates[0].weekDay)
       .fill()
       .map((_, i) => {
@@ -120,7 +123,6 @@ function Calendar({ startDate, endDate }) {
       </>
     );
   }
-  if (isLoadingGamesSeason) return <></>;
 
   return (
     <CalendarDiv>

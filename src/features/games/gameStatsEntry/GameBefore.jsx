@@ -236,6 +236,7 @@ function GameBefore({ game, playerGames, editGame, isEditingGame }) {
   }
 
   if (isWorking) return <Spinner />;
+
   const playerSeasonNumberChanges = playerSeasonWithNumber.map((player) => ({
     seasonPlayerId: player.id,
     ...player,
@@ -258,8 +259,8 @@ function GameBefore({ game, playerGames, editGame, isEditingGame }) {
         value: play.player,
       })),
   ];
-  const numberOfStarters =
-    playerGameStatus.start.length === 10 && playerGameStatus.gkStarter;
+  // const numberOfStarters =
+  //   playerGameStatus.start.length === 10 && playerGameStatus.gkStarter;
 
   return (
     <>
