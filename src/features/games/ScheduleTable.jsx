@@ -19,10 +19,9 @@ function ScheduleTable() {
   const { isLoadingSeason, season } = useSeason(currentSeason);
   const { isLoadingGamesSeason, gamesSeason } = useGamesSeason(currentSeason);
   //TODO FUTURE break schedule into {season.teamLevels["Varsity","JV"] and cycle through
-  if (isLoadingGamesSeason /*|| isLoadingRecent*/ || isLoadingSeason)
-    return <Spinner />;
-  if (!season) return <div>Sorry You Must Have A Season Selected</div>;
-  if (!gamesSeason.length) return <Empty resource="Games" />;
+  if (isLoadingGamesSeason || isLoadingSeason || !season) return <Spinner />;
+
+  // if (!gamesSeason.length) return <Empty resource="Games" />;
   return (
     <>
       <Heading as="h2" location="center">

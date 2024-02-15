@@ -2,8 +2,9 @@ import { useEffect } from 'react';
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 import { useRecentSeason } from '../seasons/useSeasons';
 import Logo from '../../ui/Logo';
+import Spinner from '../../ui/Spinner';
 
-function AppLayoutPublic({ logo }) {
+function AppLayoutPublic({ logo, children }) {
   // ON LOAD  UPDATE THE RECENT AND CURRENT IN LOCAL AND CONTEXT PROVIDER
   const { currentSeason, updateCurrentSeason, updateRecentSeason } =
     useCurrentSeason();
@@ -23,7 +24,13 @@ function AppLayoutPublic({ logo }) {
       isLoadingRecent,
     ]
   );
-  return <div>{logo && <Logo />}</div>;
+  if (isLoadingRecent || !currentSeason) return <Spinner />;
+  return (
+    <>
+      <div>{logo && <Logo />}</div>
+      {children}
+    </>
+  );
 }
 
 export default AppLayoutPublic;

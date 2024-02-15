@@ -18,8 +18,9 @@ const styles = StyleSheet.create({
 function Schedule() {
   return (
     <>
-      <AppLayoutPublic />
-      <ScheduleTable />
+      <AppLayoutPublic>
+        <ScheduleTable />
+      </AppLayoutPublic>
     </>
   );
 }
