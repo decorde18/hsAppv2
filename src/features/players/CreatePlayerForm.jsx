@@ -280,7 +280,6 @@ function CreatePlayerForm() {
     console.log(errors);
   }
   if (isWorking) return <Spinner />;
-
   const previousSeason =
     seasons.find((season) => season.id === currentSeason).season - 1;
   const teamPicUrl = `${supabaseUrl}/storage/v1/object/public/teampics/independence${previousSeason}.jpg`;

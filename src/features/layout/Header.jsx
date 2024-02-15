@@ -6,6 +6,9 @@ import SeasonSelector from './SeasonSelector';
 // import { useAuth } from '../contexts/FakeAuthContexts';
 import { styled } from 'styled-components';
 import Logout from '../authentication/Logout';
+import Button from '../../ui/Button';
+import { NavLink } from 'react-router-dom';
+import Row from '../../ui/Row';
 
 const StyledHeader = styled.header`
   display: flex;
@@ -31,13 +34,18 @@ const H1 = styled.h1`
 `;
 
 function Header({ type }) {
-  // const { isAuthenticated } = useAuth();
-
   return (
     <StyledHeader className="relative mb-2">
       <Logo></Logo>
       <Div>
         <H1>INDEPENDENCE GIRLS SOCCER</H1>
+        <Row type="horizontal" justify="center">
+          <NavLink to="../schedule">
+            <Button size="medium" variation="primary">
+              SCHEDULE
+            </Button>
+          </NavLink>
+        </Row>
         {type !== 'nonApp' && (
           <Div2>
             <SeasonSelector />

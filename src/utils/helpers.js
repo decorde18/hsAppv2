@@ -13,6 +13,15 @@ export const formatCurrency = (value) =>
   new Intl.NumberFormat('en', { style: 'currency', currency: 'USD' }).format(
     value
   );
+export function subtractTimes(startTime, endTime) {
+  return timeToSeconds(endTime) - timeToSeconds(startTime);
+  function timeToSeconds(time) {
+    time = time.split(':');
+    if (time.length === 3) time = +time[0] * 60 * 60 + +time[1] * 60 + +time[2];
+    else time = +time[0] * 60 + +time[1];
+    return time;
+  }
+}
 
 // We want to make this function work for both Date objects and strings (which come from Supabase)
 export const subtractDates = (dateStr1, dateStr2) =>

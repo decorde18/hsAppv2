@@ -4,14 +4,13 @@ import Empty from '../../../ui/Empty';
 
 import GamePlayerRow from './GamePlayerRow';
 
+import { usePlayerSeasonWithNumber } from '../../players/usePlayerSeasons';
 import {
-  usePlayerSeason,
-  usePlayerSeasonWithNumber,
-} from '../../players/usePlayerSeasons';
-import {
+  usePlayerGames,
   useCreatePlayerGame,
   useUpdatePlayerGame,
 } from '../../players/usePlayerGames';
+import { useGame } from '../useGames';
 import { useEffect, useState } from 'react';
 import Heading from '../../../ui/Heading';
 import styled from 'styled-components';
@@ -78,7 +77,10 @@ const columnTypes = [
 ];
 const numberOfColumns = new Set(columnTypes.map((col) => col.column));
 
-function GameBefore({ game, playerGames, editGame, isEditingGame }) {
+function GameBefore({ editGame, isEditingGame }) {
+  const { isLoadingGame, game } = useGame();
+  const { isLoadingPlayerGames, playerGames } = usePlayerGames();
+
   const { isLoadingPlayerSeasonWithNumber, playerSeasonWithNumber } =
     usePlayerSeasonWithNumber(game.season);
   const { createPlayerGame, isCreatingPlayerGame } = useCreatePlayerGame();
@@ -93,62 +95,52 @@ function GameBefore({ game, playerGames, editGame, isEditingGame }) {
     notDressed: [],
     gkStarter: null,
   });
-  //todo fix, on create stats for game, it doesn't refresh when they are created
 
-  const isWorking = isCreatingPlayerGame || isLoadingPlayerSeasonWithNumber;
+  const isWorking =
+    isLoadingGame ||
+    isLoadingPlayerGames ||
+    isCreatingPlayerGame ||
+    isLoadingPlayerSeasonWithNumber;
+  // useEffect(() => {
+  //   //todo this needs to run after create playerGames as well
+  //   //update state of all values
+  //   if (isLoadingPlayerSeasonWithNumber) return;
+  //   setInitialStatus(playerGames);
+  //   //I only want it to run on load
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [isLoadingPlayerSeasonWithNumber]);
   useEffect(() => {
     //add playerGame if they are not already added
     if (isLoadingPlayerSeasonWithNumber) return;
-    playerSeasonWithNumber.map((player) => {
-      if (!playerGames.find((game) => player.playerId === game.player))
-        createPlayerGame({
-          newData: {
-            game: game.id,
-            player: player.playerId,
-            dressed: player.teamLevel.includes('Varsity'),
-          },
-        });
-    });
+    const playerGameArray = playerGames;
+    if (playerSeasonWithNumber.length !== playerGames.length) {
+      playerSeasonWithNumber.map((player) => {
+        if (
+          !playerGames.find((playGame) => player.playerId === playGame.player)
+        )
+          if (
+            !playerGames.find((playGame) => player.playerId === playGame.player)
+          ) {
+            createPlayerGame({
+              newData: {
+                game: game.id,
+                player: player.playerId,
+                dressed: player.teamLevel.includes('Varsity'),
+                start: false,
+                injured: false,
+                unavailable: false,
+              },
+              onSuccess: (data) => playerGameArray.push(data),
+            });
+          }
+      });
+      //I only want it to run on load
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      // console.log(playerGameArray);
+    }
+    setInitialStatus(playerGameArray);
   }, [isLoadingPlayerSeasonWithNumber]);
-  useEffect(() => {
-    //update state of all values
-    if (isLoadingPlayerSeasonWithNumber) return;
-    const updatedPlayerGames = playerGames.map((player) => ({
-      ...playerSeasonWithNumber.find((play) => play.playerId === player.player),
-      ...player,
-    }));
-    setPlayerGameStatus({
-      start: updatedPlayerGames
-        .filter(
-          (playerG) => playerG.start === true && playerG.gkStarter === false
-        )
-        .sort((a, b) => a.number - b.number),
-      dressed: updatedPlayerGames
-        .filter(
-          (playerG) => playerG.start === false && playerG.dressed === true
-        )
-        .sort((a, b) => a.number - b.number),
-      injured: updatedPlayerGames
-        .filter((playerG) => playerG.injured === true)
-        .sort((a, b) => a.number - b.number),
-      unavailable: updatedPlayerGames
-        .filter((playerG) => playerG.available === false)
-        .sort((a, b) => a.number - b.number),
-      notDressed: updatedPlayerGames
-        .filter(
-          (playerG) =>
-            playerG.start === false &&
-            playerG.dressed === false &&
-            playerG.injured === false &&
-            playerG.unavailable === false
-        )
-        .sort((a, b) => a.number - b.number),
-      gkStarter: updatedPlayerGames.find((player) => player.gkStarter === true)
-        ?.player,
-    });
-    //I only want it to run on load
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoadingPlayerSeasonWithNumber]);
+
   useEffect(() => {
     setBeginGame(
       playerGameStatus.start.length === 10 && playerGameStatus.gkStarter
@@ -204,6 +196,43 @@ function GameBefore({ game, playerGames, editGame, isEditingGame }) {
   function handleOnToggle(status, id) {
     const newStatus = status === 'dressed' ? 'start' : 'dressed';
     updateStatus(status, newStatus, id);
+  }
+  function setInitialStatus(playG) {
+    console.log(playG);
+    const updatedPlayerGames = playG.map((player) => ({
+      ...playerSeasonWithNumber.find((play) => play.playerId === player.player),
+      ...player,
+    }));
+
+    setPlayerGameStatus({
+      start: updatedPlayerGames
+        .filter(
+          (playerG) => playerG.start === true && playerG?.gkStarter === false
+        )
+        .sort((a, b) => a.number - b.number),
+      dressed: updatedPlayerGames
+        .filter(
+          (playerG) => playerG.start === false && playerG.dressed === true
+        )
+        .sort((a, b) => a.number - b.number),
+      injured: updatedPlayerGames
+        .filter((playerG) => playerG.injured === true)
+        .sort((a, b) => a.number - b.number),
+      unavailable: updatedPlayerGames
+        .filter((playerG) => playerG.available === false)
+        .sort((a, b) => a.number - b.number),
+      notDressed: updatedPlayerGames
+        .filter(
+          (playerG) =>
+            playerG.start === false &&
+            playerG.dressed === false &&
+            playerG.injured === false &&
+            playerG.unavailable === false
+        )
+        .sort((a, b) => a.number - b.number),
+      gkStarter: updatedPlayerGames.find((player) => player.gkStarter === true)
+        ?.player,
+    });
   }
   function updateStatus(status, newStatus, id) {
     const playerG = playerGamesWithNumber.find((play) => play.player === id);

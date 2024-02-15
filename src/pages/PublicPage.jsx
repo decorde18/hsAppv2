@@ -10,7 +10,7 @@ const StyledPublicPage = styled.div`
   grid-template-rows: 15rem 1fr auto;
 `;
 const Main = styled.main`
-  margin: auto;
+  margin: 10rem auto;
 `;
 const StyledNav = styled.span`
   color: blue;

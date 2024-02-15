@@ -4,8 +4,8 @@ import CreatePlayerForm from '../features/players/CreatePlayerForm';
 function NewPlayer() {
   return (
     <>
-      <AppLayoutPublic />
-      <CreatePlayerForm />;
+      <AppLayoutPublic logo={true} />
+      <CreatePlayerForm />
     </>
   );
 }

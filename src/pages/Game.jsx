@@ -48,16 +48,17 @@ function Game() {
     stoppages,
     subs,
   };
+  //TODO FIXME take props out of all these pages
   return (
     <>
       {edit ? (
         <>
-          <GameHeader game={game} />
+          <GameHeader game={game} stoppages={stoppages} />
           <GameStatsEdit props={props} />
         </>
       ) : game.status === 'to be played' ? (
         <>
-          <GameHeader game={game} />
+          <GameHeader game={game} stoppages={stoppages} />
           <GameSettings
             game={game}
             editGame={editGame}
@@ -65,12 +66,7 @@ function Game() {
             playerGames={playerGames}
             expand={false}
           />
-          <GameBefore
-            game={game}
-            editGame={editGame}
-            isEditingGame={isEditing}
-            playerGames={playerGames}
-          />
+          <GameBefore editGame={editGame} isEditingGame={isEditing} />
         </>
       ) : game.status === 'started' ? (
         <GameDuring
@@ -82,7 +78,7 @@ function Game() {
         />
       ) : (
         <>
-          <GameHeader game={game} />
+          <GameHeader game={game} stoppages={stoppages} />
           <GameSettings
             game={game}
             editGame={editGame}

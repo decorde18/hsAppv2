@@ -5,31 +5,29 @@ import { useGamesSeason } from './useGames';
 import Table from '../../ui/Table';
 import Empty from '../../ui/Empty';
 import ScheduleRow from './ScheduleRow';
-import { useSearchParams } from 'react-router-dom';
 import Heading from '../../ui/Heading';
-import { useRecentSeason, useSeason } from '../seasons/useSeasons';
+import { useSeason } from '../seasons/useSeasons';
+import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 
 const Right = styled.div`
   text-align: right;
 `;
 
 function ScheduleTable() {
-  //TODO FUTURE ---need to create context provider in App for recent season... currently it is read in SeasonSelector, move to App --- if no searchParam, use Recent once it loads
-  const [searchParams] = useSearchParams();
+  const { currentSeason } = useCurrentSeason();
 
-  const season = searchParams.get('season');
-  const { isLoadingSeason, season: seasonApi } = useSeason(season);
-  const { isLoadingGamesSeason, gamesSeason } = useGamesSeason(season);
-  if (!season) return <div>Sorry You Must Have A Season Selected</div>;
-  //TODO FUTURE break schedule into {seasonApi.teamLevels["Varsity","JV"] and cycle through
+  const { isLoadingSeason, season } = useSeason(currentSeason);
+  const { isLoadingGamesSeason, gamesSeason } = useGamesSeason(currentSeason);
+  //TODO FUTURE break schedule into {season.teamLevels["Varsity","JV"] and cycle through
   if (isLoadingGamesSeason /*|| isLoadingRecent*/ || isLoadingSeason)
     return <Spinner />;
+  if (!season) return <div>Sorry You Must Have A Season Selected</div>;
   if (!gamesSeason.length) return <Empty resource="Games" />;
   return (
     <>
       <Heading as="h2" location="center">
-        Independence High School Girls&#39; <br></br>Soccer Season{' '}
-        {seasonApi.season}
+        Independence High School Girls&#39; <br></br>
+        {`Soccer Season ${season.season}`}
       </Heading>
       <Heading as="h3">Varsity Schedule</Heading>
       <Table columns="2px 49px 50px 180px 150px 1fr 2px">

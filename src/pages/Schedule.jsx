@@ -1,4 +1,5 @@
 import ScheduleTable from '../features/games/ScheduleTable';
+import AppLayoutPublic from '../features/layout/AppLayoutPublic';
 import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
 
 // Create styles
@@ -15,7 +16,12 @@ const styles = StyleSheet.create({
 });
 
 function Schedule() {
-  return <ScheduleTable />;
+  return (
+    <>
+      <AppLayoutPublic />
+      <ScheduleTable />
+    </>
+  );
 }
 
 export default Schedule;

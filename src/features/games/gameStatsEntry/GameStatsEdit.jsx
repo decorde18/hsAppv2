@@ -12,11 +12,14 @@ import Row from '../../../ui/Row';
 import Heading from '../../../ui/Heading';
 
 import GameStatsEditRow from './GameStatsEditRow';
+import PlayerGameTimes from './inGameSubs/PlayerGameTimes';
+import CurrentGK from './inGameSubs/CurrentGK';
 
 import {
   convertMinutesSecondsToSeconds,
   convertSBtimeToLocalTime,
   convertSecondsToMinutesSeconds,
+  subtractTimes,
 } from '../../../utils/helpers';
 
 import {
@@ -43,9 +46,6 @@ const Container = styled.div`
   flex-wrap: nowrap;
   justify-content: space-between;
   height: 80dvh;
-`;
-const FullRow = styled.div`
-  margin: 0 auto;
 `;
 const MainGrid = styled.div`
   flex: 0 0 84%;
@@ -136,15 +136,6 @@ function GameStatsEdit({
     isDeletingPeriod ||
     isCreatingPeriod;
 
-  const [playerStatus, setPlayerStatus] = useState({
-    available: [],
-    starters: [],
-    reserves: [],
-    startingGk: [],
-    onFieldPlayers: [],
-    onBench: [],
-    currentGk: [],
-  });
   const [gameStats, setGameStats] = useState({
     periods,
     subs,
@@ -153,29 +144,6 @@ function GameStatsEdit({
   });
   const [errorModal, setErrorModal] = useState(false);
 
-  useEffect(() => {
-    //initial playerStatus based on starters and bench players
-    //update state of all values
-    if (isLoadingPlayerSeasonWithNumber) return;
-
-    const available = playerGames
-      .filter((player) => player.dressed)
-      .map((player) => player.player);
-    const starters = playerGames.filter((player) => player.start);
-    const reserves = playerGames.filter((player) => !player.start);
-    const startingGk = playerGames.find((player) => player.gkStarter).player;
-    const fieldPlayers = playerGames.filter((player) => !player.gkStarter);
-    setPlayerStatus({
-      available,
-      starters,
-      reserves,
-      startingGk,
-      fieldPlayers,
-    });
-    //I only want it to run on load
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoadingPlayerSeasonWithNumber]);
-  //todo useEffect to update playerStatus with subs that have been made
   function changeHandler(e) {
     //todo these will return the game time as a period time, will need to make it a game minute
     const [table, name, type] = e.target.name.split('-');
@@ -352,13 +320,33 @@ function GameStatsEdit({
           {
             type: 'input',
             size: 4,
-            value: field.subIn,
+            value:
+              field.gkSub &&
+              playerSeasonWithNumber.find(
+                (player) => player.playerId === field.subOut
+              ).gkNumber
+                ? playerSeasonWithNumber.find(
+                    (player) => player.playerId === field.subOut
+                  ).gkNumber
+                : playerSeasonWithNumber.find(
+                    (player) => player.playerId === field.subIn
+                  ).number,
             name: `subs-subIn-number-`,
           },
           {
             type: 'input',
             size: 4,
-            value: field.subOut,
+            value:
+              field.gkSub &&
+              playerSeasonWithNumber.find(
+                (player) => player.playerId === field.subOut
+              ).gkNumber
+                ? playerSeasonWithNumber.find(
+                    (player) => player.playerId === field.subOut
+                  ).gkNumber
+                : playerSeasonWithNumber.find(
+                    (player) => player.playerId === field.subOut
+                  ).number,
             name: `subs-subOut-number-`,
           },
           {
@@ -371,7 +359,60 @@ function GameStatsEdit({
       })),
     },
   ];
+  const gameTime =
+    periods.reduce((acc, cur) => {
+      acc = acc + subtractTimes(cur.start, cur.end);
+      return acc;
+    }, 0) -
+    stoppages.reduce(
+      (acc, cur) => (acc += cur.clockStopped ? cur.end - cur.begin : 0),
+      0
+    );
+  const inGamePlayers = playerGames
+    .filter((player) => player.dressed)
+    .map((player) => ({
+      ...playerSeasonWithNumber.find((play) => play.playerId === player.player),
+      id: player.player,
+      // gkStarter: player.gkStarter ? 1 : 0,
+      // gkIns: subs.filter((sub) => sub.subIn === player.player && sub.gkSub)
+      //   .length,
+      // gkOuts: subs.filter((sub) => sub.subOut === player.player && sub.gkSub)
+      //   .length,
+      subDetails: playerGameTime(
+        player.player,
+        player.start,
+        player.gkStarter,
+        gameTime
+      ),
+    }))
+    .sort((a, b) => a.number - b.number);
+  //     gkStatus: player.gkStarter + player.gkIns - player.gkOuts,
+  function playerGameTime(playerId, start, gkStarter, minute) {
+    const ins = subs.filter((sub) => sub.subIn === playerId);
+    const outs = subs.filter((sub) => sub.subOut === playerId);
+    const countIns = ins.length;
+    const countOuts = outs.length;
+    const sumIns = ins.reduce((acc, cur) => (acc += cur.gameMinute), 0);
+    const sumOuts = outs.reduce((acc, cur) => (acc += cur.gameMinute), 0);
+    start = start ? 1 : 0;
+    const time = convertSecondsToMinutesSeconds(
+      minute * (start + countIns - countOuts) + sumOuts - sumIns
+    );
+    const status = start + countIns - countOuts;
+    gkStarter = gkStarter ? 1 : 0;
+    const gkIns = ins.filter((sub) => sub.gkSub);
+    const gkOuts = outs.filter((sub) => sub.gkSub);
+    const gkCountIns = gkIns.length;
+    const gkCountOuts = gkOuts.length;
+    const gkSumIns = ins.reduce((acc, cur) => (acc += cur.gameMinute), 0);
+    const gkSumOuts = outs.reduce((acc, cur) => (acc += cur.gameMinute), 0);
+    const gkTime = convertSecondsToMinutesSeconds(
+      minute * (gkStarter + gkCountIns - gkCountOuts) + gkSumOuts - gkSumIns
+    );
+    const gkStatus = gkStarter + gkCountIns - gkCountOuts;
 
+    return { start, status, time, gkStarter, gkStatus, gkTime };
+  }
   return (
     <>
       <Heading as="h5" case="upper" location="center">
@@ -449,21 +490,25 @@ function GameStatsEdit({
         </MainGrid>
         <SidePanel>
           <Column>
-            <Heading as="h5" location="center">
-              Current Players
-            </Heading>
-            <Row type="horizontal" justify="flex-start">
-              <div>
-                #<div>18</div>
-              </div>
-              <div>
-                Name
-                <div> David Cordero de Jesus </div>
-              </div>
-            </Row>
+            <CurrentGK inGamePlayers={inGamePlayers} />
           </Column>
-          <Column>ON FIELD</Column>
-          <Column>ON BENCH</Column>
+          <Column>
+            <PlayerGameTimes
+              inGamePlayers={inGamePlayers.filter(
+                (player) =>
+                  player.subDetails.status === 1 &&
+                  player.subDetails.gkStatus !== 1
+              )}
+            />
+          </Column>
+          <Column>
+            <PlayerGameTimes
+              inGamePlayers={inGamePlayers.filter(
+                (player) => player.subDetails.status === 0
+              )}
+              heading="Reserve Players "
+            />
+          </Column>
         </SidePanel>
       </Container>
     </>

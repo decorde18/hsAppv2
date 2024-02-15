@@ -36,6 +36,7 @@ seasonselector -
 
 - calendar funtionality - set start and end date - advance months, etc
 - delete parent, delete person too? - same with player, etc
+- go through gk subs and inlude true value on DB
 
 ## - TODO POSSIBLY
 

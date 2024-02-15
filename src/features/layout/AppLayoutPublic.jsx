@@ -3,7 +3,7 @@ import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 import { useRecentSeason } from '../seasons/useSeasons';
 import Logo from '../../ui/Logo';
 
-function PublicPages() {
+function AppLayoutPublic({ logo }) {
   // ON LOAD  UPDATE THE RECENT AND CURRENT IN LOCAL AND CONTEXT PROVIDER
   const { currentSeason, updateCurrentSeason, updateRecentSeason } =
     useCurrentSeason();
@@ -23,11 +23,7 @@ function PublicPages() {
       isLoadingRecent,
     ]
   );
-  return (
-    <div>
-      <Logo />
-    </div>
-  );
+  return <div>{logo && <Logo />}</div>;
 }
 
-export default PublicPages;
+export default AppLayoutPublic;

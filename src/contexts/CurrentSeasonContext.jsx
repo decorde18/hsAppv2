@@ -4,6 +4,7 @@ import { useLocalStorageState } from '../hooks/useLocalStorageState';
 const CurrentSeasonContext = createContext();
 
 function CurrentSeasonProvider({ children }) {
+  //The recent is set to current in AppLayoutPublic
   const [currentSeason, setCurrentSeason] = useLocalStorageState(
     false,
     'currentSeason'
