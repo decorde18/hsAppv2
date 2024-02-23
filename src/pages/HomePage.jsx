@@ -3,7 +3,7 @@ import Header from '../features/layout/Header';
 import Footer from '../features/layout/Footer';
 import { NavLink } from 'react-router-dom';
 
-const StyledPublicPage = styled.div`
+const StyledHomePage = styled.div`
   display: grid;
   overflow: auto;
   height: 100vh;
@@ -16,9 +16,9 @@ const StyledNav = styled.span`
   color: blue;
   text-decoration: underline;
 `;
-function PublicPage() {
+function HomePage() {
   return (
-    <StyledPublicPage>
+    <StyledHomePage>
       <Header type="nonApp" />
       <Main>
         <h1>
@@ -30,8 +30,8 @@ function PublicPage() {
         </h1>
       </Main>
       <Footer />
-    </StyledPublicPage>
+    </StyledHomePage>
   );
 }
 
-export default PublicPage;
+export default HomePage;

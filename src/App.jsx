@@ -12,7 +12,7 @@ import Login from './pages/Login';
 import PageNotFound from './pages/PageNotFound';
 import GlobalStyles from './styles/GlobalStyles';
 import AppLayout from './features/layout/AppLayout';
-import AppLayoutPdf from './ui/AppLayoutPdf';
+import AppLayoutPdf from './features/layout/AppLayoutPdf';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SessionContextProvider } from '@supabase/auth-helpers-react';
@@ -35,8 +35,10 @@ import Schedule from './pages/Schedule';
 import ScheduleTSSAA from './pages/ScheduleTSSAA';
 import RosterTSSAA from './pages/RosterTSSAA';
 import Roster from './pages/Roster';
-import PublicPage from './pages/PublicPage';
+import HomePage from './pages/HomePage';
 import ProtectedRoute from './ui/ProtectedRoute';
+import PublicRoute from './ui/PublicRoute';
+import AppLayoutPublic from './features/layout/AppLayoutPublic';
 // import { PDFViewer } from '@react-pdf/renderer';
 
 import Uniforms from './pages/Uniforms';
@@ -54,7 +56,7 @@ const queryClient = new QueryClient({
     },
   },
 });
-
+//todo do I need session contect provider? where does supabase get accessed?
 function App() {
   return (
     <Router>
@@ -65,8 +67,25 @@ function App() {
             <GlobalStyles />
             <Routes>
               <Route index element={<Navigate replace to="public" />} />
+              <Route path="public" element={<HomePage />} />
 
-              <Route path="public" element={<PublicPage />} />
+              <Route
+                path="/"
+                element={
+                  <PublicRoute>
+                    <AppLayoutPublic />
+                  </PublicRoute>
+                }
+              >
+                {/* THESE ARE OUR PUBLIC PAGES */}
+                <Route path="login" element={<Login />} />
+                <Route path="schedule" element={<Schedule />} />
+                <Route path="roster" element={<Roster />} />
+                <Route path="newplayer" element={<NewPlayer />} />
+                <Route path="*" element={<PageNotFound />} />
+              </Route>
+
+              {/* THESE ARE OUR MAIN APP PAGES  - NEED APP LAYOUT*/}
               <Route
                 path="app"
                 element={
@@ -93,6 +112,8 @@ function App() {
                 <Route path="users" element={<Users />} />
                 <Route path="settings" element={<Settings />} />
               </Route>
+
+              {/* THESE ARE OUR PROTECTED ROUTES THAT DON"T NEED APP LAYOUT */}
               <Route
                 path="protected"
                 element={
@@ -106,13 +127,8 @@ function App() {
                 <Route path="account" element={<Account />} />
                 <Route path="game" element={<Game />} />
               </Route>
-
-              <Route path="login" element={<Login />} />
-              <Route path="schedule" element={<Schedule />} />
-              <Route path="roster" element={<Roster />} />
-              <Route path="newplayer" element={<NewPlayer />} />
-              <Route path="*" element={<PageNotFound />} />
             </Routes>
+
             <Toaster
               position="top-center"
               gutter={12}

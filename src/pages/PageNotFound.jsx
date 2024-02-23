@@ -17,18 +17,16 @@ const Div2 = styled.div`
 `;
 function PageNotFound() {
   return (
-    <>
-      <Div>
-        <Header type="nonApp" />
-        <Div2>
-          SORRY THIS PAGE IS NOT FOUND
-          <div>
-            <BackButton />
-          </div>
-        </Div2>
-        <Footer />
-      </Div>
-    </>
+    <Div>
+      <Header type="nonApp" />
+      <Div2>
+        SORRY THIS PAGE IS NOT FOUND
+        <div>
+          <BackButton />
+        </div>
+      </Div2>
+      <Footer />
+    </Div>
   );
 }
 

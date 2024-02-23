@@ -56,12 +56,15 @@ export function useGames() {
 }
 
 export function useGamesSeason(seasonId) {
+  //Filter by season
+  const filter = { field: 'seasonId', value: seasonId };
+
   const {
     isLoading: isLoadingGamesSeason,
     data: gamesSeason,
     error,
   } = useQuery({
-    queryKey: ['gamesSeason'],
+    queryKey: ['gamesSeason', filter],
     queryFn: () => (seasonId ? getGamesSeason(seasonId) : null),
   });
   return { isLoadingGamesSeason, error, gamesSeason };

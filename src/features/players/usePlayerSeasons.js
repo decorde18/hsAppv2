@@ -90,12 +90,15 @@ export function useDeletePlayerSeason() {
 }
 
 export function usePlayerSeasonWithNumber(seasonId) {
+  const { currentSeason } = useCurrentSeason();
+
+  const filter = { field: 'seasonId', value: currentSeason };
   const {
     isLoading: isLoadingPlayerSeasonWithNumber,
     data: playerSeasonWithNumber,
     error,
   } = useQuery({
-    queryKey: ['playerSeasonWithNumber'],
+    queryKey: ['playerSeasonWithNumber', filter],
     queryFn: () => getPlayerSeasonWithNumbers(seasonId),
   });
   return { isLoadingPlayerSeasonWithNumber, error, playerSeasonWithNumber };

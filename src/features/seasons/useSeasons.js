@@ -21,7 +21,6 @@ export function useSeasons() {
     !filterValue || filterValue === 'all'
       ? null
       : { field: 'season', value: filterValue, method: 'eq' };
-
   const {
     //destructure has plenty of other useful values ie status console.log this query to see the different ones
     isLoading: isLoadingSeasons,
@@ -48,10 +47,7 @@ export function useSeason() {
   const { currentSeason } = useCurrentSeason();
 
   //Filter by season
-  const filter =
-    !currentSeason || currentSeason === 'all'
-      ? null
-      : { field: 'seasonId', value: currentSeason };
+  const filter = { field: 'seasonId', value: currentSeason };
   const {
     setSeason,
     isLoading: isLoadingSeason,
@@ -59,7 +55,7 @@ export function useSeason() {
     error,
   } = useQuery({
     queryKey: ['season', filter],
-    queryFn: () => (filter ? getSeason(filter) : null),
+    queryFn: () => getSeason(currentSeason),
     retry: false,
   });
   return { isLoadingSeason, error, season, setSeason };

@@ -45,13 +45,20 @@ const Center = styled.div`
   border: 1px solid;
 `;
 
-function PublicPlayerRow({ player }) {
+function PublicPlayerRow({ player, position }) {
   return (
     <Table.PrintRow>
       <div></div>
-      <Right>{player.uniform?.uniformJerseys.number}</Right>
-      <Player>{`${player.players.people.firstName} ${player.players.people.lastName}`}</Player>
-
+      {position === 'GK' ? (
+        <Right>{player.gknumber}</Right>
+      ) : !player.secondnumber ? (
+        <Right>{player.number}</Right>
+      ) : (
+        <Right>
+          {player.number}/{player.secondnumber}
+        </Right>
+      )}
+      <Player>{`${player.firstName} ${player.lastName}`}</Player>
       <Right>{player.grade}</Right>
       <Player>{player.position}</Player>
     </Table.PrintRow>

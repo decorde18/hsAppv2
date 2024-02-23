@@ -51,8 +51,8 @@ function AppLayout() {
     <StyledAppLayout>
       <Header />
       <Main className="flex">
-        <SideBar> </SideBar>
-        <MainSection></MainSection>
+        <SideBar />
+        <MainSection />
       </Main>
       <Footer />
     </StyledAppLayout>

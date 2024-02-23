@@ -1,18 +1,31 @@
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useEffect } from 'react';
 import { useLocalStorageState } from '../hooks/useLocalStorageState';
+import { useSearchParams } from 'react-router-dom';
+import { useRecentSeason } from '../features/seasons/useSeasons';
 
 const CurrentSeasonContext = createContext();
 
 function CurrentSeasonProvider({ children }) {
-  //The recent is set to current in AppLayoutPublic
+  const { isLoadingRecent, recentSeason: recent } = useRecentSeason();
   const [currentSeason, setCurrentSeason] = useLocalStorageState(
-    false,
+    null,
     'currentSeason'
   );
   const [recentSeason, setRecentSeason] = useLocalStorageState(
     false,
     'recentSeason'
   );
+  const [searchParams] = useSearchParams();
+  const curSeason = +searchParams.get('season');
+
+  useEffect(() => {
+    if (isLoadingRecent) return;
+    if (!recentSeason) updateRecentSeason(recent.id);
+    if (curSeason === 0 || !currentSeason) updateCurrentSeason(recent.id);
+    if (curSeason > 0 && curSeason !== currentSeason)
+      updateCurrentSeason(curSeason);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [curSeason, isLoadingRecent]);
 
   function updateCurrentSeason(season) {
     setCurrentSeason(season);

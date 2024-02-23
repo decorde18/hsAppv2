@@ -1,11 +1,7 @@
 import ScheduleHelperTable from '../features/games/ScheduleHelperTable';
 
-function Events() {
-  return (
-    <div>
-      <ScheduleHelperTable />
-    </div>
-  );
+function ScheduleHelper() {
+  return <ScheduleHelperTable />;
 }
 
-export default Events;
+export default ScheduleHelper;

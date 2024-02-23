@@ -1,5 +1,11 @@
+import styled from 'styled-components';
+
+const StyledP = styled.p`
+  margin: auto;
+`;
+
 function Empty({ resource }) {
-  return <p>No {resource} could be found.</p>;
+  return <StyledP>No {resource} could be found.</StyledP>;
 }
 
 export default Empty;

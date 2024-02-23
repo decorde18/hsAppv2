@@ -131,7 +131,9 @@ export async function getPlayerSeasonWithNumbers(seasonId) {
     .select(`*`)
     .eq('seasonId', seasonId)
     .order('grade', { ascending: false })
-    .order('status', { ascending: true });
+    .order('status', { ascending: true })
+    .order('lastName')
+    .order('firstName');
 
   if (error) {
     console.log(error);

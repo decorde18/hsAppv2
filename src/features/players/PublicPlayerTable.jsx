@@ -2,19 +2,15 @@ import styled from 'styled-components';
 import Spinner from '../../ui/Spinner';
 
 import { useSeason } from '../seasons/useSeasons';
-import { usePlayerSeasons } from './usePlayerSeasons';
+import { usePlayerSeasonWithNumber } from './usePlayerSeasons';
 
 import Table from '../../ui/Table';
 import Empty from '../../ui/Empty';
 
-import { useSearchParams } from 'react-router-dom';
 import Heading from '../../ui/Heading';
 import PublicPlayerRow from './PublicPlayerRow';
-import {
-  useUniformSeasons,
-  useUniformSeasonPlayers,
-} from '../uniforms/useUniforms';
-import { useEffect, useState } from 'react';
+
+import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 
 const Right = styled.div`
   text-align: right;
@@ -23,202 +19,156 @@ const Center = styled.div`
   text-align: center;
   width: 100%;
 `;
-const Div = styled.div`
+const Section = styled.div`
   display: flex;
-  gap: 50px;
   padding-bottom: 2.5rem;
+  justify-content: center;
+  gap: 0.25rem;
+  flex-basis: auto;
+`;
+const Sec = styled.div`
+  padding: 1rem 1rem 1rem 5rem;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 2rem;
+`;
+const Vertical = styled.div`
+  display: flex;
+  flex-direction: column;
 `;
 const People = styled.div`
   font-size: 1.3rem;
 `;
+const Container = styled.div`
+  @media screen {
+    margin: 0;
+    padding: 1rem;
+    background-color: var(--color-grey-0);
+    border: 1px solid var(--color-grey-100);
+    border-radius: var(--border-radius-lg);
+    max-height: 95vh;
+    overflow: auto;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    position: absolute;
+  }
+`;
+
 function PublicPlayerTable() {
-  const [searchParams] = useSearchParams();
-  const season = searchParams.get('season');
-  const { isLoadingSeason, season: seasonApi } = useSeason(season);
-  const { isLoadingUniformSeasonPlayers, uniformSeasonPlayers } =
-    useUniformSeasonPlayers();
-  const { isLoadingPlayerSeasons, playerSeasons } = usePlayerSeasons();
-  const { uniformSeasons } = useUniformSeasons();
+  const { currentSeason } = useCurrentSeason();
+  const { isLoadingSeason, season } = useSeason();
 
-  if (!season) return <div>Sorry You Must Have A Season Selected</div>;
-  if (isLoadingPlayerSeasons || isLoadingSeason) return <Spinner />;
-  if (!playerSeasons.length) return <Empty resource="Players" />;
+  const { isLoadingPlayerSeasonWithNumber, playerSeasonWithNumber } =
+    usePlayerSeasonWithNumber(currentSeason);
 
-  const roster = playerSeasons.filter(
-    (player) => +player.seasonId === +season && player.status === 'Rostered'
-  );
-  // .sort((a, b) => +a.grade - +b.grade);
-  const gkUnis = uniformSeasons.find(
-    (uni) =>
-      uni.season === +season &&
-      uni.team === 'GK' &&
-      uni.uniforms.type === 'GK Jersey'
-  );
-  const rosteredWithNumber = roster
-    .map((player) => ({
-      ...player,
-      uniform: uniformSeasonPlayers.find(
-        (jersey) => jersey.seasonPlayer === player.id
-      ),
-    }))
-    .sort(
-      (a, b) =>
-        +a.uniform?.uniformJerseys.number - +b.uniform?.uniformJerseys.number
+  if (!currentSeason) return <div>Sorry You Must Have A Season Selected</div>;
+  if (isLoadingSeason || isLoadingPlayerSeasonWithNumber) return <Spinner />;
+  if (!playerSeasonWithNumber.length)
+    return (
+      <Container>
+        <Empty resource="Players" />
+      </Container>
     );
-  const rosteredWithNumberGk = roster
-    .map((player) => ({
-      ...player,
-      uniform: uniformSeasonPlayers.find(
-        (jersey) =>
-          jersey.uniformJerseys.uniform == gkUnis.uniform &&
-          jersey.seasonPlayer === player.id
-      ),
-    }))
-    .sort(
-      (a, b) =>
-        +a.uniform?.uniformJerseys.number - +b.uniform?.uniformJerseys.number
-    )
-    .filter((player) => player.uniform);
+
+  const orderedRoster = playerSeasonWithNumber.sort(
+    (a, b) => a.number - b.number
+  );
+  const positions = ['field', 'GK'];
+  const teams = ['Varsity', 'JV'];
 
   return (
-    <>
+    <Container>
       <Heading as="h2" location="center">
-        Independence High School Girls&#39; <br></br>Soccer Season{' '}
-        {seasonApi.season}
+        Independence High School Girls&#39; <br></br>
+        {`Soccer Season ${season.season}`}
       </Heading>
-      <Div>
-        <div>
-          <Heading as="h3">Varsity Roster</Heading>
-          <Table columns=".25fr .5fr 2fr .5fr .75fr">
-            <Table.PrintHeader>
-              <div></div>
-              <div>#</div>
-              <Center>Player Name</Center>
-
-              <Center>Grade</Center>
-              <Center>Pos</Center>
-            </Table.PrintHeader>
-            <Table.Body
-              data={rosteredWithNumber.filter((player) =>
-                player.teamLevel.includes('Varsity')
-              )}
-              render={(player) => (
-                <PublicPlayerRow player={player} key={`V-${player.id}`} />
-              )}
-            />
-          </Table>
-        </div>
-        <div>
-          <Heading as="h3">JV Roster</Heading>
-          <Table columns=".25fr .5fr 2fr .5fr .75fr">
-            <Table.PrintHeader>
-              <div></div>
-              <div>#</div>
-              <Center>Player Name</Center>
-
-              <Center>Grade</Center>
-              <Center>Pos</Center>
-            </Table.PrintHeader>
-            <Table.Body
-              data={rosteredWithNumber.filter((player) =>
-                player.teamLevel.includes('JV')
-              )}
-              render={(player) => (
-                <PublicPlayerRow player={player} key={`JV-${player.id}`} />
-              )}
-            />
-          </Table>
-        </div>
-      </Div>
-      <Div>
-        <div>
-          {' '}
-          <Heading as="h3">GK</Heading>
-          <Table columns=".25fr .5fr 2fr .5fr .75fr">
-            <Table.PrintHeader>
-              <div></div>
-              <div>#</div>
-              <Center>Player Name</Center>
-
-              <Center>Grade</Center>
-              <Center></Center>
-            </Table.PrintHeader>
-            <Table.Body
-              data={rosteredWithNumberGk.filter((player) =>
-                player.teamLevel.includes('Varsity')
-              )}
-              render={(player) => (
-                <PublicPlayerRow player={player} key={`V-GK-${player.id}`} />
-              )}
-            />
-          </Table>
-        </div>
-        <div>
-          <Heading as="h3">GK</Heading>
-          <Table columns=".25fr .5fr 2fr .5fr .75fr">
-            <Table.PrintHeader>
-              <div></div>
-              <div>#</div>
-              <Center>Player Name</Center>
-
-              <Center>Grade</Center>
-              <Center></Center>
-            </Table.PrintHeader>
-            <Table.Body
-              data={rosteredWithNumberGk.filter((player) =>
-                player.teamLevel.includes('JV')
-              )}
-              render={(player) => (
-                <PublicPlayerRow player={player} key={`JV-GK-${player.id}`} />
-              )}
-            />
-          </Table>
-        </div>
-      </Div>
-      <Div>
-        <div>
+      <Section>
+        {teams.map((team) => (
+          <Vertical key={team}>
+            {positions.map((position) => (
+              <div key={`${team}-${position}`}>
+                {position === 'GK' ? (
+                  <Heading as="h3" location="center">{`GK`}</Heading>
+                ) : (
+                  <Heading
+                    as="h3"
+                    location="center"
+                  >{`${team} Roster`}</Heading>
+                )}
+                <Table columns=".25fr .5fr 2fr .5fr .75fr">
+                  <Table.PrintHeader>
+                    <div></div>
+                    <Right>#</Right>
+                    <Center>Player Name</Center>
+                    <Center>Grade</Center>
+                    {position !== 'GK' && <Center>Pos</Center>}
+                  </Table.PrintHeader>
+                  <Table.Body
+                    data={orderedRoster
+                      .filter((player) => player.teamLevel.includes(team))
+                      .filter((player) =>
+                        position === 'GK' ? player.gknumber : player
+                      )}
+                    render={(player) => (
+                      <PublicPlayerRow
+                        player={player}
+                        position={position}
+                        key={`${team}-${position}-${player.id}`}
+                      />
+                    )}
+                  />
+                </Table>
+              </div>
+            ))}
+          </Vertical>
+        ))}
+      </Section>
+      <Sec>
+        <Vertical>
           <Heading as="h3">Team Personnel</Heading>
           <People>
             <strong>Head Coach:</strong>
             <span>
               {' '}
-              {`${seasonApi.people.firstName} ${seasonApi.people.lastName}`}
+              {`${season.people.firstName} ${season.people.lastName}`}
             </span>
           </People>
           <People>
             <strong>Assistant Coaches:</strong>
-            <span> {seasonApi.assistant_coaches}</span>
+            <span> {season.assistant_coaches}</span>
           </People>
-          {seasonApi.manager ? (
-            <div>
+          {season.manager ? (
+            <People>
               <strong>Managers:</strong>
-              <span> {seasonApi.manager}</span>
-            </div>
+              <span> {season.manager}</span>
+            </People>
           ) : (
             <div></div>
           )}
           <People>
             <strong>Trainer:</strong>
-            <span> {seasonApi.trainer}</span>
+            <span> {season.trainer}</span>
           </People>
-        </div>
-        <div>
+        </Vertical>
+        <Vertical>
           <Heading as="h3">Administration</Heading>
           <People>
             <strong>Principal:</strong>
-            <span> {seasonApi.principal}</span>
+            <span> {season.principal}</span>
           </People>
           <People>
             <strong>Assistant Principals:</strong>
-            <span> {seasonApi.assistantPrincipals}</span>
+            <span> {season.assistantPrincipals}</span>
           </People>
           <People>
             <strong>Athletic Director:</strong>
-            <span> {seasonApi.athleticDirector}</span>
+            <span> {season.athleticDirector}</span>
           </People>
-        </div>
-      </Div>
-    </>
+        </Vertical>
+      </Sec>
+    </Container>
   );
 }
 
