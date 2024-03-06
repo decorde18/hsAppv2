@@ -1,8 +1,8 @@
 import supabase from './supabase';
 
-export async function getSeasons({ filter, sortBy } /*filter pagination*/) {
+export async function getSeasons() {
   /*filter pagination*/
-  let query = supabase
+  const { data: seasons, error } = await supabase
     .from('seasons')
     .select('*')
     .order('season', { ascending: false });
@@ -11,9 +11,9 @@ export async function getSeasons({ filter, sortBy } /*filter pagination*/) {
   //   .select('*')
   //   .order('season', { ascending: false });
   //FILTER
-  if (filter !== null)
-    query = query[filter.method || 'eq'](filter.field, filter.value);
-  const { data: seasons, error } = await query;
+  //   if (filter !== null)
+  //     query = query[filter.method || 'eq'](filter.field, filter.value);
+  //  query;
 
   if (error) {
     console.log(error);
@@ -36,16 +36,16 @@ export async function getRecentSeason() {
 }
 
 export async function getSeason(season) {
-  const { data: recentSeason, error } = await supabase
+  const { data, error } = await supabase
     .from('seasons')
     .select('*, people(*)')
     .eq('id', season)
     .single();
   if (error) {
     console.log(error);
-    throw new Error('Recent Season Could Not Be Loaded');
+    throw new Error('Season Could Not Be Loaded');
   }
-  return recentSeason;
+  return data;
 }
 
 export async function updateSeasonApi({ id, ...updateField }) {

@@ -13,7 +13,17 @@ import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 
 const PrintStyle = styled.div`
   @media screen {
-    padding: 5rem 10rem;
+    margin: 0;
+    padding: 1rem 2rem;
+    background-color: var(--color-grey-0);
+    border: 1px solid var(--color-grey-100);
+    border-radius: var(--border-radius-lg);
+    max-height: 95vh;
+    overflow: auto;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    position: absolute;
   }
   @media print {
   }
@@ -57,7 +67,6 @@ function ScheduleTable() {
           </Table>
         </div>
       ))}
-      {gamesSeason.map((game) => game.season)}
 
       <p>*- Denotes District Game</p>
       <p>S- Denotes Pre Season Scrimmage</p>

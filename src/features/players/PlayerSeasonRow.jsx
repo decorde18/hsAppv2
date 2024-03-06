@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { HiPencil } from 'react-icons/hi2';
+import { HiPencil, HiTrash, HiEye } from 'react-icons/hi2';
 
 import Table from '../../ui/Table';
 import Row from '../../ui/Row';
@@ -16,6 +16,7 @@ import { formatDate } from '../../utils/helpers';
 
 import CreatePlayerForm from './CreatePlayerModalForm';
 import { useState } from 'react';
+import PlayerIndividualPage from './PlayerIndividualPage';
 
 const Player = styled.div`
   font-size: 1.6rem;
@@ -23,17 +24,17 @@ const Player = styled.div`
   color: var(--color-grey-600);
 `;
 
-function PlayerSeasonRow({ playerSeason }) {
+function PlayerSeasonRow({ playerSeason, teams }) {
   const { playerId, ...player } = playerSeason;
   const { updateSetting, isUpdating } = useUpdatePlayerSeason();
 
   const [toggleStates, setToggleStates] = useState({
     status: statusFilterLabel.find((val) => val.label === player['status'])
       .value,
-    returningPlayer: player['returningPlayer'],
-    enrolledLastYear: player['enrolledLastYear'],
-    livesWithParents: player['livesWithParents'],
-    teamLevel: player['teamLevel'],
+    returningPlayer: player.returningPlayer,
+    enrolledLastYear: player.enrolledLastYear,
+    livesWithParents: player.livesWithParents,
+    teamLevel: player.teamLevel,
   });
 
   const isWorking = isUpdating;
@@ -60,11 +61,11 @@ function PlayerSeasonRow({ playerSeason }) {
     setToggleStates({ ...toggleStates, teamLevel: updatedArray });
     updateSetting({ teamLevel: updatedArray, id: player.id });
   }
-
   return (
     <Table.Row>
-      <Player>{player['fullName']}</Player>
+      <Player>{player.fullname}</Player>
       <Select
+        width={12.7}
         options={statusFilterLabel}
         onChange={handleSelectChange}
         name="status"
@@ -72,38 +73,37 @@ function PlayerSeasonRow({ playerSeason }) {
         value={toggleStates['status']}
       />
       <div>
-        {player['players.dateOfBirth'] &&
-          formatDate(new Date(player['players.dateOfBirth']))}
+        {player.dateOfBirth && formatDate(new Date(player.dateOfBirth))}
       </div>
-      <div>{player['players.entryYear']}</div>
-      <div>{player['grade']}</div>
+      <div>{player.entryYear}</div>
+      <div>{player.grade}</div>
       <Switch
         name="returningPlayer"
-        checked={toggleStates['returningPlayer'] || false}
+        checked={toggleStates.returningPlayer || false}
         onChange={handleSwitchToggle}
         disabled={isWorking}
       ></Switch>
       <Switch
         name="enrolledLastYear"
-        checked={toggleStates['enrolledLastYear'] || false}
+        checked={toggleStates.enrolledLastYear || false}
         onChange={handleSwitchToggle}
         disabled={isWorking}
       ></Switch>
       <Switch
         name="livesWithParents"
-        checked={toggleStates['livesWithParents'] || false}
+        checked={toggleStates.livesWithParents || false}
         onChange={handleSwitchToggle}
         disabled={isWorking}
       ></Switch>
       <Row type="horizontal">
         {toggleStates['status'] === 1 ? (
-          player['seasons.teamLevels'].map((level) => (
+          teams.map((level) => (
             <div key={level}>
               <Button
                 name={level}
-                value={toggleStates['teamLevel'].includes(level) ? true : false}
+                value={toggleStates.teamLevel.includes(level) ? true : false}
                 variation={
-                  toggleStates['teamLevel'].includes(level)
+                  toggleStates.teamLevel.includes(level)
                     ? 'primary'
                     : 'secondary'
                 }
@@ -124,6 +124,9 @@ function PlayerSeasonRow({ playerSeason }) {
         <Menus.Menu>
           <Menus.Toggle id={playerId} />
           <Menus.List id={playerId}>
+            <Modal.Open opens="view">
+              <Menus.Button icon={<HiEye />}>View</Menus.Button>
+            </Modal.Open>
             <Modal.Open opens="edit">
               <Menus.Button icon={<HiPencil />}>edit</Menus.Button>
             </Modal.Open>
@@ -132,6 +135,9 @@ function PlayerSeasonRow({ playerSeason }) {
               <Menus.Button icon={<HiTrash />}>delete</Menus.Button>
             </Modal.Open> */}
           </Menus.List>
+          <Modal.Window name="view">
+            {<PlayerIndividualPage player={playerSeason} />}
+          </Modal.Window>
 
           <Modal.Window name="edit">
             {<CreatePlayerForm playerToEdit={player} />}

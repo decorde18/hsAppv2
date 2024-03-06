@@ -1,16 +1,22 @@
 import styled from 'styled-components';
 import { useForm, useFieldArray } from 'react-hook-form';
+import { useState } from 'react';
 
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 import { supabaseUrl } from '../../services/supabase';
 
-import { useSeasons } from '../seasons/useSeasons';
+import { createEditPeople } from '../../services/apiPeople';
+import {
+  createEditParent,
+  createEditPlayerParent,
+} from '../../services/apiParents';
 import { useCreatePeople } from '../people/useCreatePeople';
 import { useCreatePlayerSeason } from './usePlayerSeasons';
 import { useCreatePlayer } from './useCreatePlayer';
 // import { useCreateParent, useCreatePlayerParent } from '../parents/useParents';
 import { useParents } from '../parents/useParents';
 import { usePlayers } from '../players/usePlayers';
+import { useSeasons } from '../seasons/useSeasons';
 
 import Button from '../../ui/Button';
 import Select from '../../ui/Select';
@@ -22,12 +28,6 @@ import Input from '../../ui/Input';
 import Row from '../../ui/Row';
 import Spinner from '../../ui/Spinner';
 import toast from 'react-hot-toast';
-import { createEditPeople } from '../../services/apiPeople';
-import {
-  createEditParent,
-  createEditPlayerParent,
-} from '../../services/apiParents';
-import { useState } from 'react';
 
 const Background = styled.div`
   position: absolute;
@@ -126,16 +126,11 @@ function CreatePlayerForm() {
 
   const { isCreatingPeople, createPeople } = useCreatePeople();
   const { isCreatingPlayer, createPlayer } = useCreatePlayer();
-  // const { isCreatingParent, createParent } = useCreateParent();
-  // const { isCreatingPlayerParent, createPlayerParent } =
-  //   useCreatePlayerParent();
   const { isCreatingPlayerSeason, createPlayerSeason } =
     useCreatePlayerSeason();
   const isWorking =
     isCreatingPeople ||
     isCreatingPlayer ||
-    // isCreatingParent ||
-    // isCreatingPlayerParent ||
     isCreatingPlayerSeason ||
     isLoadingSeasons ||
     isLoadingPlayers ||
@@ -186,7 +181,7 @@ function CreatePlayerForm() {
     function createAPlayer(playerData) {
       return createPeople(
         // create people records for player
-        { ...playerPersonData },
+        { ...playerPersonData, gender: 'F' },
         {
           onSuccess: (data) =>
             createPlayer(
@@ -199,21 +194,17 @@ function CreatePlayerForm() {
                     seasonId: currentSeason,
                     grade,
                   });
-                  parents
-                    .slice()
-                    // .forEach((parent) => createParents(parent, data.id));
-                    .forEach((parent, index) => {
-                      const formerP = formerParent.find(
-                        (former) => former.index === index
-                      );
-                      formerP.parentId !== 'default'
-                        ? addPlayerParent({
-                            player: data.id,
-                            parent: formerP.parentId,
-                          })
-                        : createParents(parent, data.id);
-                    });
-                  // createParents(data.id);
+                  parents.slice().forEach((parent, index) => {
+                    const formerP = formerParent.find(
+                      (former) => former.index === index
+                    );
+                    formerP.parentId !== 'default'
+                      ? addPlayerParent({
+                          player: data.id,
+                          parent: formerP.parentId,
+                        })
+                      : createParents(parent, data.id);
+                  });
                 },
               }
             ),

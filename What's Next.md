@@ -1,28 +1,27 @@
 ## //TODO FIXME !!!
 
-- DONE PublicPlayerTable - center for media screen
-- DONE PublicPlayer Table - doesn't update when season is changed, mst refresh
-- DONE not showing all players- do we need JVNavy/JVGold?- not all seasons showing up
-- DONE PublicPlayerTable - add option for altNumber
-- DONE on roster for previous seasons, can't becaue uniform gives null
-
-- take searchparams out of routes and put in context?
-- searchParams not needed for season except for layouts
-- add coach on schedule helper not working (says firstname and last name required)
-- on gameEntry and eventEntry - create a function for need Google Sing in. That allows me to work on the forms without being logged
-
-- seasonselector -
-
+- DONE playerTable clean it up (filter, sort)
+- DONE when click on Players, url changes to season =recent, but season selector does not
+- DONE seasonselector -
+- DONE add coach on schedule helper not working (says firstname and last name required)
+- Player INFORMATION pop up modal
+- edit Player pop up modal make functional
+- double check communication table for effectivenss (new view was added on playerTable and communicationtbale that we can see to simplify)
+- on gameEntry and eventEntry - create a function for need Google Sign in. That allows me to work on the forms without being logged
+- switch all Select to new React-Select?
 - validate that no new player is already in system, likewise with parent
 
-- scheeduleTable - see the todos
-- apiPlayers - sort order not working
-- usePlayerSeasons -see todos
+- scheduleTable - see the todos
+- apiPlayers - sort order not working --- redo all
+- usePlayerSeasons -see todos --- redo all
 - apiGames - updateGames - not only cancelGame but updateGameStatus and takes which status - update calendar
 - redo useSeason, if single season, if no season (use current , if no current, use Recent) - if no season (new program or new school using progam)- or All for all seasons (may still need to separate bevause we may need to have access to all seasons as well as the current season in Mutations) - add the auto season select on public pages, homepage, seasonSelector
 
+- PlayerTable, clean it up
+
 ## //TODO FIXME !!
 
+- playerRow playerSeasonRow
 - refactor public/private pages with layout - lets make sure all is the way it should be
 - playerseason row - get JV, V from season settings
   -sidebar hihlighted when clicked
@@ -36,8 +35,9 @@
 
 ## TODO NEXT !!!
 
+- all-time vs current season tabs
 - Pagination
-  -Filters
+  -Filters ---see filter from PlayerTable and convert to global
 - schedule Helper - email functionality --include check all of each subHeading - add JV/V/both ? - on change to scheduled, go to create game - when scheduled, button to go to game
   - continue game stats manual entry - add new entries
   - create end of game stats page
@@ -47,7 +47,6 @@
 
 - create add another on create events, players, games
 - update schools with new classifications and districts
-- all-time vs current season tabs
 - add new locations to create game, new school
 
 ## TODO NEXT !

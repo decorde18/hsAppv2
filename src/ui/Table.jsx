@@ -4,12 +4,11 @@ import styled from 'styled-components';
 const StyledTable = styled.div`
   /* border: 1px solid var(--color-grey-200); */
   padding: 1rem;
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   background-color: var(--color-grey-0);
   border-radius: 7px;
   overflow: hidden;
 `;
-
 const CommonRow = styled.div`
   display: grid;
   grid-template-columns: ${(props) => props.columns};
@@ -17,9 +16,8 @@ const CommonRow = styled.div`
   align-items: center;
   transition: none;
 `;
-
 const StyledHeader = styled(CommonRow)`
-  padding: 1rem 2.4rem;
+  padding: 1rem;
   background-color: var(--color-grey-50);
   border-bottom: 1px solid var(--color-grey-100);
   text-transform: uppercase;
@@ -40,7 +38,6 @@ const StyledPrintHeaderBorder = styled(CommonRow)`
   border: 1px solid;
   column-gap: 0;
 `;
-
 const StyledRow = styled(CommonRow)`
   padding: 0.2rem 1rem;
 
@@ -62,11 +59,9 @@ const StyledPrintRowBorder = styled(CommonRow)`
     border-bottom: 1px solid var(--color-grey-100);
   } */
 `;
-
 const StyledBody = styled.section`
   margin: 0.4rem 0;
 `;
-
 const Footer = styled.footer`
   background-color: var(--color-grey-50);
   display: flex;
@@ -78,7 +73,6 @@ const Footer = styled.footer`
     display: none;
   }
 `;
-
 const Empty = styled.p`
   font-size: 1.6rem;
   font-weight: 500;

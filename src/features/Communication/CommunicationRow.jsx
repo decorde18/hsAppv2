@@ -31,9 +31,8 @@ function CommunicationRow({
       teamLevel,
       returningPlayer,
       isPlayerAdded,
-      players: {
-        people: { firstName, lastName, email },
-      },
+      fullname,
+      email,
     },
   } = player;
 
@@ -93,7 +92,7 @@ function CommunicationRow({
             onChange={(e) => handlePlayerCheck(e.target.checked)}
           />
         </div>
-        <Player>{`${firstName} ${lastName}`}</Player>
+        <Player>{fullname}</Player>
       </Flex>
       <div>{grade}</div>
       <div>{status}</div>

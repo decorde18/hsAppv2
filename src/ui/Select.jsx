@@ -17,11 +17,24 @@ const StyledSelect = styled.select`
     props.type === 'dark' ? 'var(--color-brand-50)' : 'var(--color-grey-700)'};
   font-weight: 500;
   box-shadow: var(--shadow-sm);
-  ${(props) => (props.width === 0 ? null : 'width: 100%')};
+  ${(props) => (props.width === 0 ? null : `width: ${props.width}rem`)};
 `;
-function Select({ options, value, onChange, register, ...props }) {
+function Select({
+  options,
+  value,
+  onChange,
+  register,
+  defaultValue,
+  ...props
+}) {
   return (
-    <StyledSelect {...register} value={value} onChange={onChange} {...props}>
+    <StyledSelect
+      {...register}
+      value={value}
+      onChange={onChange}
+      defaultValue={defaultValue}
+      {...props}
+    >
       {options.map((option) => (
         <option value={option.value} key={option.value}>
           {option.label}

@@ -1,7 +1,6 @@
 import styled from 'styled-components';
-import { useState } from 'react';
 import Table from '../../ui/Table';
-import { formatCurrency, formatTime, formatDate } from '../../utils/helpers';
+import { formatTime, formatDate } from '../../utils/helpers';
 
 const Right = styled.div`
   text-align: right;

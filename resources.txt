@@ -9,7 +9,12 @@ settings/3 dots - HiEllipsisVertical
 close x - HiXMark
 triangle down - HiChevronDown , triangle up- HiChevronUp, HiChevronUpDown
 HiOutlineChartBar stats
+HiEye - eyeball
 
+
+              <Heading as="h1" case="upper" location="center">
+                new player form
+              </Heading>
       <Heading as="h5" case="upper" location="center">
 
 <Row type="horizontal" justify="center">
@@ -18,11 +23,14 @@ HiOutlineChartBar stats
 
  Input = ({ size = defaultAnimationValues.size, ...props }) SIZE IN REM
 
-<Select options= label, value{gkSelectArray}type="dark"
-onChange={updateGK}   value={playerGameStatus.gkStarter || 0}
-id={'gkStarter'}
-disabled={isUpdating}
-/>
+      <Select
+        width={12.7}
+        options={statusFilterLabel}
+        onChange={handleSelectChange}
+        name="status"
+        disabled={isWorking}
+        value={toggleStates['status']}
+      />
 
  Collapsible({ children, animation = defaultAnimationValues, open }
 

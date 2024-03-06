@@ -1,40 +1,58 @@
 import styled from 'styled-components';
+
 import Spinner from '../../ui/Spinner';
-import TssaaTableRow from './TssaaTableRow';
-import { useSeason } from '../seasons/useSeasons';
-
-import { usePlayerSeasons } from './usePlayerSeasons';
-
 import Table from '../../ui/Table';
 import Empty from '../../ui/Empty';
-
-import { useSearchParams } from 'react-router-dom';
 import Heading from '../../ui/Heading';
 
-const Right = styled.div`
-  text-align: right;
-`;
+import TssaaTableRow from './TssaaTableRow';
+
+import { useSeason } from '../seasons/useSeasons';
+import { usePlayerSeasons } from './usePlayerSeasons';
+
 const Center = styled.div`
   text-align: center;
   width: 100%;
   border: 1px solid;
+  font-size: 1rem;
+  height: 100%;
+`;
+const Container = styled.div`
+  @media screen {
+    margin: 0;
+    padding: 1rem;
+    background-color: var(--color-grey-0);
+    border: 1px solid var(--color-grey-100);
+    border-radius: var(--border-radius-lg);
+    max-height: 95vh;
+    overflow: auto;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    position: absolute;
+  }
 `;
 
 function TssaaRosterTable() {
-  const [searchParams] = useSearchParams();
-  const season = searchParams.get('season');
-  const { isLoadingSeason, season: seasonApi } = useSeason(season);
-
+  const { isLoadingSeason, season } = useSeason();
   const { isLoadingPlayerSeasons, playerSeasons } = usePlayerSeasons();
 
-  if (!season) return <div>Sorry You Must Have A Season Selected</div>;
   if (isLoadingPlayerSeasons || isLoadingSeason) return <Spinner />;
-  if (!playerSeasons.length) return <Empty resource="Players" />;
+  if (!season)
+    return (
+      <Container>
+        <Empty resource="Season" />
+      </Container>
+    );
+  if (!playerSeasons.length)
+    return (
+      <Container>
+        <Empty resource="Players" />
+      </Container>
+    );
 
   const tssaaRoster = playerSeasons
-    .filter(
-      (player) => +player.seasonId === +season && player.status === 'Rostered'
-    )
+    .filter((player) => player.status === 'Rostered')
     .sort((a, b) => {
       const aa = a.players.people.firstName.toLowerCase();
       const bb = b.players.people.firstName.toLowerCase();
@@ -59,15 +77,16 @@ function TssaaRosterTable() {
     });
 
   return (
-    <>
+    <Container>
       <Heading as="h2" location="center">
         Independence High School Girls&#39; <br></br>Soccer Season{' '}
-        {seasonApi.season}
+        {season.season}
       </Heading>
-      <Heading as="h3">TSSAA Roster</Heading>
-      <Table columns=".25fr 4fr 2fr 1fr 1fr 1fr 1fr 1fr 1px">
+      <Heading as="h3" location="center">
+        TSSAA Roster
+      </Heading>
+      <Table columns="4fr 1.9fr 1.05fr 1.05fr 1.05fr 1fr 1fr 1fr ">
         <Table.PrintHeaderBorder>
-          <div></div>
           <Center>Player Name</Center>
           <Center>Date of Birth</Center>
           <Center>Year Entered 9th</Center>
@@ -79,14 +98,13 @@ function TssaaRosterTable() {
         </Table.PrintHeaderBorder>
         <Table.Body
           data={tssaaRoster.filter(
-            (player) => player.players.entryYear !== seasonApi.season
+            (player) => player.players.entryYear !== season.season
           )}
           render={(player) => <TssaaTableRow player={player} key={player.id} />}
         />
       </Table>
-      <Table columns=".25fr 4fr 2fr 1fr 1fr 1fr 1fr 1fr 1px">
+      <Table columns=" 4fr 1.9fr 1.05fr 1.05fr 1.05fr 1fr 1fr 1fr ">
         <Table.PrintHeaderBorder>
-          <div></div>
           <Center>Player Name</Center>
           <Center>Date of Birth</Center>
           <Center>Year Entered 9th</Center>
@@ -98,12 +116,12 @@ function TssaaRosterTable() {
         </Table.PrintHeaderBorder>
         <Table.Body
           data={tssaaRoster.filter(
-            (player) => player.players.entryYear === seasonApi.season
+            (player) => player.players.entryYear === season.season
           )}
           render={(player) => <TssaaTableRow player={player} key={player.id} />}
         />
       </Table>
-    </>
+    </Container>
   );
 }
 

@@ -50,10 +50,7 @@ import Game from './pages/Game';
 
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: {
-      // staleTime: 60 * 1000, //amount of time before refresh of data ---can set to 0 and therfore it is always fetching
-      staleTime: 0,
-    },
+    queries: { staleTime: 0 },
   },
 });
 //todo do I need session contect provider? where does supabase get accessed?

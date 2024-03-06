@@ -133,6 +133,21 @@ export function convertMinutesSecondsToSeconds(time) {
 //2 days later
 // new Date(new Date().getTime() - 2*24*60*60*1000).toLocaleDateString() // 11/14/2015
 
+export function convertToPhoneNumber(number) {
+  const numberValue = number?.replace(/\D[^.]/g, '');
+  const phoneNumber =
+    numberValue?.length === 10
+      ? numberValue.slice(0, 0) +
+        '(' +
+        numberValue.slice(0, 3) +
+        ') ' +
+        numberValue.slice(3, 6) +
+        '-' +
+        numberValue.slice(6)
+      : numberValue;
+  return phoneNumber;
+}
+
 export function flattenObject(obj, prefix = '') {
   let flattened = {};
   for (let key in obj) {

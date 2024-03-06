@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom';
 import { styled } from 'styled-components';
 import Button from '../../ui/Button';
 import { useState } from 'react';
+import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 
 const Ul = styled.ul`
   display: flex;
@@ -26,6 +27,7 @@ const menuButtons = [
 ];
 
 function AppNav() {
+  const { currentSeason } = useCurrentSeason();
   const [active, setActive] = useState('Main');
   function handleToggle(e) {
     setActive(e.target.name);
@@ -34,17 +36,21 @@ function AppNav() {
     <Ul>
       {menuButtons.map((button) => {
         return (
-          <Li key={`${button.name}btn`}>
-            <Button
-              size="large"
-              variation={active === button.name ? 'primary' : 'secondary'}
-              onClick={handleToggle}
-            >
-              <NavLink to={button.link} name={button.name}>
+          <NavLink
+            to={`${button.link}?season=${currentSeason}`}
+            name={button.name}
+            key={`${button.name}btn`}
+          >
+            <Li>
+              <Button
+                size="large"
+                variation={active === button.name ? 'primary' : 'secondary'}
+                onClick={handleToggle}
+              >
                 {button.name}
-              </NavLink>
-            </Button>
-          </Li>
+              </Button>
+            </Li>
+          </NavLink>
         );
       })}
     </Ul>

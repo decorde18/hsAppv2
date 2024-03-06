@@ -4,13 +4,14 @@ import CreatePlayerForm from './CreatePlayerModalForm';
 
 import { useDeletePlayer } from './useDeletePlayer';
 
-import { HiPencil, HiTrash } from 'react-icons/hi2';
+import { HiPencil, HiTrash, HiEye } from 'react-icons/hi2';
 
 import ModalConfirm from '../../ui/ModalConfirm';
 import Modal from '../../ui/Modal';
 import Table from '../../ui/Table';
 import Menus from '../../ui/Menus';
 import { formatDate } from '../../utils/helpers';
+import PlayerIndividualPage from './PlayerIndividualPage';
 
 const Player = styled.div`
   font-size: 1.6rem;
@@ -22,21 +23,20 @@ const Player = styled.div`
 function PlayerRow({ player }) {
   const { isDeleting, deletePlayer } = useDeletePlayer();
 
-  const {
-    id: playerId,
-    people: { firstName, lastName },
-    dateOfBirth,
-  } = player;
+  const { id: playerId, firstName, lastName, dateOfBirth, seasons } = player;
   return (
     <Table.Row>
-      <div></div>
       <Player>{`${firstName} ${lastName}`}</Player>
       <Player>{dateOfBirth && formatDate(new Date(dateOfBirth))}</Player>
+      <Player>{seasons}</Player>
       <div>
         <Modal>
           <Menus.Menu>
             <Menus.Toggle id={playerId} />
             <Menus.List id={playerId}>
+              <Modal.Open opens="view">
+                <Menus.Button icon={<HiEye />}>View</Menus.Button>
+              </Modal.Open>
               <Modal.Open opens="edit">
                 <Menus.Button icon={<HiPencil />}>edit</Menus.Button>
               </Modal.Open>
@@ -48,7 +48,9 @@ function PlayerRow({ player }) {
             <Modal.Window name="edit">
               {<CreatePlayerForm playerToEdit={player} />}
             </Modal.Window>
-
+            <Modal.Window name="view">
+              {<PlayerIndividualPage player={player} />}
+            </Modal.Window>
             <Modal.Window name="delete">
               <ModalConfirm
                 resourceName="player"

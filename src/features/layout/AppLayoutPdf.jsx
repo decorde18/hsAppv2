@@ -1,6 +1,9 @@
+import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
+
 import { styled } from 'styled-components';
 import { createContext, useState } from 'react';
 import { Outlet } from 'react-router-dom';
+import Spinner from '../../ui/Spinner';
 
 const StyledAppLayout = styled.div`
   /* height: 100vh;
@@ -12,6 +15,9 @@ const StyledAppLayout = styled.div`
 export const AppContext = createContext();
 
 function AppLayoutPdf() {
+  const { currentSeason } = useCurrentSeason();
+  if (!currentSeason) return <Spinner />;
+
   return (
     <StyledAppLayout>
       <Outlet></Outlet>

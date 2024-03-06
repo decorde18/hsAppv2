@@ -1,8 +1,6 @@
 import Input from '../../ui/Input';
 import Form from '../../ui/Form';
 import Button from '../../ui/Button';
-import FileInput from '../../ui/FileInput';
-import Textarea from '../../ui/Textarea';
 import FormRow from '../../ui/FormRow';
 
 import { useForm } from 'react-hook-form';
@@ -13,7 +11,7 @@ import { useCreateCoach } from '../coaches/useCoaches';
 function CreatePeopleForm({ personToEdit = {}, onCloseModal, schoolToAddTo }) {
   const { id: editId, ...editValues } = personToEdit;
   const isEditSession = Boolean(editId);
-  const { register, handleSubmit, reset, getValues, formState } = useForm({
+  const { register, handleSubmit, reset, formState } = useForm({
     defaultValues: isEditSession ? editValues : {},
   });
   const { errors } = formState;
@@ -21,6 +19,7 @@ function CreatePeopleForm({ personToEdit = {}, onCloseModal, schoolToAddTo }) {
   const { isEditing, editPeople } = useEditPeople();
   const { createCoach, isCreating: isCreatingCoach } = useCreateCoach();
   const isWorking = isCreating || isEditing || isCreatingCoach;
+
   function onSubmit(data) {
     if (isEditSession)
       editPeople(
@@ -54,7 +53,7 @@ function CreatePeopleForm({ personToEdit = {}, onCloseModal, schoolToAddTo }) {
           type="text"
           id="title"
           disabled={isWorking}
-          {...register('title')}
+          register={{ ...register('title') }}
         />
       </FormRow>
       <FormRow label="First Name" error={errors?.firstName?.message}>
@@ -62,7 +61,9 @@ function CreatePeopleForm({ personToEdit = {}, onCloseModal, schoolToAddTo }) {
           type="text"
           id="firstName"
           disabled={isWorking}
-          {...register('firstName', { required: 'This field is required' })}
+          register={{
+            ...register('firstName', { required: 'This field is required' }),
+          }}
         />
       </FormRow>
       <FormRow label="Last Name" error={errors?.lastName?.message}>
@@ -70,7 +71,9 @@ function CreatePeopleForm({ personToEdit = {}, onCloseModal, schoolToAddTo }) {
           type="text"
           id="lastName"
           disabled={isWorking}
-          {...register('lastName', { required: 'This field is required' })}
+          register={{
+            ...register('lastName', { required: 'This field is required' }),
+          }}
         />
       </FormRow>
       <FormRow label="Nickname" error={errors?.nickName?.message}>
@@ -78,7 +81,7 @@ function CreatePeopleForm({ personToEdit = {}, onCloseModal, schoolToAddTo }) {
           type="text"
           id="nickName"
           disabled={isWorking}
-          {...register('nickName')}
+          register={{ ...register('nickName') }}
         />
       </FormRow>
       <FormRow label="Email" error={errors?.email?.message}>
@@ -86,7 +89,7 @@ function CreatePeopleForm({ personToEdit = {}, onCloseModal, schoolToAddTo }) {
           type="email"
           id="email"
           disabled={isWorking}
-          {...register('email')}
+          register={{ ...register('email') }}
         />
       </FormRow>
       <FormRow label="Cell" error={errors?.cellNumber?.message}>
@@ -94,7 +97,7 @@ function CreatePeopleForm({ personToEdit = {}, onCloseModal, schoolToAddTo }) {
           type="number"
           id="cellNumber"
           disabled={isWorking}
-          {...register('cellNumber')}
+          register={{ ...register('cellNumber') }}
         />
       </FormRow>
 

@@ -24,9 +24,9 @@ import Select from '../../ui/Select';
 function CommunicationTable() {
   const [searchParams, setSearchParams] = useSearchParams();
 
+  const { isLoadingSeason, season } = useSeason();
   const { isLoadingPlayerParents, playerParents } = useGetPlayerParents();
   const { isLoadingPlayerSeasons, playerSeasons } = usePlayerSeasons();
-  const { isLoadingSeason, season } = useSeason();
 
   const [allPlayersChecked, setAllPlayersChecked] = useState('none');
   const [allParentsChecked, setAllParentsChecked] = useState('none');
@@ -35,7 +35,6 @@ function CommunicationTable() {
   const [parentEmails, setParentEmails] = useState([]);
 
   const [filteredPlayers, setFilteredPlayers] = useState([]);
-  const [visibleStatus, setVisibleStatus] = useState('all');
 
   let statusFilter;
   useEffect(
@@ -44,11 +43,11 @@ function CommunicationTable() {
       if (isLoadingPlayerParents || isLoadingPlayerSeasons || isLoadingSeason)
         return;
       //default filter
-      const defaultPlayers = defaultVisiblePlayers(
-        playerSeasons,
-        playerParents,
-        season
-      );
+      const defaultPlayers = defaultVisiblePlayers({
+        players: playerSeasons,
+        parents: playerParents,
+        season: season,
+      });
       setFilteredPlayers(defaultPlayers);
     },
     [
@@ -65,8 +64,8 @@ function CommunicationTable() {
     function () {
       if (isLoadingPlayerParents || isLoadingPlayerSeasons) return;
       const newPlayerFilter = filteredPlayers
-        .filter((player) => player.isPlayerAdded && player.players.people.email)
-        .map((player) => player.players.people.email);
+        .filter((player) => player.isPlayerAdded && player.email)
+        .map((player) => player.email);
       const newParentFilter = [
         ...new Set(
           filteredPlayers
@@ -84,18 +83,6 @@ function CommunicationTable() {
     },
     [filteredPlayers, isLoadingPlayerParents, isLoadingPlayerSeasons]
   );
-
-  if (isLoadingPlayerParents || isLoadingPlayerSeasons || isLoadingSeason)
-    return <Spinner />;
-  if (!playerParents.length) return <Empty resource="Player Parents" />;
-
-  //handle filter changes
-
-  statusFilter = searchParams.get('filterRosterStatus')
-    ? statusFilterLabel.find(
-        (status) => status.value === +searchParams.get('filterRosterStatus')
-      )
-    : defaultRosterStatus(season);
 
   function handleFilterChange(e) {
     searchParams.set(e.target.id, e.target.value);
@@ -260,6 +247,17 @@ function CommunicationTable() {
     setFilteredPlayers(rowCheck);
   }
 
+  if (isLoadingPlayerParents || isLoadingPlayerSeasons || isLoadingSeason)
+    return <Spinner />;
+  if (!playerParents.length) return <Empty resource="Player Parents" />;
+
+  //handle filter changes
+
+  statusFilter = searchParams.get('filterRosterStatus')
+    ? statusFilterLabel.find(
+        (status) => status.value === +searchParams.get('filterRosterStatus')
+      )
+    : defaultRosterStatus(season);
   return (
     <Menus>
       <input defaultValue={playerEmails} />
@@ -301,7 +299,30 @@ function CommunicationTable() {
           </>
         </Table.Header>
         <Table.Body
-          data={filteredPlayers}
+          data={filteredPlayers
+            .sort((a, b) => {
+              const aa = a.firstName.toLowerCase();
+              const bb = b.firstName.toLowerCase();
+              if (aa < bb) {
+                return -1;
+              }
+              if (aa > bb) {
+                return 1;
+              }
+              return 0;
+            })
+            .sort((a, b) => {
+              const aa = a.lastName.toLowerCase();
+              const bb = b.lastName.toLowerCase();
+              if (aa < bb) {
+                return -1;
+              }
+              if (aa > bb) {
+                return 1;
+              }
+              return 0;
+            })
+            .sort((a, b) => b.grade - a.grade)}
           render={(player) =>
             player.isPlayerVisible ? (
               <CommunicationRow

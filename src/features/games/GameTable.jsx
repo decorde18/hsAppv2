@@ -4,13 +4,12 @@ import Spinner from '../../ui/Spinner';
 import { useGames } from './useGames';
 import { useGoals, useGamePeriods } from './useGames';
 
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Button from '../../ui/Button';
 import Table from '../../ui/Table';
 import Empty from '../../ui/Empty';
 import GameRow from './GameRow';
 import AddGame from './AddGame';
-import { useSearchParams } from 'react-router-dom';
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 import Menus from '../../ui/Menus';
 

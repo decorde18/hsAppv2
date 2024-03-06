@@ -4,7 +4,7 @@ import {
   getRecentSeason,
   getSeasons,
   getSeason,
-  getSeason as curSeasonApi,
+  // getSeason as curSeasonApi,
   updateSeasonApi,
   createEditSeason,
 } from '../../services/apiSeasons';
@@ -14,24 +14,42 @@ import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 
 export function useSeasons() {
   /*filter pagination*/
+  // const { currentSeason } = useCurrentSeason();
+  // console.log(currentSeason);
   //FILTER
-  const [searchParams] = useSearchParams();
-  const filterValue = searchParams.get('season');
-  const filter =
-    !filterValue || filterValue === 'all'
-      ? null
-      : { field: 'season', value: filterValue, method: 'eq' };
+  // const [searchParams, setSearchParams] = useSearchParams();
+  // searchParams.set('season', currentSeason);
+  // setSearchParams(searchParams);
+  // const filterValue = searchParams.get('season');
+  // const filter =
+  //   !filterValue || filterValue === 'all'
+  //     ? null
+  //     : { field: 'season', value: filterValue, method: 'eq' };
   const {
     //destructure has plenty of other useful values ie status console.log this query to see the different ones
     isLoading: isLoadingSeasons,
     data: seasons,
     error,
   } = useQuery({
-    queryKey: ['seasons', filter] /*filter pagination*/,
-    queryFn: () => getSeasons({ filter }) /*filter pagination*/,
+    queryKey: ['seasons'] /*filter pagination*/,
+    queryFn: () => getSeasons() /*filter pagination*/,
   });
 
   return { isLoadingSeasons, error, seasons };
+}
+export function useSeason() {
+  const { currentSeason } = useCurrentSeason();
+  // const [searchParams, setSearchParams] = useSearchParams();
+  // searchParams.set('season', currentSeason);
+  // setSearchParams(searchParams);
+  //Filter by season
+  const filter = { field: 'seasonId', value: currentSeason };
+  const { isLoading: isLoadingSeason, data: season } = useQuery({
+    queryKey: ['season', filter],
+    queryFn: () => getSeason(currentSeason),
+    retry: false,
+  });
+  return { isLoadingSeason, season };
 }
 export function useRecentSeason() {
   const {
@@ -41,24 +59,6 @@ export function useRecentSeason() {
   } = useQuery({ queryKey: ['recentSeason'], queryFn: getRecentSeason });
   const [recentSeason] = data ? data : [];
   return { isLoadingRecent, error, recentSeason };
-}
-
-export function useSeason() {
-  const { currentSeason } = useCurrentSeason();
-
-  //Filter by season
-  const filter = { field: 'seasonId', value: currentSeason };
-  const {
-    setSeason,
-    isLoading: isLoadingSeason,
-    data: season,
-    error,
-  } = useQuery({
-    queryKey: ['season', filter],
-    queryFn: () => getSeason(currentSeason),
-    retry: false,
-  });
-  return { isLoadingSeason, error, season, setSeason };
 }
 
 export function useUpdateSeason(seasonId, updateField) {

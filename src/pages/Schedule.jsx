@@ -45,12 +45,3 @@ function Schedule() {
 }
 
 export default Schedule;
-
-// <Document>
-//   <Page size="Letter" style={styles.page}>
-//     <View style={styles.section}>
-//       <Text><ScheduleTable /></Text>
-//     </View>
-
-//   </Page>
-// </Document>;

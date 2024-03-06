@@ -36,7 +36,7 @@ const H1 = styled.h1`
 function Header({ type }) {
   return (
     <StyledHeader className="relative mb-2">
-      <Logo></Logo>
+      <Logo />
       <Div>
         <H1>INDEPENDENCE GIRLS SOCCER</H1>
         <Row type="horizontal" justify="center">

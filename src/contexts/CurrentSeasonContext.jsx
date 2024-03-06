@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect } from 'react';
-import { useLocalStorageState } from '../hooks/useLocalStorageState';
 import { useSearchParams } from 'react-router-dom';
+
+import { useLocalStorageState } from '../hooks/useLocalStorageState';
 import { useRecentSeason } from '../features/seasons/useSeasons';
 
 const CurrentSeasonContext = createContext();
@@ -15,7 +16,7 @@ function CurrentSeasonProvider({ children }) {
     false,
     'recentSeason'
   );
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const curSeason = +searchParams.get('season');
 
   useEffect(() => {
@@ -28,11 +29,14 @@ function CurrentSeasonProvider({ children }) {
   }, [curSeason, isLoadingRecent]);
 
   function updateCurrentSeason(season) {
+    searchParams.set('season', season);
+    setSearchParams(searchParams);
     setCurrentSeason(season);
   }
   function updateRecentSeason(season) {
     setRecentSeason(season);
   }
+  if (isLoadingRecent) return;
   return (
     <CurrentSeasonContext.Provider
       value={{

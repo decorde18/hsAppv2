@@ -10,11 +10,13 @@ const Player = styled.div`
   font-family: 'Sono';
   width: 100%;
   border: 1px solid;
+  padding-left: 2rem;
 `;
 const Div = styled.div`
   display: flex;
   width: 100%;
   height: 100%;
+  border-left: 1.5px solid;
 `;
 const EmptyDiv = styled.div`
   display: flex;
@@ -26,12 +28,10 @@ const Center = styled.div`
   border: 1px solid;
   text-align: center;
   width: 100%;
-  border: 1px solid;
 `;
 function TssaaTableRow({ player }) {
   return (
     <Table.PrintRowBorder>
-      <div></div>
       <Player>{`${player.players.people.firstName} ${player.players.people.lastName}`}</Player>
       <Player>{formatDate(new Date(player.players.dateOfBirth))}</Player>
       <Player>{player.players.entryYear}</Player>

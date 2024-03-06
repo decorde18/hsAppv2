@@ -6,8 +6,6 @@ import Footer from './Footer';
 import MainSection from './MainSection';
 
 import { styled } from 'styled-components';
-import { useEffect } from 'react';
-import { useRecentSeason } from '../seasons/useSeasons';
 
 const StyledAppLayout = styled.div`
   //THIS IS FOR THE HEADER< BODY< FOOTER
@@ -26,26 +24,9 @@ const Main = styled.main`
 
 function AppLayout() {
   // ON LOAD OF PROTECTED ROUTES, UPDATE THE RECENT AND CURRENT IN LOCAL AND CONTEXT PROVIDER
-  const { currentSeason, updateCurrentSeason, updateRecentSeason } =
-    useCurrentSeason();
-  const { isLoadingRecent, recentSeason } = useRecentSeason();
+  const { currentSeason } = useCurrentSeason();
 
-  useEffect(
-    function () {
-      if (isLoadingRecent) return;
-      updateRecentSeason(recentSeason.id);
-      if (!currentSeason) updateCurrentSeason(recentSeason.id);
-    },
-    [
-      currentSeason,
-      updateCurrentSeason,
-      recentSeason,
-      updateRecentSeason,
-      isLoadingRecent,
-    ]
-  );
-
-  if (isLoadingRecent) return;
+  if (!currentSeason) return;
 
   return (
     <StyledAppLayout>

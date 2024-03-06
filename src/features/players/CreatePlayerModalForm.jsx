@@ -37,7 +37,13 @@ function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
   let parentId;
   let playerId;
 
-  const isWorking = false;
+  const isWorking =
+    isCreatingParent ||
+    isCreatingPeople ||
+    isCreatingPlayer ||
+    isCreatingPlayerParent ||
+    isCreatingPlayerSeason ||
+    isEditingPlayer;
   function onSubmit(data) {
     if (isEditSession) {
       const { people: playerPeopleData } = { data };
@@ -69,59 +75,65 @@ function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
     const entryYear = currentSeason.season - (+grade - 9);
     const playerData = { previousSchool, entryYear };
 
-    createPeople(
-      { ...playerPeopleData },
-      {
-        onSuccess: (data) => {
-          // create player and get ID
-          createPlayer(
-            { peopleId: data.id, ...playerData },
-            {
-              onSuccess: (data) => {
-                playerId = data.id;
-                createPeople(
-                  { ...parentPeopleData },
-                  {
-                    onSuccess: (data) => {
-                      // create player and get ID
-                      createParent(
-                        { peopleId: data.id },
-                        {
-                          onSuccess: (data) => {
-                            parentId = data.id;
-                            addPlayerParent();
-                          },
-                        }
-                      );
-                    },
-                  }
-                );
-              },
-            }
-          );
-        },
-      }
-    );
-    function addPlayerParent() {
-      createPlayerParent({ player: playerId, parent: parentId });
-      addPlayerSeason();
-    }
-    function addPlayerSeason() {
-      createPlayerSeason({
-        playerId,
-        seasonId: currentSeason.id,
-        grade,
-        status: 'Interested',
-      });
+    console.log(data);
+    // createPeople(
+    //   { ...playerPeopleData },
+    //   {
+    //     onSuccess: (data) => {
+    //       // create player and get ID
+    //       createPlayer(
+    //         { peopleId: data.id, ...playerData },
+    //         {
+    //           onSuccess: (data) => {
+    //             playerId = data.id;
+    //             createPeople(
+    //               { ...parentPeopleData },
+    //               {
+    //                 onSuccess: (data) => {
+    //                   // create player and get ID
+    //                   createParent(
+    //                     { peopleId: data.id },
+    //                     {
+    //                       onSuccess: (data) => {
+    //                         parentId = data.id;
+    //                         addPlayerParent();
+    //                       },
+    //                     }
+    //                   );
+    //                 },
+    //               }
+    //             );
+    //           },
+    //         }
+    //       );
+    //     },
+    //   }
+    // );
+    // function addPlayerParent() {
+    //   createPlayerParent({ player: playerId, parent: parentId });
+    //   addPlayerSeason();
+    // }
+    // function addPlayerSeason() {
+    //   createPlayerSeason({
+    //     playerId,
+    //     seasonId: currentSeason.id,
+    //     grade,
+    //     status: 'Interested',
+    //   });
 
-      reset();
-      onCloseModal?.();
-    }
+    //   reset();
+    //   onCloseModal?.();
+    // }
   }
   function onError(errors) {
     console.log(errors);
   }
-
+  // PEOPLE
+  //firstName, lastName, nickname, cell, email,dateOfBirth, otherLastName, gender,
+  //PLAYER
+  //entryYear, previousSchool, creditsNeeded
+  //PARENTS
+  //SEASONS
   return (
     <Form
       onSubmit={handleSubmit(onSubmit, onError)}
@@ -133,19 +145,23 @@ function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
           <Input
             type="text"
             id="firstName"
-            {...register('people.firstName', {
-              required: 'We need your first name',
-            })}
             disabled={isWorking}
+            register={{
+              ...register('people.firstName', {
+                required: 'We need your first name',
+              }),
+            }}
           />
         </FormRow>
         <FormRow label="Last Name *" error={errors?.lastName?.message}>
           <Input
             type="text"
             id="lastName"
-            {...register('people.lastName', {
-              required: 'We need your last name',
-            })}
+            register={{
+              ...register('people.lastName', {
+                required: 'We need your last name',
+              }),
+            }}
             disabled={isWorking}
           />
         </FormRow>
@@ -154,7 +170,7 @@ function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
             <Input
               type="date"
               id="dateOfBirth"
-              {...register('dateOfBirth')}
+              register={{ ...register('dateOfBirth') }}
               disabled={isWorking}
             />
           </FormRow>
@@ -182,9 +198,11 @@ function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
           <Input
             type="text"
             id="previousSchool"
-            {...register('previousSchool', {
-              required: false,
-            })}
+            register={{
+              ...register('previousSchool', {
+                required: false,
+              }),
+            }}
             disabled={isWorking}
           />
         </FormRow>
@@ -192,9 +210,11 @@ function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
           <Input
             type="email"
             id="email"
-            {...register('people.email', {
-              required: false,
-            })}
+            register={{
+              ...register('people.email', {
+                required: false,
+              }),
+            }}
             disabled={isWorking}
           />
         </FormRow>
@@ -211,9 +231,11 @@ function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
             <Input
               type="text"
               id="parentfirstName"
-              {...register('parentfirstName', {
-                required: 'We need the parent first name',
-              })}
+              register={{
+                ...register('parentfirstName', {
+                  required: 'We need the parent first name',
+                }),
+              }}
               disabled={isWorking}
             />
           </FormRow>
@@ -221,9 +243,11 @@ function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
             <Input
               type="text"
               id="parentlastName"
-              {...register('parentlastName', {
-                required: 'We need the parent last name',
-              })}
+              register={{
+                ...register('parentlastName', {
+                  required: 'We need the parent last name',
+                }),
+              }}
               disabled={isWorking}
             />
           </FormRow>
@@ -232,9 +256,11 @@ function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
               type="email"
               id="parentemail"
               disabled={isWorking}
-              {...register('parentemail', {
-                required: 'We need a parent Email',
-              })}
+              register={{
+                ...register('parentemail', {
+                  required: 'We need a parent Email',
+                }),
+              }}
             />
           </FormRow>
         </>
@@ -259,9 +285,9 @@ function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
   //         type="number"
   //         id="maxCapacity"
   //         disabled={isWorking}
-  //         {...register('maxCapacity', {
+  //         register={{...register('maxCapacity', {
   //           required: 'This field is required',
-  //           min: { value: 1, message: 'Capacity should be at least 1' },
+  //           min: { value: 1, message: 'Capacity }should be at least 1' },
   //         })}
   //       />
   //     </FormRow>
@@ -271,9 +297,9 @@ function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
   //         type="number"
   //         id="regularPrice"
   //         disabled={isWorking}
-  //         {...register('regularPrice', {
+  //         register={{...register('regularPrice', {
   //           required: 'This field is required',
-  //           min: { value: 1, message: 'Capacity should be at least 1' },
+  //           min: { value: 1, message: 'Capacity s}hould be at least 1' },
   //         })}
   //       />
   //     </FormRow>
@@ -284,9 +310,9 @@ function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
   //         id="discount"
   //         defaultValue={0}
   //         disabled={isWorking}
-  //         {...register('discount', {
+  //         register={{...register('discount', {
   //           required: 'This field is required',
-  //           validate: (value) =>
+  //           validate: (value) =>}
   //             +value <= +getValues().regularPrice ||
   //             'Discount should be less than price',
   //         })}
@@ -302,17 +328,17 @@ function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
   //         id="description"
   //         disabled={isWorking}
   //         defaultValue=""
-  //         {...register('description', { required: 'This field is required' })}
+  //         register={{...register('description', { required: 'This field is required' })}
   //       />
-  //     </FormRow>
+  //     </FormRow>}
 
   //     <FormRow label="Cabin photo" error={errors?.image?.message}>
   //       <FileInput
   //         id="image"
   //         accept="image/*"
-  //         {...register('image', {
+  //         register={{...register('image', {
   //           required: isEditSession ? false : 'This field is required',
-  //         })}
+  //         })}}
   //       />
   //     </FormRow>
 

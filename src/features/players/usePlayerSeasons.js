@@ -3,12 +3,27 @@ import { toast } from 'react-hot-toast';
 import {
   getPlayerSeason,
   getPlayerSeasons,
+  getPlayerSeasonsAll,
   updatePlayerSeason,
   createPlayerSeasons,
   deletePlayerSeasonApi,
   getPlayerSeasonWithNumbers,
+  getSeasonsPlayer,
 } from '../../services/apiPlayers';
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
+
+export function useSeasonsPlayer(filter) {
+  filter = { field: 'playerId', value: filter };
+  const {
+    isLoading: isLoadingSeaonsPlayer,
+    data: seasonsPlayer,
+    error,
+  } = useQuery({
+    queryKey: ['seasonsPlayer', filter],
+    queryFn: () => getSeasonsPlayer({ filter }),
+  });
+  return { isLoadingSeaonsPlayer, error, seasonsPlayer };
+}
 
 //TODO change all PlayerSeasons to add the object
 export function usePlayerSeasons(season) {
@@ -30,6 +45,17 @@ export function usePlayerSeasons(season) {
     queryFn: () => getPlayerSeasons({ filter }),
   });
   return { isLoadingPlayerSeasons, error, playerSeasons };
+}
+export function usePlayerSeasonsAll() {
+  const {
+    isLoading: isLoadingPlayerSeasonsAll,
+    data: playerSeasonsAll,
+    error,
+  } = useQuery({
+    queryKey: ['playerSeasonsAll'],
+    queryFn: getPlayerSeasonsAll,
+  });
+  return { isLoadingPlayerSeasonsAll, error, playerSeasonsAll };
 }
 //TODO Take this out and just use usePlayerSeasons with the filter, maybe use this for specific player, specific season
 export function usePlayerSeason(seasonId) {
