@@ -78,5 +78,33 @@ export function filterBySeasonPhase(season) {
   return {
     id: 'status',
     value: defaultFilter.value,
+    label: defaultFilter.label,
   };
+}
+
+export function filterChange({ selected, name, currentFilters, columns }) {
+  const selectedField = columns.find((column) => column.field === name);
+  const prevFilter = currentFilters.filter((option) => option.field !== name);
+  const newFilter = selected.length
+    ? [
+        ...prevFilter,
+        {
+          field: name,
+          value: selected.map((option) => option.value),
+          textSearch: selectedField.textSearch,
+          table: selectedField.table,
+        },
+      ]
+    : [...prevFilter];
+  return newFilter;
+}
+export function sortUpdate({ selectedSort, sort }) {
+  const table = Object.keys(selectedSort)[0];
+  const prevSort = sort[table].filter(
+    (prev) => prev.field !== selectedSort[table][0].field
+  );
+  const [newSort] = selectedSort[table].map((next) => ({
+    [table]: [next, ...prevSort],
+  }));
+  return { ...sort, ...newSort };
 }

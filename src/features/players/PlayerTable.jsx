@@ -7,12 +7,12 @@ import AddPlayer from './AddPlayer';
 
 import { useState } from 'react';
 import ButtonGroup from '../../ui/ButtonGroup';
-
 const StyledDiv = styled.div`
   display: flex;
   gap: 2px;
   justify-content: space-between;
 `;
+
 function PlayerTable() {
   const [playerTableData, setPlayerTableData] = useState('Season');
   const [filteredCount, setFilteredCount] = useState();

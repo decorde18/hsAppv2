@@ -8,7 +8,7 @@ const Ul = styled.ul`
   display: flex;
   justify-content: center;
   background-color: var(--color-light--2);
-  border-radius: 7px;
+  border-radius: var(--border-radius-md);
   margin: 2rem;
   padding: 1rem;
   position: sticky;

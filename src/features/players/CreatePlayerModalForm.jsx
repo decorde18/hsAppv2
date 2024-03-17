@@ -1,361 +1,237 @@
-import Button from '../../ui/Button';
-import Form from '../../ui/Form';
-import FormRow from '../../ui/FormRow';
-import Heading from '../../ui/Heading';
-import Input from '../../ui/Input';
-import Row from '../../ui/Row';
-
+import styled from 'styled-components';
 import { useForm } from 'react-hook-form';
-import { useCreatePeople } from '../people/useCreatePeople';
-import { useCreatePlayerSeason } from './usePlayerSeasons';
-import { useCreatePlayer } from './useCreatePlayer';
-import { useEditPlayer } from './useEditPlayer';
-import { useCreateParent, useCreatePlayerParent } from '../parents/useParents';
-import { useContext, useEffect, useState } from 'react';
-import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
+import { useState } from 'react';
+
+import Form from '../../ui/Form';
+import Heading from '../../ui/Heading';
+import FormRow from '../../ui/FormRow';
+import Row from '../../ui/Row';
+import Button from '../../ui/Button';
+import Input from '../../ui/Input';
+
+import CreateParentModalForm from './CreateParentModalForm';
+
+import { useData, useUpdateData } from '../../services/useUniversal';
+
+const fields = [
+  {
+    label: 'First Name *',
+    field: 'firstName',
+    table: 'people',
+    type: 'text',
+    required: true,
+    message: 'We need the first name',
+  },
+  {
+    label: 'Last Name *',
+    field: 'lastName',
+    table: 'people',
+    type: 'text',
+    required: true,
+    message: 'We need the last name',
+  },
+  {
+    label: 'Gender *',
+    field: 'gender',
+    table: 'people',
+    type: 'text',
+    required: true,
+    placeholder: 'F',
+    message: 'We need a gender',
+  },
+  {
+    label: 'Nickname',
+    field: 'nickName',
+    table: 'people',
+    type: 'text',
+    required: false,
+  },
+  {
+    label: 'Date of Birth',
+    field: 'dateOfBirth',
+    table: 'people',
+    type: 'date',
+    required: false,
+  },
+  { field: 'empty' },
+  {
+    label: 'Email',
+    field: 'email',
+    table: 'people',
+    type: 'email',
+    required: false,
+  },
+  {
+    label: 'Cell',
+    field: 'cellNumber',
+    table: 'people',
+    type: 'number',
+    required: false,
+  },
+  {
+    label: 'Entry Year *',
+    field: 'entryYear',
+    table: 'players',
+    type: 'number',
+    required: true,
+    message: 'We need the year entered 9th',
+  },
+  {
+    label: 'Grade *',
+    field: 'grade',
+    table: 'playerSeasons',
+    type: 'number',
+    required: true,
+    message: 'We need the grade',
+  },
+  { field: 'empty2' },
+];
+
+const tableIds = [
+  { table: 'playerSeasons', id: 'id' },
+  { table: 'people', id: 'peopleId' },
+  { table: 'players', id: 'playerId' },
+];
+
+const Grid = styled.div`
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+`;
+const StyledBtn = styled.div`
+  display: inline-block;
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-sm);
+  padding: 0.5rem 1rem;
+  line-height: 3rem;
+  font-size: 1.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  text-align: center;
+
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  color: var(--color-brand-50);
+  background-color: var(--color-brand-500);
+  border: 1px solid var(--color-brand-500);
+`;
 
 function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
-  const { id: editId, ...editValues } = playerToEdit;
-  const isEditSession = Boolean(editId);
+  const isEditSession = Boolean(playerToEdit.id);
 
-  const { register, handleSubmit, reset, getValues, formState } = useForm({
-    defaultValues: isEditSession ? editValues : {},
+  const { register, handleSubmit, reset, formState } = useForm({
+    defaultValues: isEditSession ? playerToEdit : {},
   });
   const { errors } = formState;
-  const { isCreatingPeople, createPeople } = useCreatePeople();
-  const { isCreatingPlayer, createPlayer } = useCreatePlayer();
-  const { isCreatingParent, createParent } = useCreateParent();
-  const { isCreatingPlayerParent, createPlayerParent } =
-    useCreatePlayerParent();
-  const { isCreatingPlayerSeason, createPlayerSeason } =
-    useCreatePlayerSeason();
 
-  const { isEditingPlayer, editPlayer } = useEditPlayer();
+  const { isUpdating, updateData } = useUpdateData();
+  const [showParents, setShowParents] = useState(false);
 
-  const { currentSeason } = useCurrentSeason();
+  const parents = useData({
+    table: 'parents',
+    sort: [{ field: 'fullnamelast', direction: true }],
+  });
+  const playerParents = useData({
+    table: 'playerParents',
+    filter: [{ field: 'player', value: playerToEdit.playerId }],
+    sort: [{ field: 'fullnamelast', direction: true }],
+  });
+  const isWorking = isUpdating;
 
-  let parentId;
-  let playerId;
-
-  const isWorking =
-    isCreatingParent ||
-    isCreatingPeople ||
-    isCreatingPlayer ||
-    isCreatingPlayerParent ||
-    isCreatingPlayerSeason ||
-    isEditingPlayer;
   function onSubmit(data) {
     if (isEditSession) {
-      const { people: playerPeopleData } = { data };
-      delete data.people;
-      editPlayer(
-        { newPlayerData: data, id: editId },
-        {
-          onSuccess: (data) => {
-            reset();
-            onCloseModal?.();
-          },
-          onError: (err) => console.log(err),
-        }
+      tableIds.map((table) =>
+        updateData({
+          table: table.table,
+          newData: Object.assign(
+            {},
+            ...fields
+              .filter((field) => field.table === table.table)
+              .map((field) => ({ [field.field]: data[field.field] }))
+          ),
+          id: data[table.id],
+        })
       );
-      return;
     }
-
-    //separate player from parent
-    const { parentfirstName, parentlastName, parentemail, ...playerTempData } =
-      data;
-    const parentPeopleData = {
-      firstName: parentfirstName,
-      lastName: parentlastName,
-      email: parentemail,
-    };
-    const { grade, previousSchool, ...playerPeopleData } = playerTempData;
-
-    //get player entryYear
-    const entryYear = currentSeason.season - (+grade - 9);
-    const playerData = { previousSchool, entryYear };
-
-    console.log(data);
-    // createPeople(
-    //   { ...playerPeopleData },
-    //   {
-    //     onSuccess: (data) => {
-    //       // create player and get ID
-    //       createPlayer(
-    //         { peopleId: data.id, ...playerData },
-    //         {
-    //           onSuccess: (data) => {
-    //             playerId = data.id;
-    //             createPeople(
-    //               { ...parentPeopleData },
-    //               {
-    //                 onSuccess: (data) => {
-    //                   // create player and get ID
-    //                   createParent(
-    //                     { peopleId: data.id },
-    //                     {
-    //                       onSuccess: (data) => {
-    //                         parentId = data.id;
-    //                         addPlayerParent();
-    //                       },
-    //                     }
-    //                   );
-    //                 },
-    //               }
-    //             );
-    //           },
-    //         }
-    //       );
-    //     },
-    //   }
-    // );
-    // function addPlayerParent() {
-    //   createPlayerParent({ player: playerId, parent: parentId });
-    //   addPlayerSeason();
-    // }
-    // function addPlayerSeason() {
-    //   createPlayerSeason({
-    //     playerId,
-    //     seasonId: currentSeason.id,
-    //     grade,
-    //     status: 'Interested',
-    //   });
-
-    //   reset();
-    //   onCloseModal?.();
-    // }
+    close();
+  }
+  function close() {
+    reset();
+    onCloseModal?.();
   }
   function onError(errors) {
     console.log(errors);
   }
-  // PEOPLE
-  //firstName, lastName, nickname, cell, email,dateOfBirth, otherLastName, gender,
-  //PLAYER
-  //entryYear, previousSchool, creditsNeeded
-  //PARENTS
-  //SEASONS
+  if (parents.isLoading || playerParents.isLoading) return;
+
   return (
-    <Form
-      onSubmit={handleSubmit(onSubmit, onError)}
-      type={onCloseModal ? 'Modal' : 'regular'}
-    >
-      <Row>
-        <Heading as="h2">Player Information</Heading>
-        <FormRow label="First Name *" error={errors?.firstName?.message}>
-          <Input
-            type="text"
-            id="firstName"
-            disabled={isWorking}
-            register={{
-              ...register('people.firstName', {
-                required: 'We need your first name',
-              }),
-            }}
-          />
-        </FormRow>
-        <FormRow label="Last Name *" error={errors?.lastName?.message}>
-          <Input
-            type="text"
-            id="lastName"
-            register={{
-              ...register('people.lastName', {
-                required: 'We need your last name',
-              }),
-            }}
-            disabled={isWorking}
-          />
-        </FormRow>
-        {isEditSession && (
-          <FormRow label="Date of Birth" error={errors?.dateOfBirth?.message}>
-            <Input
-              type="date"
-              id="dateOfBirth"
-              register={{ ...register('dateOfBirth') }}
-              disabled={isWorking}
-            />
-          </FormRow>
-        )}
-        {!isEditSession && (
-          <FormRow label="Rising Grade *" error={errors?.grade?.message}>
-            <select
-              id="grade"
-              {...register('grade', {
-                required: 'We need your grade',
+    <>
+      <Form
+        onSubmit={handleSubmit(onSubmit, onError)}
+        type={onCloseModal ? 'Modal' : 'regular'}
+      >
+        {!showParents && (
+          <>
+            <Row>
+              <Heading as="h2">Player Information</Heading>
+            </Row>
+            <Grid>
+              {fields.map((each) => {
+                if (each.label) {
+                  return (
+                    <FormRow
+                      label={each.label}
+                      key={`player-${each.field}`}
+                      error={errors?.[each.field]?.message}
+                    >
+                      <Input
+                        id={`player-${each.field}`}
+                        name={each.field}
+                        error={errors?.[each.field]?.message}
+                        type={each.type}
+                        disabled={isWorking}
+                        register={{
+                          ...register(each.field, {
+                            required: each.required ? each.message : false,
+                          }),
+                        }}
+                        ref={null}
+                      />
+                    </FormRow>
+                  );
+                } else return <div key={`player-${each.field}`}></div>;
               })}
-              disabled={isWorking}
-            >
-              <option value="9">9th</option>
-              <option value="10">10th</option>
-              <option value="11">11th</option>
-              <option value="12">12th</option>
-            </select>
-          </FormRow>
+            </Grid>
+
+            <FormRow>
+              <StyledBtn onClick={() => setShowParents(!showParents)}>
+                Show Parents
+              </StyledBtn>
+              <Button
+                variation="secondary"
+                type="reset"
+                onClick={() => onCloseModal?.()}
+              >
+                Cancel
+              </Button>
+
+              <Button disabled={isWorking}>
+                {isEditSession ? 'Edit Player' : 'Create New Player'}
+              </Button>
+            </FormRow>
+          </>
         )}
-        <FormRow
-          label="Previous School"
-          error={errors?.previousSchool?.message}
-        >
-          <Input
-            type="text"
-            id="previousSchool"
-            register={{
-              ...register('previousSchool', {
-                required: false,
-              }),
-            }}
-            disabled={isWorking}
-          />
-        </FormRow>
-        <FormRow label="Email" error={errors?.email?.message}>
-          <Input
-            type="email"
-            id="email"
-            register={{
-              ...register('people.email', {
-                required: false,
-              }),
-            }}
-            disabled={isWorking}
-          />
-        </FormRow>
-      </Row>
-      {!isEditSession && (
-        <>
-          <Row>
-            <Heading as="h2">Parent Information</Heading>
-          </Row>
-          <FormRow
-            label="First Name *"
-            error={errors?.parentfirstName?.message}
-          >
-            <Input
-              type="text"
-              id="parentfirstName"
-              register={{
-                ...register('parentfirstName', {
-                  required: 'We need the parent first name',
-                }),
-              }}
-              disabled={isWorking}
-            />
-          </FormRow>
-          <FormRow label="Last Name *" error={errors?.parentlastName?.message}>
-            <Input
-              type="text"
-              id="parentlastName"
-              register={{
-                ...register('parentlastName', {
-                  required: 'We need the parent last name',
-                }),
-              }}
-              disabled={isWorking}
-            />
-          </FormRow>
-          <FormRow label="Email *" error={errors?.parentemail?.message}>
-            <Input
-              type="email"
-              id="parentemail"
-              disabled={isWorking}
-              register={{
-                ...register('parentemail', {
-                  required: 'We need a parent Email',
-                }),
-              }}
-            />
-          </FormRow>
-        </>
-      )}
-      <FormRow>
-        <Button
-          variation="secondary"
-          type="reset"
-          onClick={() => onCloseModal?.()}
-        >
-          Cancel
-        </Button>
-        <Button disabled={isWorking}>
-          {isEditSession ? 'Edit Player' : 'Create New Player'}
-        </Button>
-      </FormRow>
-    </Form>
+      </Form>
+      <CreateParentModalForm
+        setShowParents={setShowParents}
+        showParents={showParents}
+        playerId={playerToEdit.playerId}
+        parents={parents}
+        playerParents={playerParents}
+      />
+    </>
   );
-
-  //     <FormRow label="Maximum capacity" error={errors?.maxCapacity?.message}>
-  //       <Input
-  //         type="number"
-  //         id="maxCapacity"
-  //         disabled={isWorking}
-  //         register={{...register('maxCapacity', {
-  //           required: 'This field is required',
-  //           min: { value: 1, message: 'Capacity }should be at least 1' },
-  //         })}
-  //       />
-  //     </FormRow>
-
-  //     <FormRow label="Regular price" error={errors?.regularPrice?.message}>
-  //       <Input
-  //         type="number"
-  //         id="regularPrice"
-  //         disabled={isWorking}
-  //         register={{...register('regularPrice', {
-  //           required: 'This field is required',
-  //           min: { value: 1, message: 'Capacity s}hould be at least 1' },
-  //         })}
-  //       />
-  //     </FormRow>
-
-  //     <FormRow label="Discount" error={errors?.discount?.message}>
-  //       <Input
-  //         type="number"
-  //         id="discount"
-  //         defaultValue={0}
-  //         disabled={isWorking}
-  //         register={{...register('discount', {
-  //           required: 'This field is required',
-  //           validate: (value) =>}
-  //             +value <= +getValues().regularPrice ||
-  //             'Discount should be less than price',
-  //         })}
-  //       />
-  //     </FormRow>
-
-  //     <FormRow
-  //       label="Description for website"
-  //       error={errors?.description?.message}
-  //     >
-  //       <Textarea
-  //         type="number"
-  //         id="description"
-  //         disabled={isWorking}
-  //         defaultValue=""
-  //         register={{...register('description', { required: 'This field is required' })}
-  //       />
-  //     </FormRow>}
-
-  //     <FormRow label="Cabin photo" error={errors?.image?.message}>
-  //       <FileInput
-  //         id="image"
-  //         accept="image/*"
-  //         register={{...register('image', {
-  //           required: isEditSession ? false : 'This field is required',
-  //         })}}
-  //       />
-  //     </FormRow>
-
-  //     <FormRow>
-  //       <Button
-  //         variation="secondary"
-  //         type="reset"
-  //         onClick={() => onCloseModal?.()}
-  //       >
-  //         Cancel
-  //       </Button>
-  //       <Button disabled={isWorking}>
-  //         {isEditSession ? 'Edit Cabin' : 'Create New Cabin'}
-  //       </Button>
-  //     </FormRow>
-  //   </Form>
-  // );
 }
 
 export default CreatePlayerForm;

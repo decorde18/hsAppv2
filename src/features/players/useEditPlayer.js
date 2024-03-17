@@ -14,3 +14,4 @@ export function useEditPlayer() {
   });
   return { isEditingPlayer, editPlayer };
 }
+//todo change newPlayerData to just newData? CreatePlayerModalForm see Edit player submit, could be easier with just newData

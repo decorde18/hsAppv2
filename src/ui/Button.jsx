@@ -92,15 +92,13 @@ const Button = styled.button`
   border-radius: var(--border-radius-sm);
   box-shadow: var(--shadow-sm);
 
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
+  padding: 0.5rem 1rem;
+
   font-size: 1.5rem;
   line-height: 2rem;
   letter-spacing: 0.025em;
   text-transform: uppercase;
-  border-radius: 0.25rem;
+
   border-style: none;
   cursor: pointer;
 

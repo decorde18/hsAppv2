@@ -1,23 +1,14 @@
 ## //TODO FIXME !!!
 
-- DONE playerTable clean it up (filter, sort)
-- DONE when click on Players, url changes to season =recent, but season selector does not
-- DONE seasonselector -
-- DONE add coach on schedule helper not working (says firstname and last name required)
-- Player INFORMATION pop up modal
-- edit Player pop up modal make functional
+- createPlayerModal for new players
+
 - double check communication table for effectivenss (new view was added on playerTable and communicationtbale that we can see to simplify)
 - on gameEntry and eventEntry - create a function for need Google Sign in. That allows me to work on the forms without being logged
-- switch all Select to new React-Select?
 - validate that no new player is already in system, likewise with parent
 
 - scheduleTable - see the todos
-- apiPlayers - sort order not working --- redo all
-- usePlayerSeasons -see todos --- redo all
 - apiGames - updateGames - not only cancelGame but updateGameStatus and takes which status - update calendar
 - redo useSeason, if single season, if no season (use current , if no current, use Recent) - if no season (new program or new school using progam)- or All for all seasons (may still need to separate bevause we may need to have access to all seasons as well as the current season in Mutations) - add the auto season select on public pages, homepage, seasonSelector
-
-- PlayerTable, clean it up
 
 ## //TODO FIXME !!
 
@@ -32,10 +23,14 @@
 - fix defaults of new season -id: 23 (not all transfered) - see details below
 - auto selecting classification??? can't seem to make it not work again
 - filter searchParams when season # dos not exist (ie seasonId=24)
+- apiPlayers - sort order not working --- redo all - see useEditPlayer for proper way
+- usePlayerSeasons -see todos --- redo all see useEditPlayer for proper way
+- on modals (createPlayerModalForm is the first) close only if no API error
 
 ## TODO NEXT !!!
 
-- all-time vs current season tabs
+- all-time Players clean it up (filter, sort)
+- all-time Games Create
 - Pagination
   -Filters ---see filter from PlayerTable and convert to global
 - schedule Helper - email functionality --include check all of each subHeading - add JV/V/both ? - on change to scheduled, go to create game - when scheduled, button to go to game
@@ -48,9 +43,12 @@
 - create add another on create events, players, games
 - update schools with new classifications and districts
 - add new locations to create game, new school
+- Stats- add to playerIniv Pages
+- PlayerRow, create universal file based on columns
 
 ## TODO NEXT !
 
+- switch all Select to new React-Select?
 - calendar funtionality - set start and end date - advance months, etc
 - delete parent, delete person too? - same with player, etc
 - go through gk subs and inlude true value on DB
@@ -69,25 +67,22 @@
 - in CreateGameForm/CreateEventForm, I use StyledSelect instead of my Select Component because I need to pass the arguments into the options but because I have default values, I created it differently. Can I recreate the StyledSelects with new options?
 - create file upload page for team pics, player pics, etc - see https://www.youtube.com/watch?v=HvOvdD2nX1k
 - useMutation in create playerForm does not run on create parents because of iterations. If you can understand the useMutation hook later on as a developer, fix it
-  details ---
-  season: 2024
-  schoolYear: "2024-2025"
-  classification: "I AAA"
-  region: "5"
-  district: "10"
-  home_location: null \*\*\*
-  coach: null
-  assistant_coaches: null
-  trainer: null
-  principal: null
-  manager: null
-  teamName: null
-  gender: null
-  teamMascot: "Lady Eagles"
-  assistantPrincipals: null
-  athleticDirector: null
-  created_at: "2023-11-25T16:09:04.356112+00:00"
-  updated_at: "2023-11-26T23:28:44.159798+00:00"
-  ▶ teamLevels 2 items
-  seasonPhase: "pre-Tryout"
-  people: null
+
+3/5/2024
+
+- DONE playerTable clean it up (filter, sort)
+- DONE when click on Players, url changes to season =recent, but season selector does not
+- DONE seasonselector -
+- DONE add coach on schedule helper not working (says firstname and last name required)
+- DONE Player INFORMATION pop up modal
+
+3/16/2024
+
+- DONE add gender, nickname to playersviwe2
+- DONE add to createPlayerModalForm
+- DONE modified at or updated at from playersview2 needs to be changed (not sure which table)
+  -DONE Universal fetch api
+- DONE finish parentModal
+- DONE editPlayerModal for new players
+- DONE delete picture altRoster gkRoster rosterNumber
+- DONE redo games tables

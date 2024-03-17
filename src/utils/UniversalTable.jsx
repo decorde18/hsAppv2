@@ -1,75 +1,64 @@
+import { useCurrentSeason } from '../contexts/CurrentSeasonContext';
 import { useEffect, useState } from 'react';
 
-import { useData } from '../../services/useUniversal';
-import { filterChange, sortUpdate } from '../../utils/filterHelpers';
+import { useData } from '../services/useUniversal';
 
-import Table from '../../ui/Table';
-import Empty from '../../ui/Empty';
-import Menus from '../../ui/Menus';
-import HeaderSortFilter from '../../ui/HeaderSortFilter';
-import Spinner from '../../ui/Spinner';
+import { filterChange, sortUpdate } from './filterHelpers';
 
-import PlayerRow from './PlayerRow';
+import Table from '../ui/Table';
+import Empty from '../ui/Empty';
+import Menus from '../ui/Menus';
+import HeaderSortFilter from '../ui/HeaderSortFilter';
+import Spinner from '../ui/Spinner';
+
+import PlayerRow from '../features/players/PlayerRow'; //UPDATE FOR APPROPRIATE TABLE
 
 const columns = [
+  //UPDATE FOR APPROPRIATE TABLE
   {
     table: 'players',
     label: 'Player',
     field: 'fullnamelast',
     type: 'string',
-    sort: true,
+    filter: true,
+    defaultFilter: [2, 3, 4], //must be array
+    textSearch: true, //needed for finding partial values in strings
+    sort: true, //is the sort on for table load
     sortPriority: 1,
     defaultSortDirection: true,
     width: '1.5fr',
     isSearchable: true,
   },
-  {
-    table: 'players',
-    label: 'DOB',
-    field: 'dateOfBirth',
-    type: 'date',
-    defaultSortDirection: true,
-    width: '1fr',
-    isSearchable: true,
-  },
-  {
-    table: 'players',
-    label: 'Entry Year',
-    field: 'entryYear',
-    type: 'number',
-    filter: true,
-    defaultSortDirection: true,
-    // defaultFilter: [2004, 2005],
-    width: '.75fr',
-  },
-  {
-    table: 'players',
-    label: 'Seasons',
-    field: 'seasons',
-    type: 'string',
-    filter: true,
-    textSearch: true, //needed for finding partial values in strings
-    defaultSortDirection: true,
-    width: '1fr ',
-  },
-  { width: '0.25fr', field: 'options' },
+
+  { width: '0.2fr', field: 'options' },
 ];
 
 function PlayerTableAllTime({ setFilteredCount }) {
+  const { currentSeason } = useCurrentSeason();
+  //UPDATE FOR APPROPRIATE TABLE
+  const additionalFilters = [
+    {
+      field: 'seasonId',
+      value: currentSeason,
+      table: 'playerSeasons',
+    },
+  ];
+  //UPDATE FOR APPROPRIATE TABLE
   const columnWidths = columns.reduce((acc, cur) => {
     return (acc = acc.concat(' ', cur.width));
   }, '');
   const [filterOptions, setFilterOptions] = useState({});
-  const [currentFilters, setCurrentFilters] = useState(
-    columns
+  const [currentFilters, setCurrentFilters] = useState([
+    ...columns
       .filter((column) => column.defaultFilter)
       .map((column) => ({
         field: column.field,
         value: column.defaultFilter,
         textSearch: column.text,
         table: column.table,
-      }))
-  );
+      })),
+    ...additionalFilters,
+  ]);
 
   const [sort, setSort] = useState({
     [[
@@ -87,43 +76,48 @@ function PlayerTableAllTime({ setFilteredCount }) {
   }); //defaultSort Order
 
   const players = useData({
+    //UPDATE FOR APPROPRIATE TABLE
     table: 'players',
     filter: currentFilters.filter((option) => option.table === 'players'),
     sort: sort.players,
   });
   const seasons = useData({
+    //UPDATE FOR APPROPRIATE TABLE
     table: 'seasons',
     filter: currentFilters.filter((option) => option.table === 'seasons'),
   });
 
   useEffect(() => {
-    if (players.isLoading || seasons.isLoading) return;
+    if (players.isLoading || seasons.isLoading) return; //UPDATE FOR APPROPRIATE TABLE
     //update filterOptions if needed
     const options = columns
       .filter((column) => column.filter)
-      .map((column) =>
-        column.field !== 'seasons'
-          ? {
-              [column.field]: [
-                ...new Set(
-                  players.data
-                    .map((player) => player[column.field])
-                    .concat(filterOptions[column.field])
-                ),
-              ].sort((a, b) => a - b),
-            }
-          : {
-              seasons: seasons.data
-                .map((season) => season.season)
-                .sort((a, b) => a - b),
-            }
+      .map(
+        (
+          column //this is if we have an odd column that needs more information other than that which is in the results (ie this is stored as season Id, but we need to see the season, not the id)
+        ) =>
+          column.field !== 'seasons' //UPDATE FOR APPROPRIATE TABLE
+            ? {
+                [column.field]: [
+                  ...new Set(
+                    players.data //UPDATE FOR APPROPRIATE TABLE
+                      .map((player) => player[column.field])
+                      .concat(filterOptions[column.field])
+                  ),
+                ].sort((a, b) => a - b),
+              }
+            : {
+                seasons: seasons.data
+                  .map((season) => season.season)
+                  .sort((a, b) => a - b),
+              } //UPDATE FOR APPROPRIATE TABLE
       );
 
     setFilterOptions(Object.assign(...options));
     //update filter count
-    setFilteredCount(players.data.length);
+    setFilteredCount(players.data.length); //UPDATE FOR APPROPRIATE TABLE
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [players.data, seasons.data, players.isLoading, seasons.isLoading]);
+  }, [players.data, seasons.data, players.isLoading, seasons.isLoading]); //UPDATE FOR APPROPRIATE TABLE
 
   function handleFilterChange(selected, { name }) {
     const newFilter = filterChange({ selected, name, currentFilters, columns });
@@ -133,7 +127,7 @@ function PlayerTableAllTime({ setFilteredCount }) {
     const newSort = sortUpdate({ selectedSort, sort });
     setSort(newSort);
   }
-  if (players.isLoading || seasons.isLoading) return <Spinner />;
+  if (players.isLoading || seasons.isLoading) return <Spinner />; //UPDATE FOR APPROPRIATE TABLE
 
   return (
     <Menus>
@@ -164,7 +158,7 @@ function PlayerTableAllTime({ setFilteredCount }) {
                   value:
                     column.field === 'seasons'
                       ? seasons.data.find((season) => season.season === each).id
-                      : each,
+                      : each, //UPDATE FOR APPROPRIATE TABLE
                 })),
                 currentValue: currentFilters
                   .filter((option) => option.field === column.field)
@@ -175,7 +169,7 @@ function PlayerTableAllTime({ setFilteredCount }) {
                         column.field === 'seasons'
                           ? seasons.data.find((season) => season.id === field)
                               .season
-                          : field,
+                          : field, //UPDATE FOR APPROPRIATE TABLE
                     })),
                   ]),
               }}
@@ -184,12 +178,12 @@ function PlayerTableAllTime({ setFilteredCount }) {
           ))}
         </Table.Header>
         {players.data.length === 0 ? (
-          <Empty resource="Players" />
+          <Empty resource="Players" /> //UPDATE FOR APPROPRIATE TABLE
         ) : (
           <Table.Body
             data={players.data}
             render={(player) => (
-              <PlayerRow player={player} seasons={seasons} key={player.id} />
+              <PlayerRow player={player} seasons={seasons} key={player.id} /> //UPDATE FOR APPROPRIATE TABLE
             )}
           />
         )}
@@ -197,4 +191,4 @@ function PlayerTableAllTime({ setFilteredCount }) {
     </Menus>
   );
 }
-export default PlayerTableAllTime;
+export default PlayerTableAllTime; //UPDATE FOR APPROPRIATE TABLE

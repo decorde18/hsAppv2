@@ -9,7 +9,7 @@ import Switch from '../../ui/Switch';
 import Menus from '../../ui/Menus';
 import Modal from '../../ui/Modal';
 
-import { useUpdatePlayerSeason } from './usePlayerSeasons';
+import { useUpdateData } from '../../services/useUniversal';
 
 import { statusFilterLabel } from '../../utils/filterHelpers';
 import { formatDate } from '../../utils/helpers';
@@ -25,8 +25,8 @@ const Player = styled.div`
 `;
 
 function PlayerSeasonRow({ playerSeason, teams }) {
-  const { playerId, ...player } = playerSeason;
-  const { updateSetting, isUpdating } = useUpdatePlayerSeason();
+  const { ...player } = playerSeason;
+  const { isUpdating, updateData } = useUpdateData();
 
   const [toggleStates, setToggleStates] = useState({
     status: statusFilterLabel.find((val) => val.label === player['status'])
@@ -43,13 +43,17 @@ function PlayerSeasonRow({ playerSeason, teams }) {
     const value = +e.target.value;
     const status = statusFilterLabel.find((val) => val.value === value).label;
     setToggleStates({ ...toggleStates, status: value });
-    updateSetting({ status, id: player.id });
+    updateData({ table: 'playerSeasons', newData: { status }, id: player.id });
   }
   function handleSwitchToggle(e) {
     const name = e.target.name;
     const checked = e.target.checked;
     setToggleStates({ ...toggleStates, [name]: checked });
-    updateSetting({ [name]: checked, id: player.id });
+    updateData({
+      table: 'playerSeasons',
+      newData: { [name]: checked },
+      id: player.id,
+    });
   }
   function handleButtonClick(e) {
     const name = e.target.name;
@@ -59,10 +63,23 @@ function PlayerSeasonRow({ playerSeason, teams }) {
         ? [...toggleStates.teamLevel, name] //add to array
         : toggleStates.teamLevel.filter((team) => team !== name); //remove from array
     setToggleStates({ ...toggleStates, teamLevel: updatedArray });
-    updateSetting({ teamLevel: updatedArray, id: player.id });
+    updateData({
+      table: 'playerSeasons',
+      newData: { teamLevel: updatedArray },
+      id: player.id,
+    });
   }
+
   return (
     <Table.Row>
+      {/* if I want to do this, ...
+      {columns.map((column) => {
+        switch (column.columnType) {
+          case 'string':
+            return <Player key={column.field}>{player[column.field]}</Player>;
+        }
+      })} */}
+      <Player>{player.number}</Player>
       <Player>{player.fullname}</Player>
       <Select
         width={12.7}
@@ -119,11 +136,10 @@ function PlayerSeasonRow({ playerSeason, teams }) {
           <div></div>
         )}
       </Row>
-
       <Modal>
         <Menus.Menu>
-          <Menus.Toggle id={playerId} />
-          <Menus.List id={playerId}>
+          <Menus.Toggle id={player.playerId} />
+          <Menus.List id={player.playerId}>
             <Modal.Open opens="view">
               <Menus.Button icon={<HiEye />}>View</Menus.Button>
             </Modal.Open>
@@ -147,7 +163,7 @@ function PlayerSeasonRow({ playerSeason, teams }) {
             <ModalConfirm
               resourceName="player"
               disabled={isDeleting}
-              onConfirm={() => deletePlayer(playerId)}
+              onConfirm={() => deletePlayer(player.playerId)}
               confirmType="delete"
             />
           </Modal.Window> */}

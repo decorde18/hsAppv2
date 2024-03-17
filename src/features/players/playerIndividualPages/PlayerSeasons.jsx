@@ -26,7 +26,7 @@ function PlayerSeasons({ seasonsPlayer, handleSeasonChange, seasons, season }) {
   const sortedSeasons = seasonsPlayer
     .map((seas) => ({
       ...seas,
-      teamLevel: seas.teamLevel.join(' / '),
+      teamLevel: seas.teamLevel ? seas.teamLevel.join(' / ') : null,
     }))
     .sort((a, b) => b.grade - a.grade);
 
@@ -45,7 +45,7 @@ function PlayerSeasons({ seasonsPlayer, handleSeasonChange, seasons, season }) {
               onClick={(e) => handleSeasonChange(e.currentTarget.id)}
               style={
                 +seas.seasonId === +season.id
-                  ? { backgroundColor: 'var(--color-grey-100)' }
+                  ? { backgroundColor: 'var(--color-grey-50)' }
                   : null
               }
             >

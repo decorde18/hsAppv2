@@ -11,21 +11,43 @@ triangle down - HiChevronDown , triangle up- HiChevronUp, HiChevronUpDown
 HiOutlineChartBar stats
 HiEye - eyeball
 
+useCreateData({ newData, table, view })
+  isCreating, createData
+useData({ table, filter, sort })
+  isLoading, data
+useUpdateData({ table, newData, id, view })
+  isUpdating, updateData
+useDeleteData({ view, table, id })
+   isDeleting, deleteData
+     const playerSeasons = useData({
+    table: 'playerSeasons',
+    filter: [        field,
+        value,
+        textSearch(boolean)]
+    sort: [{field, direction (boolean), }]
+  });
 
-              <Heading as="h1" case="upper" location="center">
-                new player form
-              </Heading>
-      <Heading as="h5" case="upper" location="center">
+<Heading as="h1" case="upper" location="center">
+new player form
+</Heading>
+<Heading as="h5" case="upper" location="center">
 
 <Row type="horizontal" justify="center">
 
 <Button size='medium type="selected" variation="primary"> type = selected  fullWidth
 
- Input = ({ size = defaultAnimationValues.size, ...props }) SIZE IN REM
+ Input = ({ size = defaultAnimationValues.size, ...props 
+ })
+                         register={{
+                          ...register(each.field, {
+                            required: each.required ? each.message : false,
+                          }),
+                        }}
+                        ref={null} SIZE IN REM
 
       <Select
         width={12.7}
-        options={statusFilterLabel}
+        options={value, label}
         onChange={handleSelectChange}
         name="status"
         disabled={isWorking}
@@ -50,3 +72,4 @@ ModalConfirm({
   onCloseModal,
   confirmType,
 })
+

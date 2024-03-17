@@ -1,189 +1,221 @@
-import Spinner from '../../ui/Spinner';
-
-import { usePlayerSeasons } from './usePlayerSeasons';
-import { useSeason } from '../seasons/useSeasons';
-
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
+import { useEffect, useState } from 'react';
 
-import PlayerSeasonRow from './PlayerSeasonRow';
+import { useData, useUpdateData } from '../../services/useUniversal';
+
+import {
+  filterBySeasonPhase,
+  filterChange,
+  sortUpdate,
+} from '../../utils/filterHelpers';
 
 import Table from '../../ui/Table';
 import Empty from '../../ui/Empty';
 import Menus from '../../ui/Menus';
 import HeaderSortFilter from '../../ui/HeaderSortFilter';
+import Spinner from '../../ui/Spinner';
 
-// import { HiPencil, HiTrash } from 'react-icons/hi2';
+import PlayerSeasonRow from './PlayerSeasonRow';
 
-//FILTER HELPERS
-import {
-  statusFilterLabel,
-  defaultVisiblePlayers,
-  visibleRosterStatus,
-  filterRosterStatus,
-  defaultRosterStatus,
-  filterBySeasonPhase,
-} from '../../utils/filterHelpers';
-
-import { useEffect, useState } from 'react';
-
-const seasonColumns = [
+const columns = [
   {
+    table: 'playerSeasons',
+    label: '#',
+    field: 'number',
+    type: 'number',
+    defaultSortDirection: true,
+    width: '.25fr',
+    columnType: 'string',
+  },
+  {
+    table: 'playerSeasons',
     label: 'Player',
     field: 'fullnamelast',
     type: 'string',
     sort: true,
-    defaultSortAsc: true,
+    sortPriority: 2,
+    defaultSortDirection: true,
+    isSearchable: true,
+    width: '1.5fr',
+    columnType: 'string',
   },
 
   {
+    table: 'playerSeasons',
     label: 'Status',
     field: 'status',
     type: 'string',
-    sort: true,
     filter: true,
-    defaultFilter: true,
-    defaultSortAsc: null,
+    defaultSortDirection: false,
+    width: '1fr',
+    columnType: 'string',
   },
   {
+    table: 'playerSeasons',
     label: 'DOB',
     field: 'dateOfBirth',
     type: 'date',
-    defaultSortAsc: null,
+    defaultSortDirection: false,
+    isSearchable: true,
+    width: '.75fr',
+    columnType: 'string',
   },
   {
+    table: 'playerSeasons',
     label: 'Entry Year',
     field: 'entryYear',
     type: 'number',
     filter: true,
-    defaultSortAsc: true,
+    defaultSortDirection: true,
+    width: '0.5fr',
+    columnType: 'string',
   },
   {
+    table: 'playerSeasons',
     label: 'Grade',
     field: 'grade',
     type: 'number',
     filter: true,
-    defaultSortAsc: false,
+    sort: true,
+    sortPriority: 1,
+    defaultSortDirection: false,
+    width: '0.25fr',
+    columnType: 'string',
   },
   {
+    table: 'playerSeasons',
     label: 'Returner',
     field: 'returningPlayer',
     type: 'boolean',
     filter: true,
-    defaultSortAsc: null,
+    defaultSortDirection: false,
+    width: '0.5fr',
+    columnType: 'string',
   },
   {
+    table: 'playerSeasons',
     label: 'Enrolled Last Year',
     field: 'enrolledLastYear',
     type: 'boolean',
     filter: true,
-    defaultSortAsc: null,
+    defaultSortDirection: false,
+    width: '0.5fr',
+    columnType: 'string',
   },
   {
+    table: 'playerSeasons',
     label: 'Lives With Parents',
     field: 'livesWithParents',
     type: 'boolean',
     filter: true,
-    defaultSortAsc: null,
+    defaultSortDirection: false,
+    width: '0.5fr',
+    columnType: 'string',
   },
   {
+    table: 'playerSeasons',
     label: 'Team',
     field: 'teamLevel',
     type: 'string',
     filter: true,
-    defaultSortAsc: null,
+    defaultSortDirection: false,
+    width: '1.25fr',
+    columnType: 'string',
   },
+  { width: '0.2fr', field: 'options', columnType: 'string' },
 ];
 
 function PlayerTableSeasons({ setFilteredCount }) {
   const { currentSeason } = useCurrentSeason();
+  const { isUpdating, updateData } = useUpdateData();
 
-  const { isLoadingSeason, season } = useSeason();
-  const { isLoadingPlayerSeasons, playerSeasons } =
-    usePlayerSeasons(currentSeason);
+  const columnWidths = columns.reduce((acc, cur) => {
+    return (acc = acc.concat(' ', cur.width));
+  }, '');
+  const [filterOptions, setFilterOptions] = useState({});
+  const [currentFilters, setCurrentFilters] = useState([
+    ...columns
+      .filter((column) => column.defaultFilter)
+      .map((column) => ({
+        field: column.field,
+        value: column.defaultFilter,
+        textSearch: column.text,
+        table: column.table,
+      })),
+  ]);
 
-  const [selectedOption, setSelectedOption] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
-  const [sortValues, setSortValues] = useState([]);
+  const [sort, setSort] = useState({
+    [[
+      ...new Set(
+        columns.filter((column) => column.sort).map((column) => column.table)
+      ),
+    ]]: columns
+      .filter((column) => column.sort)
+      .map((column) => ({
+        field: column.field,
+        direction: column.defaultSortDirection,
+        sortPriority: column.sortPriority,
+      }))
+      .sort((a, b) => a.sortPriority - b.sortPriority),
+  }); //defaultSort Order
+  const playerSeasons = useData({
+    table: 'playerSeasons',
+    filter: currentFilters.filter((option) => option.table === 'playerSeasons'),
+    sort: sort.playerSeasons,
+    isSeason: true,
+  });
+  const season = useData({
+    table: 'seasons',
+    filter: [{ table: 'seasons', field: 'id', value: currentSeason }],
+  });
 
-  useEffect(
-    //on LOAD with a new object with needed fields
-    function () {
-      if (isLoadingPlayerSeasons || isLoadingSeason) return;
-      const defaultFilter = filterBySeasonPhase(season);
-      const value = statusFilterLabel.find(
-        (status) => status.value === +defaultFilter.value
-      ).label;
-      seasonColumns
-        .filter((column) => column.defaultFilter)
-        .map((column) =>
-          handleFilterChange([{ value, label: value }], { name: column.field })
-        );
-    },
+  useEffect(() => {
+    if (playerSeasons.isLoading) return;
+    //update filterOptions if needed
+    const options = columns
+      .filter((column) => column.filter)
+      .map((column) => ({
+        [column.field]: [
+          ...new Set(
+            playerSeasons.data
+              .map((player) => player[column.field])
+              .concat(filterOptions[column.field])
+              .filter((column) => column)
+          ),
+        ].sort((a, b) => a - b),
+      }));
+
+    setFilterOptions(Object.assign(...options));
+    //update filter count
+    setFilteredCount(playerSeasons.data.length);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isLoadingPlayerSeasons, isLoadingSeason, currentSeason]
-  );
-
-  function handleFilterChange(selected, { name }) {
-    //set data to either Sorted unless no current sort
-    let data = sortValues.length ? sortValues : playerSeasons;
-
-    //FILTER OPTIONS
-    //get the current and previous Filter Options
-    const prevOptions = selectedOption.filter((option) => option.name !== name);
-    const curOptions = { name, selected };
-    //combine them and add to state
-    const newOptions = [...prevOptions, curOptions];
-    setSelectedOption(newOptions);
-
-    //FILTER DATA
-    //get previous and curent filters
-    const prevFilter = prevOptions.map((type) => [
-      ...new Set(
-        [].concat(
-          ...type.selected.map((value) =>
-            data.filter((player) => player[type.name] === value.value)
-          )
-        )
-      ),
-    ]);
-    const curFilter = [
-      ...new Set(
-        [].concat(
-          ...selected.map((value) =>
-            data.filter((player) => player[name] === value.value)
-          )
-        )
-      ),
-    ];
-    //filter data based on previous and current then set state
-    prevFilter.map(
-      (item) =>
-        (data =
-          prevOptions.length &&
-          prevOptions.filter((filter) => filter.selected.length).length
-            ? data.filter((element) => item.includes(element))
-            : data)
+  }, [playerSeasons.data, playerSeasons.isLoading]);
+  useEffect(() => {
+    //update default status filter
+    if (season.isLoading) return;
+    const defaultFilter = filterBySeasonPhase(season.data[0]);
+    handleFilterChange(
+      [{ value: defaultFilter.label, label: defaultFilter.value }],
+      { name: 'status' }
     );
-
-    data = selected.length
-      ? data.filter((element) => curFilter.includes(element))
-      : data;
-
-    setFilteredData(data);
-    setFilteredCount(data.length);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSeason, season.isLoading, season.data]);
+  function handleFilterChange(selected, { name }) {
+    const newFilter = filterChange({ selected, name, currentFilters, columns });
+    setCurrentFilters(newFilter);
   }
-  function handleSort(values) {
-    const sortedValues = values.map((val) => val); // this is needed to render
-    setSortValues(sortedValues);
+  function handleSort(selectedSort) {
+    const newSort = sortUpdate({ selectedSort, sort });
+    setSort(newSort);
   }
-  if (isLoadingPlayerSeasons || isLoadingSeason) return <Spinner />;
-  if (playerSeasons.length === 0) return <Empty resource="Players" />;
+
+  if (playerSeasons.isLoading || season.isLoading) return <Spinner />;
 
   return (
     <Menus>
-      <Table columns="1.5fr 1fr .75fr 0.5fr 0.25fr 0.5fr 0.5fr 0.5fr 1.25fr 0.2fr;">
+      <Table columns={columnWidths}>
         <Table.Header>
-          {seasonColumns.map((column) => (
+          {columns.map((column) => (
             <HeaderSortFilter
               key={column.field}
               header={{
@@ -191,39 +223,50 @@ function PlayerTableSeasons({ setFilteredCount }) {
                 label: column.label,
                 type: column.type,
                 field: column.field,
+                table: column.table,
               }}
-              values={filteredData}
               sort={{
-                defaultSortAsc: column.defaultSortAsc,
+                sortDirection: sort[column.table]?.find(
+                  (each) => each.field === column.field
+                )?.direction,
+                defaultSortDirection: column.defaultSortDirection,
                 handleSort: handleSort,
               }}
               filters={{
                 filter: column.filter,
                 handleFilterChange: handleFilterChange,
-                options: [
-                  ...new Set(
-                    playerSeasons
-                      .filter((each) => each[column.field])
-                      .map((each) => each[column.field])
-                  ),
-                ].map((each) => ({ value: each, label: each })),
-                defaultValue: selectedOption.filter(
-                  (option) => option.name === column.field
-                )[0]?.selected,
+                options: filterOptions[column.field]?.map((each) => ({
+                  label: each,
+                  value: each,
+                })),
+                currentValue: currentFilters
+                  .filter((option) => option.field === column.field)
+                  .map((option) => [
+                    ...option.value.map((field) => ({
+                      value: field,
+                      label: field,
+                    })),
+                  ]),
               }}
+              isSearchable={column.isSearchable}
             />
           ))}
         </Table.Header>
-        <Table.Body
-          data={filteredData}
-          render={(player) => (
-            <PlayerSeasonRow
-              playerSeason={player}
-              key={player.id}
-              teams={season.teamLevels}
-            />
-          )}
-        />
+        {playerSeasons.data.length === 0 ? (
+          <Empty resource="Players" />
+        ) : (
+          <Table.Body
+            data={playerSeasons.data}
+            render={(player) => (
+              <PlayerSeasonRow
+                playerSeason={player}
+                key={player.id}
+                teams={season.data[0].teamLevels}
+                columns={columns}
+              />
+            )}
+          />
+        )}
       </Table>
     </Menus>
   );

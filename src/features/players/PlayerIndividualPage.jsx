@@ -1,5 +1,7 @@
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
-import { useSeasons } from '../seasons/useSeasons';
+import { useData } from '../../services/useUniversal';
+
+import { useState } from 'react';
 
 import PlayerSidebar from './playerIndividualPages/PlayerSidebar';
 import PlayerParents from './playerIndividualPages/PlayerParents';
@@ -9,8 +11,6 @@ import PlayerSeasons from './playerIndividualPages/PlayerSeasons';
 import Heading from '../../ui/Heading';
 import Spinner from '../../ui/Spinner';
 import styled from 'styled-components';
-import { useState } from 'react';
-import { useSeasonsPlayer } from './usePlayerSeasons';
 
 const Container = styled.div`
   height: 75vh;
@@ -43,17 +43,22 @@ const Main = styled.section`
 
 function PlayerIndividualPage({ player }) {
   const { currentSeason } = useCurrentSeason();
-  const { isLoadingSeaonsPlayer, seasonsPlayer } = useSeasonsPlayer(
-    player.playerId
-  );
-  const { isLoadingSeasons, seasons } = useSeasons([]);
+  const playerSeasons = useData({
+    table: 'playerSeasons',
+    filter: [
+      { table: 'playerSeasons', field: 'playerId', value: player.playerId },
+    ],
+  });
+  const seasons = useData({
+    table: 'seasons',
+  });
 
   const [season, setSeason] = useState();
 
   function handleSeasonChange(value) {
-    setSeason(seasons.find((seas) => seas.id === +value));
+    setSeason(seasons.data.find((seas) => seas.id === +value));
   }
-  if (isLoadingSeasons || isLoadingSeaonsPlayer) return <Spinner />;
+  if (seasons.isLoading || playerSeasons.isLoading) return <Spinner />;
   if (!season) handleSeasonChange(currentSeason);
 
   return (
@@ -71,9 +76,9 @@ function PlayerIndividualPage({ player }) {
           <PlayerPersonalInformation player={player} />
           <PlayerParents player={player} />
           <PlayerSeasons
-            seasonsPlayer={seasonsPlayer}
+            seasonsPlayer={playerSeasons.data}
             handleSeasonChange={handleSeasonChange}
-            seasons={seasons}
+            seasons={seasons.data}
             season={season}
           />
         </Main>
@@ -83,30 +88,3 @@ function PlayerIndividualPage({ player }) {
 }
 
 export default PlayerIndividualPage;
-
-// altRoster: null;
-// bio: null;
-// captain: null;
-// created_at: '2023-11-25T16:09:04.822212+00:00';
-// dateOfBirth: '2007-06-16';
-// earnedCredits: null;
-// enrolledLastYear: true;
-// entryYear: 2021;
-// firstName: 'Maddie';
-// fullname: 'Maddie Clark';
-// fullnamelast: 'Clark, Maddie';
-// gkRoster: null;
-// grade: 12;
-// id: 1012;
-// lastName: 'Clark';
-// livesWithParents: true;
-// modified_at: '2023-11-25T16:09:04.822212+00:00';
-// picture: null;
-// position: null;
-// returningPlayer: true;
-// rosterNumber: null;
-// seasonId: 23;
-// starter: null;
-// status: 'Interested';
-// teamLevel: null;
-// updated_at: '2024-02-26T14:18:10.548227+00:00';

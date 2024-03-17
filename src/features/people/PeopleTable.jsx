@@ -11,7 +11,7 @@ const Table = styled.div`
 
   font-size: 1.4rem;
   background-color: var(--color-grey-0);
-  border-radius: 7px;
+  border-radius: var(--border-radius-md);
   overflow: hidden;
 `;
 

@@ -514,7 +514,7 @@ function CreatePlayerForm() {
                         variation="primary"
                         onClick={() => addParent(index + 1)}
                       >
-                        Add Parent
+                        Add Another Parent
                       </Button>
                     )}
                   </div>

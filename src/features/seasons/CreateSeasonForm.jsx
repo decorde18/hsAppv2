@@ -117,7 +117,8 @@ function CreateSeasonForm() {
         <Input
           type="text"
           disabled={isWorking}
-          {...register('teamMascot', { required: false })}
+          register={{ ...register('teamMascot', { required: false }) }}
+          ref={null}
           id="teamMascot"
         />
       </FormRow>
@@ -125,10 +126,13 @@ function CreateSeasonForm() {
         <Input
           type="number"
           disabled={isWorking}
-          {...register('season', {
-            required: 'This field is required as a four digit year',
-            pattern: /^[0-9]{4}$/,
-          })}
+          register={{
+            ...register('season', {
+              required: 'This field is required as a four digit year',
+              pattern: /^[0-9]{4}$/,
+            }),
+          }}
+          ref={null}
           id="season"
         />
       </FormRow>
@@ -136,7 +140,10 @@ function CreateSeasonForm() {
         <Input
           type="text"
           disabled={isWorking}
-          {...register('schoolYear', { required: 'This field is required' })}
+          register={{
+            ...register('schoolYear', { required: 'This field is required' }),
+          }}
+          ref={null}
           id="schoolYear"
         />
       </FormRow>
@@ -144,7 +151,8 @@ function CreateSeasonForm() {
         <Input
           type="text"
           disabled={isWorking}
-          {...register('classification', { required: false })}
+          register={{ ...register('classification', { required: false }) }}
+          ref={null}
           id="classification"
         />
       </FormRow>
@@ -152,7 +160,8 @@ function CreateSeasonForm() {
         <Input
           type="number"
           disabled={isWorking}
-          {...register('region', { required: false })}
+          register={{ ...register('region', { required: false }) }}
+          ref={null}
           id="region"
         />
       </FormRow>
@@ -160,7 +169,8 @@ function CreateSeasonForm() {
         <Input
           type="number"
           disabled={isWorking}
-          {...register('district', { required: false })}
+          register={{ ...register('district', { required: false }) }}
+          ref={null}
           id="district"
         />
       </FormRow>
@@ -169,7 +179,8 @@ function CreateSeasonForm() {
         <Input
           type="text"
           disabled={isWorking}
-          {...register('teamLevels', { required: false })}
+          register={{ ...register('teamLevels', { required: false }) }}
+          ref={null}
           id="teamLevels"
         />
       </FormRow>

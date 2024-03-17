@@ -1,6 +1,6 @@
 // import supabase, { supabaseUrl } from './supabase';
 import supabase from './supabase';
-const table = 'players_view2';
+const table = 'players_view';
 const table2 = 'playerSeasons';
 const table3 = 'player_seasons_with_numbers';
 const table4 = 'player_seasons2';

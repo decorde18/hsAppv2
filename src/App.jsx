@@ -53,14 +53,14 @@ const queryClient = new QueryClient({
     queries: { staleTime: 0 },
   },
 });
-//todo do I need session contect provider? where does supabase get accessed?
+
 function App() {
   return (
     <Router>
       <QueryClientProvider client={queryClient}>
+        <ReactQueryDevtools initialIsOpen={false} />
         <CurrentSeasonProvider>
           <SessionContextProvider supabaseClient={supabase}>
-            <ReactQueryDevtools initialIsOpen={false} />
             <GlobalStyles />
             <Routes>
               <Route index element={<Navigate replace to="public" />} />
