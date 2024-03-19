@@ -7,18 +7,18 @@ import AddPlayer from './AddPlayer';
 
 import { useState } from 'react';
 import ButtonGroup from '../../ui/ButtonGroup';
+
 const StyledDiv = styled.div`
   display: flex;
   gap: 2px;
   justify-content: space-between;
 `;
-
 function PlayerTable() {
-  const [playerTableData, setPlayerTableData] = useState('Season');
+  const [tableData, setTableData] = useState('Season');
   const [filteredCount, setFilteredCount] = useState();
 
   function handleButtonGroupChange(e) {
-    setPlayerTableData(e.target.name);
+    setTableData(e.target.name);
   }
 
   return (
@@ -26,13 +26,13 @@ function PlayerTable() {
       <StyledDiv>
         <ButtonGroup
           btnArray={['Season', 'All-Time']}
-          defaultBtn={playerTableData}
+          defaultBtn={tableData}
           onChange={handleButtonGroupChange}
         />
         <div>{filteredCount} players</div>
         <AddPlayer />
       </StyledDiv>
-      {playerTableData === 'Season' ? (
+      {tableData === 'Season' ? (
         <PlayerTableSeasons setFilteredCount={setFilteredCount} />
       ) : (
         <PlayerTableAllTime setFilteredCount={setFilteredCount} />

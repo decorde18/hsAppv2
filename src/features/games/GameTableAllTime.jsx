@@ -66,7 +66,7 @@ const columns = [
   {
     table: 'games',
     label: 'Location',
-    field: 'locationname',
+    field: 'locationName',
     type: 'string',
     filter: true,
     sort: false,

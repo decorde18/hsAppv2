@@ -32,7 +32,7 @@ new player form
 </Heading>
 <Heading as="h5" case="upper" location="center">
 
-<Row type="horizontal" justify="center">
+<Row type="vertical" justify="space-between" align='center'>
 
 <Button size='medium type="selected" variation="primary"> type = selected  fullWidth
 

@@ -1,52 +1,34 @@
-import {
-  useSeasons,
-  useRecentSeason,
-  useUpdateSeason,
-} from '../../features/seasons/useSeasons';
-import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
+import styled from 'styled-components';
 
-import SeasonSettings from './SeasonSettings';
-import Spinner from '../../ui/Spinner';
-import Select from '../../ui/Select';
+import { useState } from 'react';
 
+import ButtonGroup from '../../ui/ButtonGroup';
+import SeasonsAllTime from './SeasonsAllTime';
+import SeasonOverview from './SeasonOverview';
+
+const StyledDiv = styled.div`
+  display: flex;
+  gap: 2px;
+  justify-content: space-between;
+`;
 function SeasonMain() {
-  const { currentSeason } = useCurrentSeason();
+  const [tableData, setTableData] = useState('Season');
 
-  const { isLoadingSeasons, seasons } = useSeasons();
-  const { isUpdating, updateSeason } = useUpdateSeason();
-  const { isLoadingRecent, recentSeason } = useRecentSeason();
-  const options = [
-    { label: 'pre-Tryout', value: 0 },
-    { label: 'tryout', value: 1 },
-    { label: 'active', value: 2 },
-    { label: 'completed', value: 3 },
-  ];
-  if (isLoadingSeasons || isLoadingRecent) return <Spinner />;
-  function seasonChange(e) {
-    const value = e.target.options[e.target.selectedIndex].text;
-    const field = 'seasonPhase';
-    updateSeason({ [field]: value, id: currentSeason });
+  function handleButtonGroupChange(e) {
+    setTableData(e.target.name);
   }
-  const filteredSeason = seasons.find((season) => season.id === +currentSeason);
-  const defaultSeasonPhase = options.find(
-    (option) => option.label === filteredSeason.seasonPhase
-  ).value;
-
   return (
     <>
-      <div>
-        <p>TIME OF SEASON</p>
-        <Select
-          value={
-            options.find(
-              (option) => option.label === filteredSeason.seasonPhase
-            ).value
-          }
-          onChange={seasonChange}
-          options={options}
-        ></Select>
-      </div>
-      <SeasonSettings />
+      <StyledDiv>
+        <ButtonGroup
+          btnArray={['Season', 'All-Time']}
+          defaultBtn={tableData}
+          onChange={handleButtonGroupChange}
+        />
+
+        {/* <AddPlayer /> */}
+      </StyledDiv>
+      {tableData === 'Season' ? <SeasonOverview /> : <SeasonsAllTime />}
     </>
   );
 }

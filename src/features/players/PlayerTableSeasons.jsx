@@ -158,6 +158,7 @@ function PlayerTableSeasons({ setFilteredCount }) {
       }))
       .sort((a, b) => a.sortPriority - b.sortPriority),
   }); //defaultSort Order
+
   const playerSeasons = useData({
     table: 'playerSeasons',
     filter: currentFilters.filter((option) => option.table === 'playerSeasons'),

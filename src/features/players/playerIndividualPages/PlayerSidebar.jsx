@@ -34,25 +34,3 @@ function PlayerSidebar({ player, season }) {
 }
 
 export default PlayerSidebar;
-
-// bio: null;
-// captain: false;
-// dateOfBirth: '2005-06-22';
-// earnedCredits: 0;
-// enrolledLastYear: true;
-// entryYear: 2019;
-// firstName: 'Lilly';
-// fullname: 'Lilly Armentor';
-// fullnamelast: 'Armentor, Lilly';
-// grade: 12;
-// id: 741;
-// lastName: 'Armentor';
-// livesWithParents: true;
-// picture: null;
-// playerId: 248;
-// position: null;
-// returningPlayer: true;
-// seasonId: 20;
-// starter: false;
-// status: 'Rostered';
-// teamLevel: ['Varsity'];

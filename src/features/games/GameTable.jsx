@@ -3,10 +3,14 @@ import styled from 'styled-components';
 import GameTableSeasons from './GameTableSeasons';
 import GameTableAllTime from './GameTableAllTime';
 
-// import AddPlayer from './AddPlayer';
+import { useSession, useSessionContext } from '@supabase/auth-helpers-react';
 
 import { useState } from 'react';
 import ButtonGroup from '../../ui/ButtonGroup';
+import CreateGameForm from './CreateGameForm';
+import CreateGoogleSignedInError from '../Calendar/CreateGoogleSignedInError';
+import Button from '../../ui/Button';
+import Modal from '../../ui/Modal';
 const StyledDiv = styled.div`
   display: flex;
   gap: 2px;
@@ -14,11 +18,12 @@ const StyledDiv = styled.div`
 `;
 
 function GameTable() {
-  const [GameTableData, setGameTableData] = useState('Season');
+  const session = useSession();
+  const [tableData, setTableData] = useState('Season');
   const [filteredCount, setFilteredCount] = useState();
 
   function handleButtonGroupChange(e) {
-    setGameTableData(e.target.name);
+    setTableData(e.target.name);
   }
 
   return (
@@ -26,13 +31,31 @@ function GameTable() {
       <StyledDiv>
         <ButtonGroup
           btnArray={['Season', 'All-Time']}
-          defaultBtn={GameTableData}
+          defaultBtn={tableData}
           onChange={handleButtonGroupChange}
         />
         <div>{filteredCount} games</div>
-        {/* <AddPlayer /> */}
+        <Modal>
+          {!session?.provider_token ? (
+            <Modal.Open opens="game-form-error">
+              <div>You are not logged in to Google in order to add games</div>
+            </Modal.Open>
+          ) : (
+            <Modal.Open opens="game-form">
+              <Button type="selected" variation="primary">
+                Add New game
+              </Button>
+            </Modal.Open>
+          )}
+          <Modal.Window name="game-form-error">
+            <CreateGoogleSignedInError />
+          </Modal.Window>
+          <Modal.Window name="game-form">
+            <CreateGameForm />
+          </Modal.Window>
+        </Modal>
       </StyledDiv>
-      {GameTableData === 'Season' ? (
+      {tableData === 'Season' ? (
         <GameTableSeasons setFilteredCount={setFilteredCount} />
       ) : (
         <GameTableAllTime setFilteredCount={setFilteredCount} />

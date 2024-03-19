@@ -84,7 +84,7 @@ function GameRow({ game, teams }) {
           game.status === 'completed' &&
           `${game.result} ${game.gf}-${game.ga}`}
       </Game>
-      <Game>{game.locationname}</Game>
+      <Game>{game.locationName}</Game>
       <Game>{game.teamType}</Game>
       <Game>{game.seasonTime}</Game>
       <Game>{game.comment}</Game>

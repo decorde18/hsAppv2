@@ -30,6 +30,14 @@ const tables = [
     name: 'games',
     view: 'games_view',
   },
+  {
+    name: 'locations',
+    view: 'locations_view',
+  },
+  {
+    name: 'schools',
+    view: 'schools_view',
+  },
 ];
 
 export function useCreateData() {
