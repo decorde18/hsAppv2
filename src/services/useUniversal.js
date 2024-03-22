@@ -13,6 +13,8 @@ const tables = [
   {
     name: 'seasons',
   },
+  { view: 'season_stats_view' },
+  { view: 'seasons_view' },
   {
     name: 'players',
     view: 'players_view',

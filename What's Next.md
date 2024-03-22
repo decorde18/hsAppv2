@@ -1,5 +1,6 @@
 ## //TODO FIXME !!!
 
+- DONE policies for new table gf, ga...
 - createPlayerModal for new players
 
 - double check communication table for effectivenss (new view was added on playerTable and communicationtbale that we can see to simplify)

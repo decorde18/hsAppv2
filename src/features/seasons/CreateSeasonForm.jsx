@@ -113,6 +113,7 @@ function CreateSeasonForm() {
   if (isLoadingRecent) return <Spinner />;
   return (
     <Form onSubmit={handleSubmit(onSubmit, onError)} type={'regular'}>
+      Form
       <FormRow label="Mascot">
         <Input
           type="text"
@@ -174,7 +175,6 @@ function CreateSeasonForm() {
           id="district"
         />
       </FormRow>
-
       <FormRow label="Team Levels">
         <Input
           type="text"

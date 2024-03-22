@@ -18,6 +18,7 @@ function PlayerTable() {
   const [filteredCount, setFilteredCount] = useState();
 
   function handleButtonGroupChange(e) {
+    e.preventDefault();
     setTableData(e.target.name);
   }
 

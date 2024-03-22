@@ -38,12 +38,16 @@ new player form
 
  Input = ({ size = defaultAnimationValues.size, ...props 
  })
+                          type="text"
+          disabled={isWorking}
+          id={each.field}
                          register={{
                           ...register(each.field, {
                             required: each.required ? each.message : false,
                           }),
                         }}
-                        ref={null} SIZE IN REM
+                        size = {each.size}SIZE IN REM
+                        ref={null} 
 
       <Select
         width={12.7}

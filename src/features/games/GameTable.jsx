@@ -1,16 +1,17 @@
 import styled from 'styled-components';
 
+import { useState } from 'react';
+import { useSession } from '@supabase/auth-helpers-react';
+
 import GameTableSeasons from './GameTableSeasons';
 import GameTableAllTime from './GameTableAllTime';
-
-import { useSession, useSessionContext } from '@supabase/auth-helpers-react';
-
-import { useState } from 'react';
-import ButtonGroup from '../../ui/ButtonGroup';
 import CreateGameForm from './CreateGameForm';
 import CreateGoogleSignedInError from '../Calendar/CreateGoogleSignedInError';
+
+import ButtonGroup from '../../ui/ButtonGroup';
 import Button from '../../ui/Button';
 import Modal from '../../ui/Modal';
+
 const StyledDiv = styled.div`
   display: flex;
   gap: 2px;
@@ -36,7 +37,9 @@ function GameTable() {
         />
         <div>{filteredCount} games</div>
         <Modal>
-          {!session?.provider_token ? (
+          {!session?.provider_token ||
+          !process.env.NODE_ENV ||
+          process.env.NODE_ENV !== 'development' ? (
             <Modal.Open opens="game-form-error">
               <div>You are not logged in to Google in order to add games</div>
             </Modal.Open>
@@ -47,6 +50,16 @@ function GameTable() {
               </Button>
             </Modal.Open>
           )}
+
+          {!process.env.NODE_ENV ||
+            (process.env.NODE_ENV === 'development' && (
+              <Modal.Open opens="game-form">
+                <Button type="selected" variation="primary">
+                  DEVELOPMENT
+                </Button>
+              </Modal.Open>
+            ))}
+
           <Modal.Window name="game-form-error">
             <CreateGoogleSignedInError />
           </Modal.Window>

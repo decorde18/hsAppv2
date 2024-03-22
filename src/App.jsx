@@ -23,6 +23,7 @@ import supabase from './services/supabase';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
 import NewPlayer from './pages/NewPlayer';
+import SummerCampRegistrations from './features/Spreadsheets/SummerCampRegistrations';
 import Players from './pages/Players';
 import People from './pages/People';
 import Communication from './pages/Communication';
@@ -79,6 +80,7 @@ function App() {
                 <Route path="schedule" element={<Schedule />} />
                 <Route path="roster" element={<Roster />} />
                 <Route path="newplayer" element={<NewPlayer />} />
+                <Route path="campers" element={<SummerCampRegistrations />} />
                 <Route path="*" element={<PageNotFound />} />
               </Route>
 
