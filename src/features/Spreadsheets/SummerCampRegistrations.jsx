@@ -8,9 +8,10 @@ import Button from '../../ui/Button';
 import ButtonGroup from '../../ui/ButtonGroup';
 import styled from 'styled-components';
 import Heading from '../../ui/Heading';
+import Textarea from '../../ui/Textarea';
 
 const Background = styled.div`
-  background-color: var(--color-brand--2);
+  background-color: var(--color-brand--1);
 `;
 const Container = styled.div`
   /* background-color: red; */
@@ -192,7 +193,17 @@ function SummerCampRegistrations() {
   const isWorking = false;
 
   function onSubmit(data) {
-    console.log(data);
+    data = {
+      ...data,
+      timestamp: new Date().toLocaleString().replace(',', ''),
+    };
+
+    const formData = Object.keys(data).map((key) => [key, data[key]]);
+    fetch(
+      'https://script.google.com/macros/library/d/1dUm2r6hhDRWwRF6D_mELmp9X73BLn2VOX0L_NXl7GZibH0A7tRFraXbU/2',
+      { method: 'POST', body: formData }
+    );
+    console.log(formData);
   }
   function onError(errors) {
     console.log(errors);
@@ -212,6 +223,7 @@ function SummerCampRegistrations() {
       )
     );
   }
+
   return (
     <Background>
       <Container>
@@ -265,7 +277,11 @@ function SummerCampRegistrations() {
                           options={selectFields
                             .find((field) => field.field === each.field)
                             .values.map((val) => ({ ...val }))
-                            .filter((field) => field.filter === selectedCamp)}
+                            .filter((field) =>
+                              each.field === 'Grade'
+                                ? field.filter === selectedCamp
+                                : field
+                            )}
                           onChange={handleSelectChange}
                           name={each.field}
                           disabled={isWorking}
@@ -287,6 +303,20 @@ function SummerCampRegistrations() {
               </Grid>
             </Section>
           ))}
+          <Grid columns="1">
+            <Heading as="h2" case="upper" location="center">
+              Comments
+            </Heading>
+            <div>
+              (please list any medical concerns, allergies, etc we need to know
+              about)
+            </div>
+            <Textarea
+              id="comments"
+              disabled={isWorking}
+              {...register('comments')}
+            />
+          </Grid>
           <FormRow>
             <Button variation="secondary" type="reset">
               Cancel
@@ -300,5 +330,3 @@ function SummerCampRegistrations() {
 }
 
 export default SummerCampRegistrations;
-
-// https://script.google.com/macros/s/AKfycbxmqN5_q350B3DelGR1f3SJMbUzpBEtu3oKOhw_TAYs5C_NbNx9yVz0W1y-tgk1n-ksNg/exec
