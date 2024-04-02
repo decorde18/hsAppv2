@@ -80,7 +80,7 @@ function App() {
                 <Route path="schedule" element={<Schedule />} />
                 <Route path="roster" element={<Roster />} />
                 <Route path="newplayer" element={<NewPlayer />} />
-                <Route path="campers" element={<SummerCampRegistrations />} />
+                <Route path="camps" element={<SummerCampRegistrations />} />
                 <Route path="*" element={<PageNotFound />} />
               </Route>
 
