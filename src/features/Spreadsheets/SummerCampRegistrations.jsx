@@ -1,20 +1,29 @@
+import styled from 'styled-components';
+
+import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
+import { spreadsheet } from './SpreadsheetVariables';
+
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+
 import Form from '../../ui/Form';
 import FormRow from '../../ui/FormRow';
 import Input from '../../ui/Input';
 import Select from '../../ui/Select';
-import { useState } from 'react';
 import Button from '../../ui/Button';
 import ButtonGroup from '../../ui/ButtonGroup';
-import styled from 'styled-components';
 import Heading from '../../ui/Heading';
 import Textarea from '../../ui/Textarea';
+import ModalNew from '../../ui/ModalNew';
+import ModalConfirm from '../../ui/ModalConfirm';
+
+import SummerCampRegistrationConfirmation from './SummerCampRegistrationConfirmation';
+import Spinner from '../../ui/Spinner';
 
 const Background = styled.div`
   background-color: var(--color-brand--1);
 `;
 const Container = styled.div`
-  /* background-color: red; */
   min-width: 40rem;
   max-width: 100rem;
   margin: 0 auto;
@@ -33,9 +42,12 @@ const CampSelection = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
 `;
+const { googleSheet, scriptURL } = spreadsheet.find(
+  (sheet) => sheet.spreadsheet === 'camps'
+).data;
 const fields = [
   {
-    field: 'Participant_First_Name',
+    field: 'camperFirstName',
     label: 'Player First Name',
     type: 'text',
     size: 25,
@@ -44,7 +56,7 @@ const fields = [
     section: 'player',
   },
   {
-    field: 'Participant_Last_Name',
+    field: 'camperLastName',
     label: 'Player Last Name',
     type: 'text',
     size: 25,
@@ -53,8 +65,8 @@ const fields = [
     section: 'player',
   },
   {
-    field: 'Grade',
-    label: 'Rising Grade',
+    field: 'grade',
+    label: 'Rising grade',
     type: 'number',
     size: 25,
     message: 'The grade is required',
@@ -63,7 +75,7 @@ const fields = [
     section: 'player',
   },
   {
-    field: 'T_shirt_size',
+    field: 'tShirtSize',
     label: 'T-Shirt Size',
     type: 'text',
     size: 25,
@@ -73,8 +85,8 @@ const fields = [
     section: 'player',
   },
   {
-    field: 'Parent_Name',
-    label: 'Parent/Guardian Name',
+    field: 'parentName',
+    label: 'Parent/Guardian Full Name',
     type: 'string',
     size: 25,
     message: 'The guardian name is required',
@@ -82,7 +94,7 @@ const fields = [
     section: 'parent',
   },
   {
-    field: 'Parent_Email',
+    field: 'parentEmail',
     label: 'Parent/Guardian Email',
     type: 'email',
     size: 25,
@@ -91,7 +103,7 @@ const fields = [
     section: 'parent',
   },
   {
-    field: 'Parent_Phone',
+    field: 'parentPhone',
     label: 'Parent/Guardian Phone',
     type: 'tel',
     size: 25,
@@ -99,32 +111,25 @@ const fields = [
     required: true,
     section: 'parent',
   },
+
   {
-    field: 'Parent_Name2',
-    label: 'Emergency Contact (if different from above)',
+    field: 'parentName2',
+    label: 'Emergency Contact Full Name (if different from above)',
     type: 'string',
     size: 25,
     message: 'An emergency contact person is required',
     required: false,
-    section: 'parent',
+    section: 'parent2',
   },
   {
-    field: 'Parent_Phone2',
+    field: 'parentPhone2',
     label: 'Emergency Contact Phone (if different from above)',
     type: 'tel',
     size: 25,
     message: 'An emergency contact phone is required',
     required: false,
-    section: 'parent',
+    section: 'parent2',
   },
-  // {
-  //   field: 'Relationship_to_Participant',
-  //   label: 'Relationship to the Player',
-  //   type: 'string',
-  //   size: 25,
-  //   message: 'How does the emergency contact relate to the player',
-  //   required: true,
-  // },
   {
     field: 'authorization',
     label:
@@ -141,7 +146,7 @@ const fields = [
 ];
 const selectFields = [
   {
-    field: 'T_shirt_size',
+    field: 'tShirtSize',
     values: [
       { value: '', label: 'SELECT A SIZE' },
       { value: 'YS', label: 'Youth Small' },
@@ -153,15 +158,15 @@ const selectFields = [
     ],
   },
   {
-    field: 'Grade',
+    field: 'grade',
     values: [
-      { value: '', label: 'SELECT A GRADE', filter: 'Little Eagles Camp' },
+      { value: '', label: 'SELECT RISING GRADE', filter: 'Little Eagles Camp' },
       { value: 1, label: '1st grade', filter: 'Little Eagles Camp' },
       { value: 2, label: '2nd grade', filter: 'Little Eagles Camp' },
       { value: 3, label: '3th grade', filter: 'Little Eagles Camp' },
       { value: 4, label: '4th grade', filter: 'Little Eagles Camp' },
       { value: 5, label: '5th grade', filter: 'Little Eagles Camp' },
-      { value: '', label: 'SELECT A GRADE', filter: 'Eagles Camp' },
+      { value: '', label: 'SELECT RISING GRADE', filter: 'Eagles Camp' },
       { value: 6, label: '6th grade', filter: 'Eagles Camp' },
       { value: 7, label: '7th grade', filter: 'Eagles Camp' },
       { value: 8, label: '8th grade', filter: 'Eagles Camp' },
@@ -178,10 +183,13 @@ const selectFields = [
 const sections = [
   { name: 'player', title: 'Camper Information', columns: 2 },
   { name: 'parent', title: 'Parent Information', columns: 2 },
+  { name: 'parent2', title: 'Alternate Parent Information', columns: 2 },
   { name: 'authorization', title: 'Authorization', columns: 1 },
 ];
 
 function SummerCampRegistrations() {
+  const { currentSeasonNew } = useCurrentSeason();
+
   const { register, handleSubmit, reset, setValue, getValues, formState } =
     useForm();
   const { errors } = formState;
@@ -190,20 +198,50 @@ function SummerCampRegistrations() {
   const [selectFieldValues, setSelectFieldValues] = useState(
     selectFields.map((field) => ({ field: field.field, value: '' }))
   );
-  const isWorking = false;
+  const [addAnotherModal, setAddAnotherModal] = useState(false);
+  const [campers, setCampers] = useState([]);
+  const [completed, setCompleted] = useState(false);
+  let isWorking = false;
 
+  function onClose() {
+    setAddAnotherModal(false);
+  }
+  function handleSingle() {
+    reset();
+    onClose();
+    setCompleted(true); //  send to payment screen
+  }
+  function handleAddAnother() {
+    setValue('camperFirstName', null);
+    setValue('grade', '');
+    setValue('tShirtSize', '');
+    setValue('authorization', '');
+    setValue('comments', '');
+    onClose();
+  }
   function onSubmit(data) {
+    isWorking = true;
+    setCampers([...campers, `${data.camperFirstName} ${data.camperLastName}`]);
+
+    setAddAnotherModal(true);
     data = {
       ...data,
-      timestamp: new Date().toLocaleString().replace(',', ''),
+      sheet: googleSheet,
+      year: currentSeasonNew.season,
     };
+    const getFormData = (object) =>
+      Object.keys(object).reduce((formData, key) => {
+        formData.append(key, object[key]);
+        return formData;
+      }, new FormData());
 
-    const formData = Object.keys(data).map((key) => [key, data[key]]);
-    fetch(
-      'https://script.google.com/macros/library/d/1dUm2r6hhDRWwRF6D_mELmp9X73BLn2VOX0L_NXl7GZibH0A7tRFraXbU/2',
-      { method: 'POST', body: formData }
-    );
-    console.log(formData);
+    fetch(scriptURL, {
+      method: 'POST',
+      body: getFormData(data),
+    })
+      .then((response) => (isWorking = true))
+
+      .catch((error) => console.error('Error!', error.message));
   }
   function onError(errors) {
     console.log(errors);
@@ -278,14 +316,14 @@ function SummerCampRegistrations() {
                             .find((field) => field.field === each.field)
                             .values.map((val) => ({ ...val }))
                             .filter((field) =>
-                              each.field === 'Grade'
+                              each.field === 'grade'
                                 ? field.filter === selectedCamp
                                 : field
                             )}
                           onChange={handleSelectChange}
                           name={each.field}
                           disabled={isWorking}
-                          value={
+                          defaultValue={
                             selectFieldValues.find(
                               (field) => field.field === each.field
                             ).value
@@ -317,13 +355,31 @@ function SummerCampRegistrations() {
               {...register('comments')}
             />
           </Grid>
+
           <FormRow>
-            <Button variation="secondary" type="reset">
+            <Button
+              variation="secondary"
+              type="reset"
+              onClick={() => setAddAnotherModal(true)}
+            >
               Cancel
             </Button>
             <Button disabled={isWorking}>Register</Button>
           </FormRow>
         </Form>
+        <ModalNew show={addAnotherModal}>
+          <ModalConfirm
+            resourceName="camper"
+            onConfirm={handleAddAnother}
+            onCloseModal={handleSingle}
+            confirmType="add another"
+            onClose={onClose}
+          />
+        </ModalNew>
+        {/* <ModalNew show={true}> */}
+        <ModalNew show={completed && !isWorking}>
+          <SummerCampRegistrationConfirmation campers={campers} />
+        </ModalNew>
       </Container>
     </Background>
   );

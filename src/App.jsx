@@ -57,11 +57,11 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <Router>
-      <QueryClientProvider client={queryClient}>
-        <ReactQueryDevtools initialIsOpen={false} />
-        <CurrentSeasonProvider>
-          <SessionContextProvider supabaseClient={supabase}>
+    <QueryClientProvider client={queryClient}>
+      <ReactQueryDevtools initialIsOpen={false} />
+      <Router>
+        <SessionContextProvider supabaseClient={supabase}>
+          <CurrentSeasonProvider>
             <GlobalStyles />
             <Routes>
               <Route index element={<Navigate replace to="public" />} />
@@ -144,10 +144,10 @@ function App() {
                 },
               }}
             />
-          </SessionContextProvider>
-        </CurrentSeasonProvider>
-      </QueryClientProvider>
-    </Router>
+          </CurrentSeasonProvider>
+        </SessionContextProvider>
+      </Router>
+    </QueryClientProvider>
   );
 }
 

@@ -1,12 +1,22 @@
-import { createContext, useContext, useEffect } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { useLocalStorageState } from '../hooks/useLocalStorageState';
 import { useRecentSeason } from '../features/seasons/useSeasons';
+import { useData } from '../services/useUniversal';
+import Spinner from '../ui/Spinner';
 
 const CurrentSeasonContext = createContext();
 
 function CurrentSeasonProvider({ children }) {
+  //get all seasons
+  const { isLoading, data: seasons } = useData({
+    table: 'seasons',
+    sort: [{ field: 'season', direction: false }],
+  });
+  const [currentSeasonNew, setCurrentSeasonNew] = useState();
+  const [recentSeasonNew, setRecentSeasonNew] = useState();
+
   const { isLoadingRecent, recentSeason: recent } = useRecentSeason();
   const [currentSeason, setCurrentSeason] = useLocalStorageState(
     null,
@@ -28,6 +38,22 @@ function CurrentSeasonProvider({ children }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [curSeason, isLoadingRecent]);
 
+  useEffect(() => {
+    if (isLoading) return;
+    const recent = seasons[0];
+    const current = seasons.find((season) => season.id === +currentSeason);
+    //get recent season from API
+    setRecentSeasonNew(recent);
+    //if current season is stored locally, use it
+    setCurrentSeasonNew(
+      currentSeason
+        ? current
+        : //set the current season to the recent season if not already stored locally
+          recent
+    );
+    //set local variables //todo
+  }, [currentSeason, isLoading, seasons, setRecentSeason]);
+
   function updateCurrentSeason(season) {
     searchParams.set('season', season);
     setSearchParams(searchParams);
@@ -36,7 +62,8 @@ function CurrentSeasonProvider({ children }) {
   function updateRecentSeason(season) {
     setRecentSeason(season);
   }
-  if (isLoadingRecent) return;
+  if (isLoadingRecent || isLoading) return <Spinner />;
+
   return (
     <CurrentSeasonContext.Provider
       value={{
@@ -44,6 +71,9 @@ function CurrentSeasonProvider({ children }) {
         updateCurrentSeason,
         recentSeason,
         updateRecentSeason,
+        seasons,
+        recentSeasonNew,
+        currentSeasonNew,
       }}
     >
       {children}

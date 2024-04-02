@@ -56,14 +56,14 @@ export function useCreateData() {
   return { isCreating, createData };
 }
 export function useData({ table, filter, sort, isSeason }) {
-  const { currentSeason } = useCurrentSeason();
+  // const { currentSeason } = useCurrentSeason();
 
   table =
     tables.find((tab) => tab.name === table)?.view ||
     tables.find((tab) => tab.name === table).name;
-  filter = isSeason
-    ? [...filter, { field: 'seasonId', value: currentSeason }]
-    : filter;
+  // filter = isSeason
+  //   ? [...filter, { field: 'seasonId', value: currentSeason }]
+  //   : filter;
   const { isLoading, data, error } = useQuery({
     queryKey: [table, filter, sort],
     queryFn: () => getData({ table, filter, sort }),

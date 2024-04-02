@@ -59,12 +59,9 @@ const options = [
   { label: 'completed', value: 3 },
 ];
 function SeasonOverview() {
-  const { currentSeason } = useCurrentSeason();
+  const { currentSeason, currentSeasonNew } = useCurrentSeason();
   const { isUpdating, updateData } = useUpdateData();
-  const seasons = useData({
-    table: 'seasons',
-    filter: [{ field: 'id', value: currentSeason }],
-  });
+
   // const seasonStats = useData({});
 
   function seasonChange(e) {
@@ -72,28 +69,27 @@ function SeasonOverview() {
     const field = 'seasonPhase';
     updateData({
       table: 'seasons',
-      newData: [{ [field]: value, id: currentSeason }],
-      id: season.id,
+      newData: [{ [field]: value, id: currentSeasonNew.id }],
+      id: currentSeasonNew.id,
     });
   }
-  if (seasons.isLoading) return <Spinner />;
 
-  const season = seasons.data[0];
+  // const season = seasons.data[0];
   const defaultSeasonPhase = options.find(
-    (option) => option.label === season.seasonPhase
+    (option) => option.label === currentSeasonNew.seasonPhase
   ).value;
 
   return (
     <>
       <Header>
         <Heading as="h1" case="upper" location="center">
-          {season.teamMascot} {season.season} season
+          {currentSeasonNew.teamMascot} {currentSeasonNew.season} season
         </Heading>
       </Header>
       <Container>
         <Main>
           <Picture>
-            <SeasonSideBar season={season} />
+            <SeasonSideBar season={currentSeasonNew} />
           </Picture>
           <Columns>
             <div>
@@ -114,19 +110,19 @@ function SeasonOverview() {
           <Columns>
             <div>
               <strong>School Year</strong>
-              <div>{season.schoolYear}</div>
+              <div>{currentSeasonNew.schoolYear}</div>
             </div>
             <div>
               <strong>Classification</strong>
-              <div>{season.classification}</div>
+              <div>{currentSeasonNew.classification}</div>
             </div>
             <div>
               <strong>Region</strong>
-              <div>{season.region}</div>
+              <div>{currentSeasonNew.region}</div>
             </div>
             <div>
               <strong>District</strong>
-              <div>{season.district}</div>
+              <div>{currentSeasonNew.district}</div>
             </div>
           </Columns>
           <Columns>
@@ -180,11 +176,11 @@ function SeasonOverview() {
                 <Columns>
                   <div>
                     <strong>Head Coach</strong>
-                    <div>{season.coach}</div>
+                    <div>{currentSeasonNew.coach}</div>
                   </div>
                   <div>
                     <strong>Assistant Coaches</strong>
-                    <div>{season.assistant_coaches}</div>
+                    <div>{currentSeasonNew.assistant_coaches}</div>
                   </div>
                 </Columns>
               </Title>
@@ -193,11 +189,11 @@ function SeasonOverview() {
                 <Columns>
                   <div>
                     <strong>Manager</strong>
-                    <div>{season.manager}</div>
+                    <div>{currentSeasonNew.manager}</div>
                   </div>
                   <div>
                     <strong>Trainer</strong>
-                    <div>{season.trainer}</div>
+                    <div>{currentSeasonNew.trainer}</div>
                   </div>
                 </Columns>
               </Title>
@@ -208,15 +204,15 @@ function SeasonOverview() {
                 <Columns>
                   <div>
                     <strong>Athletic Director</strong>
-                    <div>{season.athleticDirector}</div>
+                    <div>{currentSeasonNew.athleticDirector}</div>
                   </div>
                   <div>
                     <strong>Principal</strong>
-                    <div>{season.principal}</div>
+                    <div>{currentSeasonNew.principal}</div>
                   </div>
                   <div>
                     <strong>Assistant Principals</strong>
-                    <div>{season.assistantPrincipals}</div>
+                    <div>{currentSeasonNew.assistantPrincipals}</div>
                   </div>
                 </Columns>
               </Title>

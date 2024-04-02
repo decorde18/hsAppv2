@@ -1,5 +1,6 @@
 ## //TODO FIXME !!!
 
+- useContext for current season - always access it that way versus theuseUniverasl I have started to implement
 - DONE policies for new table gf, ga...
 - createPlayerModal for new players
 
@@ -62,6 +63,7 @@
 
 ## TODO FUTURE
 
+- is using a state the best way to do addAnother on a form submit using the current Modal component. Loog at SummerCampRegistrations and see if this is truly the best way.
 - remove gkRoster and altRoster from playerSeasons table in SB
 - combine usePeople functions into 1, same with players
 - create helper functions for all Date events (send to google calendar, with time, without time, etc)

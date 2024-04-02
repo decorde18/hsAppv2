@@ -126,7 +126,7 @@ const columns = [
 ];
 
 function PlayerTableSeasons({ setFilteredCount }) {
-  const { currentSeason } = useCurrentSeason();
+  const { currentSeason, currentSeasonNew } = useCurrentSeason();
   const { isUpdating, updateData } = useUpdateData();
 
   const columnWidths = columns.reduce((acc, cur) => {
@@ -161,13 +161,12 @@ function PlayerTableSeasons({ setFilteredCount }) {
 
   const playerSeasons = useData({
     table: 'playerSeasons',
-    filter: currentFilters.filter((option) => option.table === 'playerSeasons'),
+    filter: [
+      ...currentFilters.filter((option) => option.table === 'playerSeasons'),
+      { field: 'seasonId', value: currentSeasonNew.id, table: 'playerSeasons' },
+    ],
     sort: sort.playerSeasons,
     isSeason: true,
-  });
-  const season = useData({
-    table: 'seasons',
-    filter: [{ table: 'seasons', field: 'id', value: currentSeason }],
   });
 
   useEffect(() => {
@@ -193,14 +192,14 @@ function PlayerTableSeasons({ setFilteredCount }) {
   }, [playerSeasons.data, playerSeasons.isLoading]);
   useEffect(() => {
     //update default status filter
-    if (season.isLoading) return;
-    const defaultFilter = filterBySeasonPhase(season.data[0]);
+
+    const defaultFilter = filterBySeasonPhase(currentSeasonNew);
     handleFilterChange(
       [{ value: defaultFilter.label, label: defaultFilter.value }],
       { name: 'status' }
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSeason, season.isLoading, season.data]);
+  }, [currentSeasonNew]);
   function handleFilterChange(selected, { name }) {
     const newFilter = filterChange({ selected, name, currentFilters, columns });
     setCurrentFilters(newFilter);
@@ -210,7 +209,7 @@ function PlayerTableSeasons({ setFilteredCount }) {
     setSort(newSort);
   }
 
-  if (playerSeasons.isLoading || season.isLoading) return <Spinner />;
+  if (playerSeasons.isLoading) return <Spinner />;
 
   return (
     <Menus>
@@ -262,7 +261,7 @@ function PlayerTableSeasons({ setFilteredCount }) {
               <PlayerSeasonRow
                 playerSeason={player}
                 key={player.id}
-                teams={season.data[0].teamLevels}
+                teams={currentSeasonNew.teamLevels}
                 columns={columns}
               />
             )}

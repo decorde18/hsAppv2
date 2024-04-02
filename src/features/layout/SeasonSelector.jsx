@@ -6,21 +6,21 @@ import { useNavigate } from 'react-router-dom';
 import Select from '../../ui/Select';
 
 function SeasonSelector() {
-  const { currentSeason, updateCurrentSeason } = useCurrentSeason();
+  const { currentSeason, currentSeasonNew, updateCurrentSeason, seasons } =
+    useCurrentSeason();
 
-  const { isLoading, data: seasons } = useData({
-    table: 'seasons',
-    sort: [{ field: 'season', direction: false }],
-  });
+  // const { isLoading, data: seasons } = useData({
+  //   table: 'seasons',
+  //   sort: [{ field: 'season', direction: false }],
+  // });
   const navigate = useNavigate();
 
   function handleSelectChange({ target }) {
     if (target.value === 'createSeason') {
       navigate(`./newseason`);
-      target.value = currentSeason;
+      target.value = currentSeasonNew.id;
     } else updateCurrentSeason(+target.value);
   }
-  if (isLoading) return;
 
   const options = [
     { value: 'createSeason', label: 'Add A New Season' },
@@ -34,7 +34,7 @@ function SeasonSelector() {
     <Select
       width={26}
       onChange={handleSelectChange}
-      defaultValue={currentSeason}
+      defaultValue={currentSeasonNew.id}
       options={options}
     />
   );

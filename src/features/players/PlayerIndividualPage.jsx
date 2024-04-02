@@ -42,23 +42,23 @@ const Main = styled.section`
 `;
 
 function PlayerIndividualPage({ player }) {
-  const { currentSeason } = useCurrentSeason();
+  const { currentSeason, seasons } = useCurrentSeason();
   const playerSeasons = useData({
     table: 'playerSeasons',
     filter: [
       { table: 'playerSeasons', field: 'playerId', value: player.playerId },
     ],
   });
-  const seasons = useData({
-    table: 'seasons',
-  });
+  // const seasons = useData({
+  //   table: 'seasons',
+  // });
 
   const [season, setSeason] = useState();
 
   function handleSeasonChange(value) {
-    setSeason(seasons.data.find((seas) => seas.id === +value));
+    setSeason(seasons.find((seas) => seas.id === +value));
   }
-  if (seasons.isLoading || playerSeasons.isLoading) return <Spinner />;
+  if (playerSeasons.isLoading) return <Spinner />;
   if (!season) handleSeasonChange(currentSeason);
 
   return (
@@ -78,7 +78,7 @@ function PlayerIndividualPage({ player }) {
           <PlayerSeasons
             seasonsPlayer={playerSeasons.data}
             handleSeasonChange={handleSeasonChange}
-            seasons={seasons.data}
+            seasons={seasons}
             season={season}
           />
         </Main>

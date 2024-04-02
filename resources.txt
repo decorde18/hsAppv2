@@ -24,7 +24,7 @@ useDeleteData({ view, table, id })
     filter: [        field,
         value,
         textSearch(boolean)]
-    sort: [{field, direction (boolean), }]
+    sort: [{field:'', direction: (boolean), }]
   });
 
 <Heading as="h1" case="upper" location="center">
@@ -34,7 +34,7 @@ new player form
 
 <Row type="vertical" justify="space-between" align='center'>
 
-<Button size='medium type="selected" variation="primary"> type = selected  fullWidth
+<Button size='medium' type="selected" variation="primary"> type = selected  fullWidth
 
  Input = ({ size = defaultAnimationValues.size, ...props 
  })

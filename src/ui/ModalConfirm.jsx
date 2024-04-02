@@ -31,8 +31,8 @@ function ModalConfirm({
       <Heading as="h3" case="upper">
         {confirmType} {resourceName}
       </Heading>
-      {confirmType === 'addAnother' ? (
-        <p>Would you like to add another?</p>
+      {confirmType === 'add another' ? (
+        <p>Would you like to add another {resourceName}?</p>
       ) : confirmType === 'create' ? (
         <p>There are no {resourceName}. Would you like to create them?</p>
       ) : (
