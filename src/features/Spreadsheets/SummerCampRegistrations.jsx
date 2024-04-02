@@ -128,6 +128,7 @@ const fields = [
     size: 25,
     message: 'An emergency contact phone is required',
     required: false,
+
     section: 'parent2',
   },
   {
