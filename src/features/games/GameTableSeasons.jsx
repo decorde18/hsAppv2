@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 import { useData } from '../../services/useUniversal';
 
 import { filterChange, sortUpdate } from '../../utils/filterHelpers';
@@ -110,6 +111,7 @@ const columns = [
 ];
 
 function GameTableSeasons({ setFilteredCount }) {
+  const { currentSeasonNew } = useCurrentSeason();
   //UPDATE FOR APPROPRIATE TABLE
   const columnWidths = columns.reduce((acc, cur) => {
     return (acc = acc.concat(' ', cur.width));
@@ -143,9 +145,12 @@ function GameTableSeasons({ setFilteredCount }) {
   const games = useData({
     //UPDATE FOR APPROPRIATE TABLE
     table: 'games',
-    filter: currentFilters.filter((option) => option.table === 'games'),
+    filter: [
+      ...currentFilters.filter((option) => option.table === 'games'),
+      { field: 'seasonId', value: currentSeasonNew.id, table: 'games' },
+    ],
     sort: sort.games,
-    isSeason: true,
+    // isSeason: true,
   });
 
   useEffect(() => {

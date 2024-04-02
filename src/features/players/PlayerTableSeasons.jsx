@@ -166,7 +166,7 @@ function PlayerTableSeasons({ setFilteredCount }) {
       { field: 'seasonId', value: currentSeasonNew.id, table: 'playerSeasons' },
     ],
     sort: sort.playerSeasons,
-    isSeason: true,
+    // isSeason: true,
   });
 
   useEffect(() => {
