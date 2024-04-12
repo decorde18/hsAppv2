@@ -1,10 +1,15 @@
 ## //TODO FIXME !!!
 
+- remove bootstrap - ButtonGroup in CreateGame
+
+- MainSection (it is in GameSettings), do we need it?)
+- People Table - convert to overall table add view edit
+- SeasonSideBar.jsx:9 The component styled.img with the id of "sc-jdEkgJ" has been created dynamically.You may see this warning because you've called styled inside another component.To resolve this only create new StyledComponents outside of any render method and function component. at SeasonSideBar (http://localhost:5173/src/features/seasons/SeasonSideBar.jsx:19:26)
+
 - useContext for current season - always access it that way versus theuseUniverasl I have started to implement
-- DONE policies for new table gf, ga...
 - createPlayerModal for new players
 
-- double check communication table for effectivenss (new view was added on playerTable and communicationtbale that we can see to simplify)
+- redo communication table ---
 - on gameEntry and eventEntry - create a function for need Google Sign in. That allows me to work on the forms without being logged
 - validate that no new player is already in system, likewise with parent
 
@@ -14,27 +19,20 @@
 
 ## //TODO FIXME !!
 
-- playerRow playerSeasonRow
-- refactor public/private pages with layout - lets make sure all is the way it should be
-- playerseason row - get JV, V from season settings
-  -sidebar hihlighted when clicked
+-sidebar hihlighted when clicked
 
 ## //TODO FIXME !
 
 - NEED TO UPDATE SEASON SELECTOR WHEN NEW SEASON IS ADDED. IT TAKES TO NEW SEASON< BUT NOT SEASON SELECTOR>
 - fix defaults of new season -id: 23 (not all transfered) - see details below
 - auto selecting classification??? can't seem to make it not work again
-- filter searchParams when season # dos not exist (ie seasonId=24)
-- apiPlayers - sort order not working --- redo all - see useEditPlayer for proper way
 - usePlayerSeasons -see todos --- redo all see useEditPlayer for proper way
 - on modals (createPlayerModalForm is the first) close only if no API error
+- Redo Create Player Form
 
 ## TODO NEXT !!!
 
-- all-time Players clean it up (filter, sort)
-- all-time Games Create
 - Pagination
-  -Filters ---see filter from PlayerTable and convert to global
 - schedule Helper - email functionality --include check all of each subHeading - add JV/V/both ? - on change to scheduled, go to create game - when scheduled, button to go to game
   - continue game stats manual entry - add new entries
   - create end of game stats page
@@ -51,6 +49,7 @@
 ## TODO NEXT !
 
 - switch all Select to new React-Select?
+- in CreateGameForm/CreateEventForm, I use StyledSelect instead of my Select Component because I need to pass the arguments into the options but because I have default values, I created it differently. Can I recreate the StyledSelects with new options?
 - calendar funtionality - set start and end date - advance months, etc
 - delete parent, delete person too? - same with player, etc
 - go through gk subs and inlude true value on DB
@@ -67,7 +66,6 @@
 - remove gkRoster and altRoster from playerSeasons table in SB
 - combine usePeople functions into 1, same with players
 - create helper functions for all Date events (send to google calendar, with time, without time, etc)
-- in CreateGameForm/CreateEventForm, I use StyledSelect instead of my Select Component because I need to pass the arguments into the options but because I have default values, I created it differently. Can I recreate the StyledSelects with new options?
 - create file upload page for team pics, player pics, etc - see https://www.youtube.com/watch?v=HvOvdD2nX1k
 - useMutation in create playerForm does not run on create parents because of iterations. If you can understand the useMutation hook later on as a developer, fix it
 
@@ -89,3 +87,16 @@
 - DONE editPlayerModal for new players
 - DONE delete picture altRoster gkRoster rosterNumber
 - DONE redo games tables
+
+4/11/2024
+
+- DONE People Table
+- DONE fix seasoncontext / season selector to update currentSeason New
+- DONE policies for new table gf, ga...
+- DONE playerRow playerSeasonRow
+- DONE refactor public/private pages with layout - lets make sure all is the way it should be
+- DONE playerseason row - get JV, V from season settings
+- DONE filter searchParams when season # dos not exist (ie seasonId=24)
+- DONE all-time Players clean it up (filter, sort)
+- DONE all-time Games Create
+  -DONE Filters ---see filter from PlayerTable and convert to global

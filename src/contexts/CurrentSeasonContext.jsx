@@ -51,7 +51,9 @@ function CurrentSeasonProvider({ children }) {
         : //set the current season to the recent season if not already stored locally
           recent
     );
-    //set local variables //todo
+    //set local variables
+    updateCurrentSeason(current.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSeason, isLoading, seasons, setRecentSeason]);
 
   function updateCurrentSeason(season) {

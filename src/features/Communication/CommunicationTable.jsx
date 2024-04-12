@@ -17,9 +17,26 @@ import {
   visibleRosterStatus,
   filterRosterStatus,
   defaultRosterStatus,
+  sortUpdate,
 } from '../../utils/filterHelpers';
 // import FilterBy from '../../ui/FilterBy';
 import Select from '../../ui/Select';
+import HeaderSortFilter from '../../ui/HeaderSortFilter';
+import { convertSBdateToLocalDate } from '../../utils/helpers';
+
+const columns = [
+  {
+    table: 'people',
+    label: 'Title',
+    field: 'title',
+    type: 'string',
+    sort: false,
+    // sortPriority: 1,
+    // defaultSortDirection: true,
+    width: '.5fr',
+    isSearchable: false,
+  },
+];
 
 function CommunicationTable() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -35,7 +52,6 @@ function CommunicationTable() {
   const [parentEmails, setParentEmails] = useState([]);
 
   const [filteredPlayers, setFilteredPlayers] = useState([]);
-
   let statusFilter;
   useEffect(
     //on LOAD with a new object with needed fields
@@ -246,18 +262,19 @@ function CommunicationTable() {
 
     setFilteredPlayers(rowCheck);
   }
+  function handleSort(selectedSort) {}
 
   if (isLoadingPlayerParents || isLoadingPlayerSeasons || isLoadingSeason)
     return <Spinner />;
   if (!playerParents.length) return <Empty resource="Player Parents" />;
 
   //handle filter changes
-
   statusFilter = searchParams.get('filterRosterStatus')
     ? statusFilterLabel.find(
         (status) => status.value === +searchParams.get('filterRosterStatus')
       )
     : defaultRosterStatus(season);
+
   return (
     <Menus>
       <input defaultValue={playerEmails} />
@@ -275,13 +292,26 @@ function CommunicationTable() {
             </div>
             <div>Player</div>
             <div>Grade</div>
+            <HeaderSortFilter
+              header={{
+                name: 'created_at',
+                label: 'Created',
+                type: 'date',
+                field: 'created_at',
+                table: 'playerSeasons',
+              }}
+              sort={{
+                defaultSortDirection: true,
+                handleSort: handleSort,
+              }}
+              filters={{}}
+            />
             <div>
               Status
               <Select
                 options={statusFilterLabel}
                 type="white"
                 onChange={handleFilterChange}
-                value={statusFilter.value}
                 id={'filterRosterStatus'}
               ></Select>
             </div>
@@ -322,7 +352,12 @@ function CommunicationTable() {
               }
               return 0;
             })
-            .sort((a, b) => b.grade - a.grade)}
+            .sort((a, b) => b.grade - a.grade)
+            .sort(
+              (a, b) =>
+                new Date(convertSBdateToLocalDate(b.created_at)) -
+                new Date(convertSBdateToLocalDate(a.created_at))
+            )}
           render={(player) =>
             player.isPlayerVisible ? (
               <CommunicationRow

@@ -7,7 +7,6 @@ const StyledTable = styled.div`
   font-size: 1.25rem;
   background-color: var(--color-grey-0);
   border-radius: var(--border-radius-md);
-  overflow: hidden;
 `;
 const CommonRow = styled.div`
   display: grid;
@@ -17,13 +16,20 @@ const CommonRow = styled.div`
   transition: none;
 `;
 const StyledHeader = styled(CommonRow)`
-  padding: 1rem;
   background-color: var(--color-grey-50);
+  /* background-color: red; */
+  padding: 1rem;
   border-bottom: 1px solid var(--color-grey-100);
   text-transform: uppercase;
   letter-spacing: 0.4px;
   font-weight: 600;
   color: var(--color-grey-600);
+  border-radius: 1rem 1rem 0 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  position: sticky;
+  top: -2.5rem;
+  z-index: 5;
 `;
 const StyledPrintHeader = styled(CommonRow)`
   padding: 0.2rem;

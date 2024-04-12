@@ -97,6 +97,12 @@ function convert12To24(time12) {
   // Return the time in 24-hour format
   return `${hours}:${minutes}:${seconds.slice(0, 2) || '00'}`;
 }
+export function convertSBdateToLocalDate(dateTime) {
+  const date = new Date(dateTime);
+  const formattedDate = date.toLocaleDateString();
+  const formattedTime = date.toLocaleTimeString();
+  return `${formattedDate} ${formattedTime}`;
+}
 export function convertSBtimeToLocalTime(time, noSeconds) {
   time = time.split('+');
   time = formatTime(time[0], noSeconds);

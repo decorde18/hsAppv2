@@ -35,7 +35,11 @@ new player form
 <Row type="vertical" justify="space-between" align='center'>
 
 <Button size='medium' type="selected" variation="primary"> type = selected  fullWidth
-
+        <ButtonGroup
+          btnArray={['Season', 'All-Time']}
+          defaultBtn={tableData}
+          onChange={handleButtonGroupChange}
+        />
  Input = ({ size = defaultAnimationValues.size, ...props 
  })
                           type="text"

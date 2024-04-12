@@ -93,6 +93,7 @@ body {
   line-height: 1.5;
   font-size: 1.6rem;
   height: 100dvh;
+  overflow: hidden;
 }
 
 input,

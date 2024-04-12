@@ -30,7 +30,7 @@ function PlayerSeasonRow({ playerSeason, teams }) {
 
   const [toggleStates, setToggleStates] = useState({
     status: statusFilterLabel.find((val) => val.label === player['status'])
-      .value,
+      ?.value,
     returningPlayer: player.returningPlayer,
     enrolledLastYear: player.enrolledLastYear,
     livesWithParents: player.livesWithParents,

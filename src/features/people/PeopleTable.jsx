@@ -1,54 +1,171 @@
-import styled from 'styled-components';
 import Spinner from '../../ui/Spinner';
 import PeopleRow from './PeopleRow';
-import { usePeople } from './usePeople';
-import { useEffect, useState } from 'react';
-import Button from '../../ui/Button';
-import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useData } from '../../services/useUniversal';
+import Menus from '../../ui/Menus';
+import Table from '../../ui/Table';
+import HeaderSortFilter from '../../ui/HeaderSortFilter';
+import Empty from '../../ui/Empty';
+import { filterChange, sortUpdate } from '../../utils/filterHelpers';
 
-const Table = styled.div`
-  border: 1px solid var(--color-grey-200);
+const columns = [
+  {
+    table: 'people',
+    label: 'Title',
+    field: 'title',
+    type: 'string',
+    sort: false,
+    // sortPriority: 1,
+    // defaultSortDirection: true,
+    width: '.5fr',
+    isSearchable: false,
+  },
+  {
+    table: 'people',
+    label: 'First Name',
+    field: 'firstName',
+    type: 'string',
+    sort: true,
+    sortPriority: 2,
+    defaultSortDirection: true,
+    width: '1.5fr',
+    isSearchable: true,
+  },
+  {
+    table: 'people',
+    label: 'Last Name',
+    field: 'lastName',
+    type: 'string',
+    sort: true,
+    sortPriority: 1,
+    defaultSortDirection: true,
+    width: '1.5fr',
+    isSearchable: true,
+  },
 
-  font-size: 1.4rem;
-  background-color: var(--color-grey-0);
-  border-radius: var(--border-radius-md);
-  overflow: hidden;
-`;
+  {
+    table: 'people',
+    label: 'Number',
+    field: 'cellNumber',
+    type: 'number',
+    sort: false,
+    // sortPriority: 1,
+    // defaultSortDirection: true,
+    width: '1fr',
+    isSearchable: true,
+  },
+  {
+    table: 'people',
+    label: 'Email',
+    field: 'email',
+    type: 'string',
+    sort: false,
+    // sortPriority: 1,
+    // defaultSortDirection: true,
+    width: '1.5fr',
+    isSearchable: true,
+  },
+  {
+    table: 'people',
+    label: 'Created',
+    field: 'created_at',
+    type: 'date',
+    sort: false,
+    // sortPriority: 1,
+    defaultSortDirection: true,
+    width: '1fr',
+    isSearchable: true,
+  },
+  { width: '0.2fr', field: 'options', columnType: 'string' },
+];
 
-const TableHeader = styled.header`
-  display: grid;
-  grid-template-columns: 0.5fr 2fr 0.5fr 2fr 1fr 1fr 1fr;
-  column-gap: 2.4rem;
-  align-items: center;
-  text-align: center;
-  background-color: var(--color-grey-50);
-  border-bottom: 1px solid var(--color-grey-100);
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  font-weight: 600;
-  color: var(--color-grey-600);
-  padding: 1.6rem 2.4rem;
-`;
 function PeopleTable() {
-  const { isLoadingPeople, people } = usePeople();
+  const columnWidths = columns.reduce((acc, cur) => {
+    return (acc = acc.concat(' ', cur.width));
+  }, '');
+  const [filterOptions, setFilterOptions] = useState({});
 
-  if (isLoadingPeople) return <Spinner />;
+  const [currentFilters, setCurrentFilters] = useState([]);
+  const [sort, setSort] = useState({
+    [[
+      ...new Set(
+        columns.filter((column) => column.sort).map((column) => column.table)
+      ),
+    ]]: columns
+      .filter((column) => column.sort)
+      .map((column) => ({
+        field: column.field,
+        direction: column.defaultSortDirection,
+        sortPriority: column.sortPriority,
+      }))
+      .sort((a, b) => a.sortPriority - b.sortPriority),
+  }); //defaultSort
+
+  const { isLoading, data: people } = useData({
+    table: 'people',
+    sort: sort.people,
+  });
+  function handleFilterChange(selected, { name }) {
+    const newFilter = filterChange({ selected, name, currentFilters, columns });
+    setCurrentFilters(newFilter);
+  }
+  function handleSort(selectedSort) {
+    const newSort = sortUpdate({ selectedSort, sort });
+    setSort(newSort);
+  }
+  if (isLoading) return <Spinner />;
+
   return (
-    <>
-      <Table role="table">
-        <TableHeader role="row">
-          <div>title</div>
-          <div>Person</div>
-          <div>nickname</div>
-          <div>other Last</div>
-          <div>email</div>
-          <div>cell</div>
-        </TableHeader>
-        {people.people.map((person) => (
-          <PeopleRow person={person} key={person.id} />
-        ))}
+    <Menus>
+      <Table columns={columnWidths}>
+        <Table.Header>
+          {columns.map((column) => (
+            <HeaderSortFilter
+              key={column.field}
+              header={{
+                name: column.field,
+                label: column.label,
+                type: column.type,
+                field: column.field,
+                table: column.table,
+              }}
+              sort={{
+                sortDirection: sort[column.table]?.find(
+                  (each) => each.field === column.field
+                )?.direction,
+                defaultSortDirection: column.defaultSortDirection,
+                handleSort: handleSort,
+              }}
+              filters={{
+                filter: column.filter,
+                handleFilterChange: handleFilterChange,
+                options: filterOptions[column.field]?.map((each) => ({
+                  label: each,
+                  value: each,
+                })),
+                currentValue: currentFilters
+                  .filter((option) => option.field === column.field)
+                  .map((option) => [
+                    ...option.value.map((field) => ({
+                      value: field,
+                      label: field,
+                    })),
+                  ]),
+              }}
+              isSearchable={column.isSearchable}
+            />
+          ))}
+        </Table.Header>
+        {people.length === 0 ? (
+          <Empty resource="People" />
+        ) : (
+          <Table.Body
+            data={people}
+            render={(person) => <PeopleRow person={person} key={person.id} />}
+          />
+        )}
       </Table>
-    </>
+    </Menus>
   );
 }
 

@@ -38,7 +38,9 @@ function PlayerPersonalInformation({ player }) {
           </SubFlex>
           <SubFlex>
             <div>DOB:</div>
-            <Value>{formatDate(new Date(player.dateOfBirth))}</Value>
+            <Value>
+              {player.dateOfBirth && formatDate(new Date(player.dateOfBirth))}
+            </Value>
           </SubFlex>
           <SubFlex>
             <div>Cell:</div>

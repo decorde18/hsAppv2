@@ -1,8 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import { styled } from 'styled-components';
 
-import AppNav from './AppNav';
-
 const Div = styled.div`
   position: relative;
   padding-top: 0.25rem;
@@ -19,7 +17,6 @@ const Div = styled.div`
 function MainSection() {
   return (
     <Div>
-      <AppNav></AppNav>
       <Outlet></Outlet>
     </Div>
   );

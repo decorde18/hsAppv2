@@ -1,39 +1,59 @@
-import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
+import { styled } from 'styled-components';
 
 import SideBar from './SideBar';
 import Header from './Header';
 import Footer from './Footer';
-import MainSection from './MainSection';
 
-import { styled } from 'styled-components';
+import { Outlet } from 'react-router-dom';
 
 const StyledAppLayout = styled.div`
   //THIS IS FOR THE HEADER< BODY< FOOTER
   height: 100vh;
-  overflow: clip;
   display: grid;
-  grid-template-rows: 15rem 1fr auto;
+  grid-template-columns: 15fr 85fr; //aside main
+  overflow: hidden;
+  align-items: start;
 `;
-const Main = styled.main`
+const Head = styled.header`
+  background-color: var(--color-grey-0);
+  /* background-color: red; */
+  grid-column: 1 / -1;
+  grid-row: 1/2;
+  position: sticky;
+  width: 100%;
+  top: 0;
+  z-index: 900;
+`;
+const Aside = styled.aside`
+  /* background-color: blue; */
+  grid-row: 2 / 4;
+  position: sticky;
+  margin: 0 auto;
+  top: 15rem;
+  padding: 1rem;
   height: 100%;
   overflow-y: auto;
-  display: grid;
-  grid-template-columns: 20rem auto;
-  margin: 0 auto;
+`;
+
+const Main = styled.section`
+  /* background-color: green; */
+  padding: 2rem;
+  height: 100%;
+  overflow-y: auto;
+  align-items: start;
 `;
 
 function AppLayout() {
-  // ON LOAD OF PROTECTED ROUTES, UPDATE THE RECENT AND CURRENT IN LOCAL AND CONTEXT PROVIDER
-  const { currentSeason } = useCurrentSeason();
-
-  if (!currentSeason) return;
-
   return (
     <StyledAppLayout>
-      <Header />
-      <Main className="flex">
+      <Head>
+        <Header />
+      </Head>
+      <Aside>
         <SideBar />
-        <MainSection />
+      </Aside>
+      <Main>
+        <Outlet />
       </Main>
       <Footer />
     </StyledAppLayout>

@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 
 import Table from '../../ui/Table';
+import { convertSBdateToLocalDate } from '../../utils/helpers';
 
 const Player = styled.div`
   font-size: 1.6rem;
@@ -33,6 +34,7 @@ function CommunicationRow({
       isPlayerAdded,
       fullname,
       email,
+      created_at,
     },
   } = player;
 
@@ -95,6 +97,7 @@ function CommunicationRow({
         <Player>{fullname}</Player>
       </Flex>
       <div>{grade}</div>
+      <div>{convertSBdateToLocalDate(created_at)}</div>
       <div>{status}</div>
       <div>{teamLevel}</div>
       <div>{returningPlayer ? 'Yes' : 'No'}</div>

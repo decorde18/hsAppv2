@@ -5,7 +5,7 @@ function NewPlayer() {
   return (
     <>
       <Logo />
-      <CreatePlayerForm />;
+      <CreatePlayerForm />
     </>
   );
 }

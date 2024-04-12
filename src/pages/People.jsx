@@ -1,28 +1,32 @@
 import PeopleTable from '../features/people/PeopleTable';
-import Button from '../ui/Button';
-import { useState } from 'react';
-import CreatePeopleForm from '../features/people/CreatePeopleForm';
 import Heading from '../ui/Heading';
 import Row from '../ui/Row';
+import AddPeople from '../features/people/AddPeople';
+import styled from 'styled-components';
 
+const Sticky = styled.div`
+  position: fixed;
+`;
+const StyledDiv = styled.div`
+  display: flex;
+  gap: 2px;
+  justify-content: space-between;
+`;
 function People() {
-  const [showForm, setShowForm] = useState(false);
   return (
     <>
-      <Row type="horizontal">
-        <Heading as="h1">All cabins</Heading>
-        <p>Filter/Sort</p>
-      </Row>
+      <StyledDiv>
+        <Row type="horizontal">
+          <Sticky>
+            <Heading as="h1" case="upper">
+              All people
+            </Heading>
+          </Sticky>
+        </Row>
+        <AddPeople />
+      </StyledDiv>
       <Row>
         <PeopleTable />
-        <Button
-          type="selected"
-          variation="primary"
-          onClick={() => setShowForm((show) => !show)}
-        >
-          Add new Person
-        </Button>
-        {showForm && <CreatePeopleForm />}
       </Row>
     </>
   );

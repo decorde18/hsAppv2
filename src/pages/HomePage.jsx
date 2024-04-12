@@ -2,6 +2,8 @@ import { styled } from 'styled-components';
 import Header from '../features/layout/Header';
 import Footer from '../features/layout/Footer';
 import { NavLink } from 'react-router-dom';
+import Row from '../ui/Row';
+import Button from '../ui/Button';
 
 const StyledHomePage = styled.div`
   display: grid;
@@ -20,6 +22,14 @@ function HomePage() {
   return (
     <StyledHomePage>
       <Header type="nonApp" />
+
+      <Row type="horizontal" justify="center">
+        <NavLink to="../schedule">
+          <Button size="medium" variation="primary">
+            SCHEDULE
+          </Button>
+        </NavLink>
+      </Row>
       <Main>
         <h1>
           <span>New Players, please </span>

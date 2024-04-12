@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { HiSquare2Stack, HiPencil, HiTrash } from 'react-icons/hi2';
 import ButtonIcon from '../../ui/ButtonIcon';
 import { useDeletePeople } from './useDeletePeople';
+import { convertSBdateToLocalDate } from '../../utils/helpers';
 const TableRow = styled.div`
   display: grid;
   grid-template-columns: 0.5fr 2fr 0.5fr 2fr 1fr 1fr 1fr;
@@ -15,44 +16,20 @@ const TableRow = styled.div`
   }
 `;
 
-const Img = styled.img`
-  display: block;
-  width: 6.4rem;
-  aspect-ratio: 3 / 2;
-  object-fit: cover;
-  object-position: center;
-  transform: scale(1.5) translateX(-7px);
-`;
-
-const People = styled.div`
-  font-size: 1.6rem;
-  font-weight: 600;
-  color: var(--color-grey-600);
-  font-family: 'Sono';
-`;
-
-const Price = styled.div`
-  font-family: 'Sono';
-  font-weight: 600;
-`;
-
-const Discount = styled.div`
-  font-family: 'Sono';
-  font-weight: 500;
-  color: var(--color-green-700);
-`;
-
 function PeopleRow({ person }) {
   const { isDeleting, deletePeople } = useDeletePeople();
   return (
     <>
       <TableRow role="row">
         <div>{person.title}</div>
-        <People>{`${person.firstName} ${person.lastName}`}</People>
-        <div>{person.nickName}</div>
-        <div>{person.otherLastName}</div>
-        <div>{person.email}</div>
+        <div>{person.firstName}</div>
+        <div>{person.lastName}</div>
         <div>{person.cellNumber}</div>
+        <div>{person.email}</div>
+        <div>{convertSBdateToLocalDate(person.created_at)}</div>
+        {/* <div>{person.otherLastName}</div> */}
+        {/* <div>{person.email}</div> */}
+        {/* <div>{person.cellNumber}</div> */}
         <div>
           {/* <button onClick={() => setShowForm((show) => !show)}>
           <HiPencil />

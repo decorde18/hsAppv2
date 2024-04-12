@@ -61,9 +61,10 @@ const options = [
 function SeasonOverview() {
   const { currentSeason, currentSeasonNew } = useCurrentSeason();
   const { isUpdating, updateData } = useUpdateData();
-
-  // const seasonStats = useData({});
-
+  const { isLoading, data } = useData({
+    view: 'season_stats_view',
+    filter: [{ field: 'seasonId', value: currentSeasonNew.id }],
+  });
   function seasonChange(e) {
     const value = e.target.options[e.target.selectedIndex].text;
     const field = 'seasonPhase';
@@ -74,10 +75,12 @@ function SeasonOverview() {
     });
   }
 
-  // const season = seasons.data[0];
   const defaultSeasonPhase = options.find(
     (option) => option.label === currentSeasonNew.seasonPhase
   ).value;
+  if (isLoading) return <Spinner />;
+
+  const [seasonStats] = data;
 
   return (
     <>
@@ -125,50 +128,85 @@ function SeasonOverview() {
               <div>{currentSeasonNew.district}</div>
             </div>
           </Columns>
-          <Columns>
-            <Title>
-              <strong>OVERALL</strong>
-              <Columns>
-                <div>
-                  <strong>Record</strong>
-                  <div>3-0-0</div>
-                </div>
-                <div>
-                  <strong>Win %</strong>
-                  <div>.000</div>
-                </div>
-                <div>
-                  <strong>Goals</strong>
-                  <div>36-24</div>
-                </div>
-              </Columns>
-            </Title>
-            <Title>
-              <strong>DISTRICT</strong>
-              <Columns>
-                <div>
-                  <strong>Record</strong>
-                  <div>3-0-0</div>
-                </div>
-                <div>
-                  <strong>Win %</strong>
-                  <div>.000</div>
-                </div>
-              </Columns>
-            </Title>
-            <Title>
-              <strong>POST-SEASON</strong>
-              <Columns>
-                <div>
-                  <strong>Record</strong>
-                  <div>3-0-0</div>
-                </div>
-                <div>
-                  <strong>Win</strong>%<div>.000</div>
-                </div>
-              </Columns>
-            </Title>
-          </Columns>
+          {seasonStats ? (
+            <Columns>
+              <Title>
+                <strong>OVERALL</strong>
+                <Columns>
+                  <div>
+                    <strong>Record</strong>
+                    <div>
+                      {seasonStats.wins}-{seasonStats.losses}-{seasonStats.ties}
+                    </div>
+                  </div>
+                  <div>
+                    <strong>Win %</strong>
+                    <div>
+                      {(
+                        (seasonStats.wins + 0.5 * seasonStats.ties) /
+                        (seasonStats.wins +
+                          seasonStats.losses +
+                          seasonStats.ties)
+                      ).toFixed(3)}
+                    </div>
+                  </div>
+                  <div>
+                    <strong>Goals</strong>
+                    <div>
+                      {seasonStats.gf}-{seasonStats.ga}
+                    </div>
+                  </div>
+                </Columns>
+              </Title>
+              <Title>
+                <strong>DISTRICT</strong>
+                <Columns>
+                  <div>
+                    <strong>Record</strong>
+                    <div>
+                      {seasonStats.distwins}-{seasonStats.distlosses}-
+                      {seasonStats.distties}
+                    </div>
+                  </div>
+                  <div>
+                    <strong>Win %</strong>
+                    <div>
+                      {(
+                        (seasonStats.distwins + 0.5 * seasonStats.distties) /
+                        (seasonStats.distwins +
+                          seasonStats.distlosses +
+                          seasonStats.distties)
+                      ).toFixed(3)}
+                    </div>
+                  </div>
+                </Columns>
+              </Title>
+              <Title>
+                <strong>POST-SEASON</strong>
+                <Columns>
+                  <div>
+                    <strong>Record</strong>
+                    <div>
+                      {seasonStats.postwins}-{seasonStats.postlosses}
+                    </div>
+                  </div>
+                  <div>
+                    <strong>Win</strong>%
+                    <div>
+                      {(
+                        (seasonStats.postwins + 0.5 * seasonStats.postties) /
+                        (seasonStats.postwins +
+                          seasonStats.postlosses +
+                          seasonStats.postties)
+                      ).toFixed(3)}
+                    </div>
+                  </div>
+                </Columns>
+              </Title>
+            </Columns>
+          ) : (
+            <Title>NO GAMES PLAYED</Title>
+          )}
           <Staff>
             <Columns>
               <Title>
