@@ -51,7 +51,7 @@ function GameTable() {
             </Modal.Open>
           )}
 
-          {(session?.provider_token ||
+          {(!process.env.NODE_ENV ||
             process.env.NODE_ENV === 'development') && (
             <Modal.Open opens="game-form">
               <Button type="selected" variation="primary">
