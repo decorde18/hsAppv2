@@ -15,7 +15,13 @@ const StyledRow = styled.div`
 function HeaderSortFilter({ header, sort, filters, isSearchable }) {
   const { name, label, field, table } = header;
   const { handleSort, sortDirection, defaultSortDirection } = sort;
-  const { handleFilterChange, filter, options, currentValue } = filters;
+  const {
+    handleFilterChange,
+    filter,
+    options,
+    currentValue,
+    handleSearchChange,
+  } = filters;
 
   function handleSortChange() {
     if (defaultSortDirection === undefined) return;
@@ -51,8 +57,7 @@ function HeaderSortFilter({ header, sort, filters, isSearchable }) {
           value={currentValue?.length && currentValue[0]}
         />
       )}
-      {isSearchable && <Input />}
-      {/* //todo create */}
+      {isSearchable && <Input name={field} onChange={handleSearchChange} />}
     </StyledColumn>
   );
 }

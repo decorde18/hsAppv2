@@ -11,7 +11,7 @@ export async function createDataApi({ newData, table, view }) {
   }
   return { data, table, view };
 }
-export async function getData({ table, filter, sort }) {
+export async function getData({ table, filter, search, sort }) {
   let query = supabase.from(table).select(`*`);
 
   filter &&
@@ -22,13 +22,15 @@ export async function getData({ table, filter, sort }) {
           : query.textSearch(each.field, each.value.join(' or '), {
               type: 'websearch',
               config: 'english',
-            }))
+            })) //multiple filters
     );
 
   sort &&
     sort.map(
       (each) => (query = query.order(each.field, { ascending: each.direction }))
     );
+  search &&
+    search.map((each) => (query = query.ilike(each.field, `%${each.value}%`)));
   query;
   const { data, error } = await query;
 

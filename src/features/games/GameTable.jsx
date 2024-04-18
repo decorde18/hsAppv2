@@ -26,7 +26,7 @@ function GameTable() {
   function handleButtonGroupChange(e) {
     setTableData(e.target.name);
   }
-
+  console.log(session);
   return (
     <>
       <StyledDiv>
@@ -51,7 +51,8 @@ function GameTable() {
             </Modal.Open>
           )}
 
-          {!process.env.NODE_ENV ||
+          {session?.provider_token ||
+            !process.env.NODE_ENV ||
             (process.env.NODE_ENV === 'development' && (
               <Modal.Open opens="game-form">
                 <Button type="selected" variation="primary">

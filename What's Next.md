@@ -69,7 +69,7 @@
 - create file upload page for team pics, player pics, etc - see https://www.youtube.com/watch?v=HvOvdD2nX1k
 - useMutation in create playerForm does not run on create parents because of iterations. If you can understand the useMutation hook later on as a developer, fix it
 
-3/5/2024
+## 3/5/2024
 
 - DONE playerTable clean it up (filter, sort)
 - DONE when click on Players, url changes to season =recent, but season selector does not
@@ -77,18 +77,18 @@
 - DONE add coach on schedule helper not working (says firstname and last name required)
 - DONE Player INFORMATION pop up modal
 
-3/16/2024
+## 3/16/2024
 
 - DONE add gender, nickname to playersviwe2
 - DONE add to createPlayerModalForm
 - DONE modified at or updated at from playersview2 needs to be changed (not sure which table)
-  -DONE Universal fetch api
+- DONE Universal fetch api
 - DONE finish parentModal
 - DONE editPlayerModal for new players
 - DONE delete picture altRoster gkRoster rosterNumber
 - DONE redo games tables
 
-4/11/2024
+## 4/11/2024
 
 - DONE People Table
 - DONE fix seasoncontext / season selector to update currentSeason New
@@ -99,4 +99,6 @@
 - DONE filter searchParams when season # dos not exist (ie seasonId=24)
 - DONE all-time Players clean it up (filter, sort)
 - DONE all-time Games Create
-  -DONE Filters ---see filter from PlayerTable and convert to global
+- DONE Filters ---see filter from PlayerTable and convert to global
+
+##

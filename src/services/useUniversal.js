@@ -55,7 +55,7 @@ export function useCreateData() {
 
   return { isCreating, createData };
 }
-export function useData({ table, filter, sort, isSeason }) {
+export function useData({ table, filter, sort, search, isSeason }) {
   // const { currentSeason } = useCurrentSeason();
 
   table =
@@ -66,7 +66,7 @@ export function useData({ table, filter, sort, isSeason }) {
   //   : filter;
   const { isLoading, data, error } = useQuery({
     queryKey: [table, filter, sort],
-    queryFn: () => getData({ table, filter, sort }),
+    queryFn: () => getData({ table, filter, search, sort }),
   });
 
   return { isLoading, error, data };

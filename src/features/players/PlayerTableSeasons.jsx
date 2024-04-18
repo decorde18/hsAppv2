@@ -133,6 +133,7 @@ function PlayerTableSeasons({ setFilteredCount }) {
     return (acc = acc.concat(' ', cur.width));
   }, '');
   const [filterOptions, setFilterOptions] = useState({});
+  const [searchOptions, setSearchOptions] = useState({});
   const [currentFilters, setCurrentFilters] = useState([
     ...columns
       .filter((column) => column.defaultFilter)
@@ -166,7 +167,6 @@ function PlayerTableSeasons({ setFilteredCount }) {
       { field: 'seasonId', value: currentSeasonNew.id, table: 'playerSeasons' },
     ],
     sort: sort.playerSeasons,
-    // isSeason: true,
   });
 
   useEffect(() => {
@@ -208,6 +208,29 @@ function PlayerTableSeasons({ setFilteredCount }) {
     const newSort = sortUpdate({ selectedSort, sort });
     setSort(newSort);
   }
+  function handleSearchChange(e) {
+    //todo ? probably better to create a filter outside and use that data for render, this will only add the searchOptions when changed
+    const name = e.target.name;
+    const value = e.target.value.toLowerCase();
+    const search = {
+      ...searchOptions,
+      [name]: value,
+    };
+    delete search.data;
+    setSearchOptions({
+      ...searchOptions,
+      ...search,
+      data: Object.keys(search).reduce(
+        (acc, each) => [
+          ...acc,
+          ...playerSeasons.data.filter((record) =>
+            record[each].toLowerCase().includes(value)
+          ),
+        ],
+        []
+      ),
+    }); //add filtered data to searchOptions to use in render
+  }
 
   if (playerSeasons.isLoading) return <Spinner />;
 
@@ -235,6 +258,7 @@ function PlayerTableSeasons({ setFilteredCount }) {
               filters={{
                 filter: column.filter,
                 handleFilterChange: handleFilterChange,
+                handleSearchChange: handleSearchChange,
                 options: filterOptions[column.field]?.map((each) => ({
                   label: each,
                   value: each,
@@ -256,7 +280,7 @@ function PlayerTableSeasons({ setFilteredCount }) {
           <Empty resource="Players" />
         ) : (
           <Table.Body
-            data={playerSeasons.data}
+            data={searchOptions.data || playerSeasons.data}
             render={(player) => (
               <PlayerSeasonRow
                 playerSeason={player}
