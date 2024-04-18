@@ -1,5 +1,6 @@
 ## //TODO FIXME !!!
 
+- fix events with Google log in
 - remove bootstrap - ButtonGroup in CreateGame
 
 - MainSection (it is in GameSettings), do we need it?)

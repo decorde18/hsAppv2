@@ -26,7 +26,9 @@ function GameTable() {
   function handleButtonGroupChange(e) {
     setTableData(e.target.name);
   }
+  session.green = 'yes';
   console.log(session);
+
   return (
     <>
       <StyledDiv>
@@ -37,9 +39,9 @@ function GameTable() {
         />
         <div>{filteredCount} games</div>
         <Modal>
-          {!session.provider_token ||
-          !process.env.NODE_ENV ||
-          process.env.NODE_ENV !== 'development' ? (
+          {!session.provider_token ? (
+            // || !process.env.NODE_ENV ||
+            // process.env.NODE_ENV !== 'development'
             <Modal.Open opens="game-form-error">
               <div>You are not logged in to Google in order to add games</div>
             </Modal.Open>
