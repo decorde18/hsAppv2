@@ -1,6 +1,6 @@
 import { styled } from 'styled-components';
-import Header from '../features/layout/Header';
-import Footer from '../features/layout/Footer';
+import Header from './layout/Header';
+import Footer from './layout/Footer';
 import { NavLink } from 'react-router-dom';
 import Row from '../ui/Row';
 import Button from '../ui/Button';
@@ -8,7 +8,7 @@ import Button from '../ui/Button';
 const StyledHomePage = styled.div`
   display: grid;
   overflow: auto;
-  height: 100vh;
+  height: 100dvh;
   grid-template-rows: 15rem 1fr auto;
 `;
 const Main = styled.main`

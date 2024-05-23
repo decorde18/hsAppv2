@@ -32,7 +32,9 @@ new player form
 </Heading>
 <Heading as="h5" case="upper" location="center">
 
+              <FormRow key={field.name} label={field.label} error={''}>
 <Row type="vertical" justify="space-between" align='center'>
+<Grid  columns={2} rows={2s}>
 
 <Button size='medium' type="selected" variation="primary"> type = selected  fullWidth
         <ButtonGroup
@@ -40,18 +42,18 @@ new player form
           defaultBtn={tableData}
           onChange={handleButtonGroupChange}
         />
- Input = ({ size = defaultAnimationValues.size, ...props 
- })
-                          type="text"
-          disabled={isWorking}
-          id={each.field}
-                         register={{
-                          ...register(each.field, {
-                            required: each.required ? each.message : false,
-                          }),
-                        }}
-                        size = {each.size}SIZE IN REM
-                        ref={null} 
+            <Input
+              type={each.type}
+              disabled={isWorking}
+              id={each.field}
+              register={{
+                ...register(each.field, {
+                  required: each.required ? each.message : false,
+                }),
+              }}
+              size={each.size}
+              ref={null}
+            />
 
       <Select
         width={12.7}

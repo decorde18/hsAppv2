@@ -2,9 +2,9 @@ import { useSession, useSessionContext } from '@supabase/auth-helpers-react';
 
 import { useNavigate } from 'react-router-dom';
 import { googleSignIn } from '../../services/apiAuth';
-import Logout from '../authentication/Logout';
-import { useUser } from '../authentication/useUser';
-import UserAvatar from '../authentication/UserAvatar';
+import Logout from '../../features/authentication/Logout';
+import { useUser } from '../../features/authentication/useUser';
+import UserAvatar from '../../features/authentication/UserAvatar';
 
 import Button from '../../ui/Button';
 import ButtonIcon from '../../ui/ButtonIcon';

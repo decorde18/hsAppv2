@@ -1,11 +1,11 @@
 import { useForm } from 'react-hook-form';
-import Form from '../../ui/Form';
-import FormRow from '../../ui/FormRow';
-import Input from '../../ui/Input';
-import Select from '../../ui/Select';
-import { ButtonGroup } from 'react-bootstrap';
+import Form from './Form';
+import FormRow from './FormRow';
+import Input from './Input';
+import Select from './Select';
 import { useState } from 'react';
-import Button from '../../ui/Button';
+import Button from './Button';
+import ButtonGroup from './ButtonGroup';
 
 const fields = [];
 const selectFields = [
@@ -22,7 +22,7 @@ const selectFields = [
     ],
   },
 ];
-function UniversalForm() {
+function UniversalFormOld() {
   const { register, handleSubmit, reset, setValue, getValues, formState } =
     useForm();
   const { errors } = formState;
@@ -110,4 +110,4 @@ function UniversalForm() {
   );
 }
 
-export default UniversalForm;
+export default UniversalFormOld;

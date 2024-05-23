@@ -1,5 +1,5 @@
 import ScheduleTable from '../features/games/ScheduleTable';
-import AppLayoutPublic from '../features/layout/AppLayoutPublic';
+import AppLayoutPublic from './layout/AppLayoutPublic';
 import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
 import Logo from '../ui/Logo';
 import styled from 'styled-components';
@@ -23,7 +23,7 @@ const StyledLogo = styled.div`
 `;
 const StyledDiv = styled.div`
   @media screen {
-    min-height: 100vh;
+    min-height: 100dvh;
     display: grid;
     grid-template-columns: 1fr;
     align-content: center;

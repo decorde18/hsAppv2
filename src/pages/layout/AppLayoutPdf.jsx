@@ -6,7 +6,7 @@ import { Outlet } from 'react-router-dom';
 import Spinner from '../../ui/Spinner';
 
 const StyledAppLayout = styled.div`
-  /* height: 100vh;
+  /* height: 100dvh;
   overflow: clip;
   display: grid;
   grid-template-rows: 15rem 1fr auto; */
@@ -36,7 +36,7 @@ export default AppLayoutPdf;
 //   display: grid;
 //   grid-template-columns: 26rem 1fr;
 //   grid-template-rows: auto 1fr;
-//   height: 100vh;
+//   height: 100dvh;
 // `;
 // const Container = styled.div`
 //   max-width: 120rem;

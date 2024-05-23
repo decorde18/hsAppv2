@@ -1,6 +1,6 @@
 import Spinner from '../../ui/Spinner';
 import PeopleRow from './PeopleRow';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useData } from '../../services/useUniversal';
 import Menus from '../../ui/Menus';
 import Table from '../../ui/Table';
@@ -86,6 +86,7 @@ function PeopleTable() {
   const [filterOptions, setFilterOptions] = useState({});
 
   const [currentFilters, setCurrentFilters] = useState([]);
+  const [textFilters, setTextFilters] = useState({});
   const [sort, setSort] = useState({
     [[
       ...new Set(
@@ -100,19 +101,45 @@ function PeopleTable() {
       }))
       .sort((a, b) => a.sortPriority - b.sortPriority),
   }); //defaultSort
+  const [filteredValues, setFilteredValues] = useState([]);
 
   const { isLoading, data: people } = useData({
     table: 'people',
     sort: sort.people,
   });
+
+  useEffect(() => {
+    if (isLoading) return;
+    setFilteredValues(people);
+  }, [isLoading, people]);
+
   function handleFilterChange(selected, { name }) {
     const newFilter = filterChange({ selected, name, currentFilters, columns });
     setCurrentFilters(newFilter);
   }
+  function handleSearchChange(e) {
+    const textField = e.target.name;
+    const textValue = e.target.value.toLowerCase();
+    const newTextFilter = {
+      ...textFilters,
+      [textField]: textValue,
+    };
+
+    setFilteredValues(
+      people.filter((record) =>
+        Object.entries(newTextFilter).every(([key, value]) =>
+          record[key]?.toLowerCase().includes(value)
+        )
+      )
+    );
+    setTextFilters(newTextFilter);
+  }
+
   function handleSort(selectedSort) {
     const newSort = sortUpdate({ selectedSort, sort });
     setSort(newSort);
   }
+
   if (isLoading) return <Spinner />;
 
   return (
@@ -139,6 +166,7 @@ function PeopleTable() {
               filters={{
                 filter: column.filter,
                 handleFilterChange: handleFilterChange,
+                handleSearchChange,
                 options: filterOptions[column.field]?.map((each) => ({
                   label: each,
                   value: each,
@@ -156,11 +184,11 @@ function PeopleTable() {
             />
           ))}
         </Table.Header>
-        {people.length === 0 ? (
+        {filteredValues?.length === 0 ? (
           <Empty resource="People" />
         ) : (
           <Table.Body
-            data={people}
+            data={filteredValues}
             render={(person) => <PeopleRow person={person} key={person.id} />}
           />
         )}

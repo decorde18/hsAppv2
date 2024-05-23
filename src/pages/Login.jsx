@@ -4,7 +4,7 @@ import Heading from '../ui/Heading';
 import Logo from '../ui/Logo';
 
 const LoginLayout = styled.main`
-  min-height: 100vh;
+  min-height: 100dvh;
   display: grid;
   grid-template-columns: 48rem;
   align-content: center;

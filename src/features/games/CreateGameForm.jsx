@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import moment from 'moment';
 import styled from 'styled-components';
-import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import { useForm } from 'react-hook-form';
 
 import Form from '../../ui/Form';
@@ -24,6 +23,7 @@ import { useLocations } from '../locations/useLocations';
 import { useSchools } from '../schools/useSchools';
 import { useCreateGame, useEditGame } from './useGames';
 import { createEditGoogleCalendarGame } from '../../services/apiGoogle';
+import ButtonGroup from '../../ui/ButtonGroup';
 
 const Div = styled.div`
   height: 100%;
@@ -52,7 +52,7 @@ const StyledSelect = styled.select`
 `;
 const Flex = styled.div`
   display: flex;
-  max-height: 90vh;
+  max-height: 90dvh;
 `;
 const MainForm = styled.div`
   width: 70rem;

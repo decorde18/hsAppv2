@@ -13,7 +13,7 @@ import Spinner from '../../ui/Spinner';
 import styled from 'styled-components';
 
 const Container = styled.div`
-  height: 75vh;
+  height: 75dvh;
   width: 75vw;
   overflow: hidden;
   display: flex;

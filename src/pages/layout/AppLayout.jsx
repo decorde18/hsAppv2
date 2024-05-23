@@ -8,7 +8,7 @@ import { Outlet } from 'react-router-dom';
 
 const StyledAppLayout = styled.div`
   //THIS IS FOR THE HEADER< BODY< FOOTER
-  height: 100vh;
+  height: 100dvh;
   display: grid;
   grid-template-columns: 15fr 85fr; //aside main
   overflow: hidden;

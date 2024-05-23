@@ -57,14 +57,14 @@ const Container = styled.div`
   background-color: var(--color-grey-0);
   border: 1px solid var(--color-grey-100);
   border-radius: var(--border-radius-lg);
-  max-height: 95vh;
+  max-height: 95dvh;
   overflow: auto;
   opacity: 0.9;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   position: absolute;
-  /* padding: 2.5vh 0; */
+  /* padding: 2.5dvh 0; */
 `;
 const Header = styled.header`
   padding: 0 1rem;
@@ -72,7 +72,7 @@ const Header = styled.header`
 const Div2 = styled.div`
   padding: 1rem 5rem;
   border-radius: var(--border-radius-lg);
-  /* height: 100vh; */
+  /* height: 100dvh; */
   min-width: 95rem;
 `;
 const StyledSelect = styled.select`

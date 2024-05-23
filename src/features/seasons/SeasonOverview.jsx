@@ -11,7 +11,7 @@ import Button from '../../ui/Button';
 import Row from '../../ui/Row';
 
 const Container = styled.div`
-  height: 75vh;
+  height: 75dvh;
   width: 75vw;
   padding: 2rem 2rem 2rem 2rem;
   overflow: hidden;

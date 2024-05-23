@@ -187,7 +187,7 @@ function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
               </Button>
 
               <Button disabled={isWorking}>
-                {isEditSession ? 'Edit Player' : 'Create New Player'}
+                {isEditSession ? 'Save Changes' : 'Create New Player'}
               </Button>
             </FormRow>
           </>

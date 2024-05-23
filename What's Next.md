@@ -1,9 +1,10 @@
 ## //TODO FIXME !!!
 
-- fix events with Google log in
-- remove bootstrap - ButtonGroup in CreateGame
+- ability to update schools - update coach for school
 
-- MainSection (it is in GameSettings), do we need it?)
+- fix games and events with Google log in - allow Development to acces game form
+- DONE remove bootstrap - ButtonGroup in CreateGame
+
 - People Table - convert to overall table add view edit
 - SeasonSideBar.jsx:9 The component styled.img with the id of "sc-jdEkgJ" has been created dynamically.You may see this warning because you've called styled inside another component.To resolve this only create new StyledComponents outside of any render method and function component. at SeasonSideBar (http://localhost:5173/src/features/seasons/SeasonSideBar.jsx:19:26)
 
@@ -33,6 +34,7 @@
 
 ## TODO NEXT !!!
 
+- Season Overview All-Time
 - Pagination
 - schedule Helper - email functionality --include check all of each subHeading - add JV/V/both ? - on change to scheduled, go to create game - when scheduled, button to go to game
   - continue game stats manual entry - add new entries

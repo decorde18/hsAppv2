@@ -224,7 +224,7 @@ function PlayerTableSeasons({ setFilteredCount }) {
         (acc, each) => [
           ...acc,
           ...playerSeasons.data.filter((record) =>
-            record[each].toLowerCase().includes(value)
+            record[each]?.toLowerCase().includes(value)
           ),
         ],
         []

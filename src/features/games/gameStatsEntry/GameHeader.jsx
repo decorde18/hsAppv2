@@ -5,7 +5,7 @@ import Row from '../../../ui/Row';
 
 const StyledDiv = styled.div`
   padding: 2rem;
-  height: 15dvh;
+  height: 15ddvh;
 `;
 // GAME HEADER - use on (Game Break?, game stoppage? are these modals?),
 // before game , after game

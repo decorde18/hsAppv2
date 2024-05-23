@@ -26,10 +26,8 @@ function GameTable() {
   function handleButtonGroupChange(e) {
     setTableData(e.target.name);
   }
-  session.green = 'yes';
-  console.log(session);
 
-  return (
+    return (
     <>
       <StyledDiv>
         <ButtonGroup
@@ -39,7 +37,7 @@ function GameTable() {
         />
         <div>{filteredCount} games</div>
         <Modal>
-          {!session.provider_token ? (
+          {!session?.provider_token ? (
             // || !process.env.NODE_ENV ||
             // process.env.NODE_ENV !== 'development'
             <Modal.Open opens="game-form-error">

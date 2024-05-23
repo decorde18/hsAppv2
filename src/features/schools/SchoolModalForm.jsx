@@ -1,17 +1,17 @@
 import styled from 'styled-components';
-import { useForm } from 'react-hook-form';
-import { useState } from 'react';
+// import { useForm } from 'react-hook-form';
+// import { useState } from 'react';
 
-import Form from '../ui/Form';
-import Heading from '../ui/Heading';
-import FormRow from '../ui/FormRow';
-import Row from '../ui/Row';
-import Button from '../ui/Button';
-import Input from '../ui/Input';
+// import Form from '../ui/Form';
+// import Heading from '../ui/Heading';
+// import FormRow from '../ui/FormRow';
+// import Row from '../ui/Row';
+// import Button from '../ui/Button';
+// import Input from '../ui/Input';
 
-import CreateParentModalForm from '../features/players/CreateParentModalForm';
+// import CreateParentModalForm from '../features/players/CreateParentModalForm';
 
-import { useData, useUpdateData } from '../services/useUniversal';
+// import { useData, useUpdateData } from '../services/useUniversal';
 
 const fields = [
   {
@@ -117,57 +117,59 @@ const StyledBtn = styled.div`
   border: 1px solid var(--color-brand-500);
 `;
 
-function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
-  const isEditSession = Boolean(playerToEdit.id);
+function CreateSchoolForm({ record = {}, onCloseModal }) {
+  // function CreateSchoolForm({ playerToEdit = {}, onCloseModal }) {
+  //   const isEditSession = Boolean(playerToEdit.id);
 
-  const { register, handleSubmit, reset, formState } = useForm({
-    defaultValues: isEditSession ? playerToEdit : {},
-  });
-  const { errors } = formState;
+  //   const { register, handleSubmit, reset, formState } = useForm({
+  //     defaultValues: isEditSession ? playerToEdit : {},
+  //   });
+  //   const { errors } = formState;
 
-  const { isUpdating, updateData } = useUpdateData();
-  const [showParents, setShowParents] = useState(false);
+  //   const { isUpdating, updateData } = useUpdateData();
+  //   const [showParents, setShowParents] = useState(false);
 
-  const parents = useData({
-    table: 'parents',
-    sort: [{ field: 'fullnamelast', direction: true }],
-  });
-  const playerParents = useData({
-    table: 'playerParents',
-    filter: [{ field: 'player', value: playerToEdit.playerId }],
-    sort: [{ field: 'fullnamelast', direction: true }],
-  });
-  const isWorking = isUpdating;
+  //   const parents = useData({
+  //     table: 'parents',
+  //     sort: [{ field: 'fullnamelast', direction: true }],
+  //   });
+  //   const playerParents = useData({
+  //     table: 'playerParents',
+  //     filter: [{ field: 'player', value: playerToEdit.playerId }],
+  //     sort: [{ field: 'fullnamelast', direction: true }],
+  //   });
+  //   const isWorking = isUpdating;
 
-  function onSubmit(data) {
-    if (isEditSession) {
-      tableIds.map((table) =>
-        updateData({
-          table: table.table,
-          newData: Object.assign(
-            {},
-            ...fields
-              .filter((field) => field.table === table.table)
-              .map((field) => ({ [field.field]: data[field.field] }))
-          ),
-          id: data[table.id],
-        })
-      );
-    }
-    close();
-  }
-  function close() {
-    reset();
-    onCloseModal?.();
-  }
-  function onError(errors) {
-    console.log(errors);
-  }
-  if (parents.isLoading || playerParents.isLoading) return;
+  // function onSubmit(data) {
+  //   if (isEditSession) {
+  //     tableIds.map((table) =>
+  //       updateData({
+  //         table: table.table,
+  //         newData: Object.assign(
+  //           {},
+  //           ...fields
+  //             .filter((field) => field.table === table.table)
+  //             .map((field) => ({ [field.field]: data[field.field] }))
+  //         ),
+  //         id: data[table.id],
+  //       })
+  //     );
+  //   }
+  //   close();
+  // }
+  // function close() {
+  //   reset();
+  //   onCloseModal?.();
+  // }
+  // function onError(errors) {
+  //   console.log(errors);
+  // }
+  // if (parents.isLoading || playerParents.isLoading) return;
 
   return (
     <>
-      <Form
+      <div>School Modal Form</div>
+      {/* <Form
         onSubmit={handleSubmit(onSubmit, onError)}
         type={onCloseModal ? 'Modal' : 'regular'}
       >
@@ -217,7 +219,7 @@ function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
               </Button>
 
               <Button disabled={isWorking}>
-                {isEditSession ? 'Edit Player' : 'Create New Player'}
+                {isEditSession ? 'Save Changes' : 'Create New Player'}
               </Button>
             </FormRow>
           </>
@@ -229,9 +231,9 @@ function CreatePlayerForm({ playerToEdit = {}, onCloseModal }) {
         playerId={playerToEdit.playerId}
         parents={parents}
         playerParents={playerParents}
-      />
+      /> */}
     </>
   );
 }
 
-export default CreatePlayerForm;
+export default CreateSchoolForm;

@@ -1,12 +1,12 @@
 import { styled } from 'styled-components';
-import Footer from '../features/layout/Footer';
-import Header from '../features/layout/Header';
+import Footer from './layout/Footer';
+import Header from './layout/Header';
 import BackButton from '../ui/BackButton';
 
 const Div = styled.div`
   display: grid;
   overflow: auto;
-  height: 100vh;
+  height: 100dvh;
   grid-template-rows: 15rem 1fr auto;
 `;
 const Div2 = styled.div`

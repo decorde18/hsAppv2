@@ -50,7 +50,7 @@ const StyledSelect = styled.select`
 `;
 const Flex = styled.div`
   display: flex;
-  max-height: 90vh;
+  max-height: 90dvh;
 `;
 const MainForm = styled.div`
   width: 70rem;
