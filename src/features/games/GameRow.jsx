@@ -1,5 +1,11 @@
 import styled from 'styled-components';
-import { HiPencil, HiTrash, HiEye } from 'react-icons/hi2';
+import {
+  HiPencil,
+  HiTrash,
+  HiEye,
+  HiOutlineChartBar,
+  HiVideoCamera,
+} from 'react-icons/hi2';
 
 import Table from '../../ui/Table';
 import Row from '../../ui/Row';
@@ -20,6 +26,9 @@ import {
 
 // import CreatePlayerForm from './CreatePlayerModalForm';
 import { useState } from 'react';
+import { Link, NavLink } from 'react-router-dom';
+import AddGame from './AddGame';
+import CreateGameForm from './CreateGameForm';
 // import PlayerIndividualPage from './PlayerIndividualPage';
 
 const Game = styled.div`
@@ -27,6 +36,8 @@ const Game = styled.div`
   font-weight: 500;
   color: var(--color-grey-600);
 `;
+
+//TODO DEPATURE TIME - SET departure time / bus - pop up
 
 function GameRow({ game, teams }) {
   const { isUpdating, updateData } = useUpdateData();
@@ -65,7 +76,6 @@ function GameRow({ game, teams }) {
       id: game.id,
     });
   }
-
   return (
     <Table.Row>
       {/* if I want to do this, ...
@@ -91,11 +101,8 @@ function GameRow({ game, teams }) {
 
       <Modal>
         <Menus.Menu>
-          <Menus.Toggle id={game.playerId} />
-          <Menus.List id={game.playerId}>
-            <Modal.Open opens="view">
-              <Menus.Button icon={<HiEye />}>View</Menus.Button>
-            </Modal.Open>
+          <Menus.Toggle id={game.id} />
+          <Menus.List id={game.id}>
             <Modal.Open opens="edit">
               <Menus.Button icon={<HiPencil />}>edit</Menus.Button>
             </Modal.Open>
@@ -103,13 +110,26 @@ function GameRow({ game, teams }) {
             {/* <Modal.Open opens="delete">
               <Menus.Button icon={<HiTrash />}>delete</Menus.Button>
             </Modal.Open> */}
-          </Menus.List>
-          <Modal.Window name="view">
-            {/* {<PlayerIndividualPage player={playerSeason} />} */}
-          </Modal.Window>
 
+            <NavLink
+              to={`/protected/Game?gameId=${game.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Menus.Button icon={<HiOutlineChartBar />}>Stats</Menus.Button>
+            </NavLink>
+            {game.veoLink && (
+              <NavLink
+                to={`https://app.veo.co/matches/${game.veoLink}/`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Menus.Button icon={<HiVideoCamera />}>Veo Link</Menus.Button>
+              </NavLink>
+            )}
+          </Menus.List>
           <Modal.Window name="edit">
-            {/* {<CreatePlayerForm playerToEdit={player} />} */}
+            {<CreateGameForm gameToEdit={game} />}
           </Modal.Window>
 
           {/* <Modal.Window name="delete">

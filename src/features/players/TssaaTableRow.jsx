@@ -32,10 +32,10 @@ const Center = styled.div`
 function TssaaTableRow({ player }) {
   return (
     <Table.PrintRowBorder>
-      <Player>{`${player.players.people.firstName} ${player.players.people.lastName}`}</Player>
-      <Player>{formatDate(new Date(player.players.dateOfBirth))}</Player>
-      <Player>{player.players.entryYear}</Player>
-      <Player>{player.players.creditsNeeded}</Player>
+      <Player>{`${player.firstName} ${player.lastName}`}</Player>
+      <Player>{formatDate(new Date(player.dateOfBirth))}</Player>
+      <Player>{player.entryYear}</Player>
+      <Player>{player.creditsNeeded}</Player>
       <EmptyDiv> </EmptyDiv>
       <Div>
         <Center>{player.returningPlayer ? 'X' : ''}</Center>

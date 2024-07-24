@@ -23,6 +23,10 @@ const tables = [
     name: 'playerSeasons',
     view: 'players_seasons_view',
   },
+  {
+    name: 'playerGame',
+    view: 'stats_by_player_game_view',
+  },
   { name: 'parents', view: 'parents_view' },
   {
     name: 'playerParents',
@@ -33,11 +37,31 @@ const tables = [
     view: 'games_view',
   },
   {
+    name: 'periods',
+  },
+
+  {
+    name: 'sub',
+    view: 'subs_game_view',
+  },
+  {
+    name: 'minorEvents',
+    view: 'minor_events_view',
+  },
+  {
+    name: 'subs',
+    view: 'subs_game_totals_view',
+  },
+  {
     name: 'locations',
     view: 'locations_view',
   },
   {
     name: 'schools',
+    view: 'schools_view',
+  },
+  {
+    name: 'stoppages',
     view: 'schools_view',
   },
 ];
@@ -46,8 +70,8 @@ export function useCreateData() {
   const queryClient = useQueryClient();
   const { mutate: createData, isLoading: isCreating } = useMutation({
     mutationFn: createDataApi,
-    onSuccess: ({ data, table, view }) => {
-      toast.success(`New Data successfully created in ${table}`);
+    onSuccess: ({ data, table, view, toast }) => {
+      if (toast) toast.success(`New Data successfully created in ${table}`);
       queryClient.invalidateQueries({ queries: [view] });
     },
     onError: (err) => toast.error(err.message),

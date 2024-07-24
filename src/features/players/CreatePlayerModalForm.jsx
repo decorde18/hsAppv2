@@ -84,6 +84,11 @@ const fields = [
     required: true,
     message: 'We need the grade',
   },
+  {
+    label: 'Previous School',
+    field: 'previousSchool',
+    table: 'player',
+  },
   { field: 'empty2' },
 ];
 

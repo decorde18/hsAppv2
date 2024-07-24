@@ -12,7 +12,7 @@ import Login from './pages/Login';
 import PageNotFound from './pages/PageNotFound';
 import GlobalStyles from './styles/GlobalStyles';
 import AppLayout from './pages/layout/AppLayout';
-import AppLayoutPdf from './pages/layout/AppLayoutPdf';
+import AppLayoutProtected from './pages/layout/AppLayoutProtected';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SessionContextProvider } from '@supabase/auth-helpers-react';
@@ -119,7 +119,7 @@ function App() {
                 path="protected"
                 element={
                   <ProtectedRoute>
-                    <AppLayoutPdf />
+                    <AppLayoutProtected />
                   </ProtectedRoute>
                 }
               >

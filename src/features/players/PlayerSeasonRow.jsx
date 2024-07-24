@@ -69,7 +69,7 @@ function PlayerSeasonRow({ playerSeason, teams }) {
       id: player.id,
     });
   }
-
+  //TODO FIXME !!! there is a big error when changing a player from tryout to rostered, in Supabase, I can't seem to set default to empty array.
   return (
     <Table.Row>
       {/* if I want to do this, ...

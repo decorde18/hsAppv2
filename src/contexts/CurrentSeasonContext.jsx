@@ -41,7 +41,8 @@ function CurrentSeasonProvider({ children }) {
   useEffect(() => {
     if (isLoading) return;
     const recent = seasons[0];
-    const current = seasons.find((season) => season.id === +currentSeason);
+    const current =
+      seasons.find((season) => season.id === +currentSeason) || recent;
     //get recent season from API
     setRecentSeasonNew(recent);
     //if current season is stored locally, use it

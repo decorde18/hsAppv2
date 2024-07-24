@@ -54,6 +54,10 @@ function PlayerPersonalInformation({ player }) {
             <div>Year Entered 9th:</div>
             <Value>{player.entryYear}</Value>
           </SubFlex>
+          <SubFlex>
+            <div>Previous School:</div>
+            <Value>{player.previousSchool}</Value>
+          </SubFlex>
         </Flex>
       </Main>
     </>

@@ -1,15 +1,21 @@
 import supabase from './supabase';
 
-export async function createDataApi({ newData, table, view }) {
+export async function createDataApi({
+  newData,
+  table,
+  view,
+  bulk = false,
+  toast = true,
+}) {
   const { data, error } = await supabase
     .from(table)
-    .insert([{ ...newData }])
+    .insert(bulk ? newData : [{ ...newData }]) // ??? DOES THIS WORK?
     .select();
+
   if (error) {
-    console.log(error);
-    throw new Error('Player Season Could Not Be created');
+    throw new Error(`Data in ${table} Could Not Be created`);
   }
-  return { data, table, view };
+  return { data, table, view, toast };
 }
 export async function getData({ table, filter, search, sort }) {
   let query = supabase.from(table).select(`*`);

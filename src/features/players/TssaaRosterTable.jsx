@@ -9,6 +9,8 @@ import TssaaTableRow from './TssaaTableRow';
 
 import { useSeason } from '../seasons/useSeasons';
 import { usePlayerSeasons } from './usePlayerSeasons';
+import { useData } from '../../services/useUniversal';
+import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 
 const Center = styled.div`
   text-align: center;
@@ -34,28 +36,36 @@ const Container = styled.div`
 `;
 
 function TssaaRosterTable() {
+  const { currentSeason, currentSeasonNew } = useCurrentSeason();
   const { isLoadingSeason, season } = useSeason();
-  const { isLoadingPlayerSeasons, playerSeasons } = usePlayerSeasons();
+  const playerSeasons = useData({
+    table: 'playerSeasons',
+    filter: [
+      { field: 'seasonId', value: currentSeasonNew.id, table: 'playerSeasons' },
+      { field: 'status', value: 'Rostered', table: 'playerSeasons' },
+    ],
+  });
 
-  if (isLoadingPlayerSeasons || isLoadingSeason) return <Spinner />;
-  if (!season)
-    return (
-      <Container>
-        <Empty resource="Season" />
-      </Container>
-    );
-  if (!playerSeasons.length)
+  if (playerSeasons.isLoading || isLoadingSeason) return <Spinner />;
+  console.log(currentSeasonNew.id, playerSeasons);
+  // if (!season)
+  //   return (
+  //     <Container>
+  //       <Empty resource="Season" />
+  //     </Container>
+  //   );
+  if (!playerSeasons.data.length)
     return (
       <Container>
         <Empty resource="Players" />
       </Container>
     );
 
-  const tssaaRoster = playerSeasons
+  const tssaaRoster = playerSeasons.data
     .filter((player) => player.status === 'Rostered')
     .sort((a, b) => {
-      const aa = a.players.people.firstName.toLowerCase();
-      const bb = b.players.people.firstName.toLowerCase();
+      const aa = a.firstName.toLowerCase();
+      const bb = b.firstName.toLowerCase();
       if (aa < bb) {
         return -1;
       }
@@ -65,8 +75,8 @@ function TssaaRosterTable() {
       return 0;
     })
     .sort((a, b) => {
-      const aa = a.players.people.lastName.toLowerCase();
-      const bb = b.players.people.lastName.toLowerCase();
+      const aa = a.lastName.toLowerCase();
+      const bb = b.lastName.toLowerCase();
       if (aa < bb) {
         return -1;
       }
@@ -98,7 +108,7 @@ function TssaaRosterTable() {
         </Table.PrintHeaderBorder>
         <Table.Body
           data={tssaaRoster.filter(
-            (player) => player.players.entryYear !== season.season
+            (player) => player.entryYear !== season.season
           )}
           render={(player) => <TssaaTableRow player={player} key={player.id} />}
         />
@@ -116,7 +126,7 @@ function TssaaRosterTable() {
         </Table.PrintHeaderBorder>
         <Table.Body
           data={tssaaRoster.filter(
-            (player) => player.players.entryYear === season.season
+            (player) => player.entryYear === season.season
           )}
           render={(player) => <TssaaTableRow player={player} key={player.id} />}
         />

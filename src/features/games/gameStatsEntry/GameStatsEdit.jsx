@@ -45,7 +45,7 @@ const Container = styled.div`
   display: flex;
   flex-wrap: nowrap;
   justify-content: space-between;
-  height: 80ddvh;
+  height: 80dvh;
 `;
 const MainGrid = styled.div`
   flex: 0 0 84%;

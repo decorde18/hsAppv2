@@ -13,6 +13,11 @@ HiEye - eyeball
 
 useCreateData({ newData, table, view })
   isCreating, createData
+          createData(
+          {
+            table: 'people',
+            newData: { ...parentData },
+          },)
 useData({ table, filter, sort })
   isLoading, data
 useUpdateData({ table, newData, id, view })
@@ -36,7 +41,12 @@ new player form
 <Row type="vertical" justify="space-between" align='center'>
 <Grid  columns={2} rows={2s}>
 
-<Button size='medium' type="selected" variation="primary"> type = selected  fullWidth
+
+<Button                 size="small"
+                name="allDay"
+                value={buttons.allDayValue}
+                variation={buttons.allDayValue ? 'primary' : 'secondary'}
+                onClick={handleButtonClick}> type = selected  fullWidth
         <ButtonGroup
           btnArray={['Season', 'All-Time']}
           defaultBtn={tableData}

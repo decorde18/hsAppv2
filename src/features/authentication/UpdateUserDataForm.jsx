@@ -7,6 +7,7 @@ import FormRow from '../../ui/FormRow';
 import Input from '../../ui/Input';
 
 import { useUser, useUpdateUser } from './useUser';
+import Spinner from '../../ui/Spinner';
 
 function UpdateUserDataForm() {
   // We don't need the loading state, and can immediately use the user data, because we know that it has already been loaded at this point
@@ -16,7 +17,7 @@ function UpdateUserDataForm() {
       user_metadata: { fullName: currentFullName },
     },
   } = useUser();
-
+  console.log(email);
   const { updateUser, isUpdating } = useUpdateUser();
 
   const [fullName, setFullName] = useState(currentFullName);

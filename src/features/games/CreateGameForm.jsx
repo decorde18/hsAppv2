@@ -354,7 +354,8 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
   }
 
   if (isLoading || isWorking) return <Spinner />;
-  if (!session?.provider_token) return <CreateGoogleSignedInError />;
+  if (!session?.provider_token && process.env.NODE_ENV !== 'development')
+    return <CreateGoogleSignedInError />;
   return (
     <Div>
       <Flex>
@@ -373,35 +374,35 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
             </Center>
             {/* Team Type */}
             <Center>
-              <ButtonGroup>
-                {season.teamLevels.map((team) => {
-                  return (
-                    <Button
-                      key={`${team}Button`}
-                      value={team}
-                      name="gameScheduleType"
-                      variation={
-                        gameScheduleType === team ? 'primary' : 'secondary'
-                      }
-                      onClick={handleTeamButtonChange}
-                    >
-                      {team}
-                    </Button>
-                  );
-                })}
-                {!isEditSession && (
+              {/* <ButtonGroup> */}
+              {season.teamLevels.map((team) => {
+                return (
                   <Button
-                    value="both"
+                    key={`${team}Button`}
+                    value={team}
                     name="gameScheduleType"
                     variation={
-                      gameScheduleType === 'both' ? 'primary' : 'secondary'
+                      gameScheduleType === team ? 'primary' : 'secondary'
                     }
                     onClick={handleTeamButtonChange}
                   >
-                    BOTH
+                    {team}
                   </Button>
-                )}
-              </ButtonGroup>
+                );
+              })}
+              {!isEditSession && (
+                <Button
+                  value="both"
+                  name="gameScheduleType"
+                  variation={
+                    gameScheduleType === 'both' ? 'primary' : 'secondary'
+                  }
+                  onClick={handleTeamButtonChange}
+                >
+                  BOTH
+                </Button>
+              )}
+              {/* </ButtonGroup> */}
             </Center>
             {/* date and time */}
             <FormRow label="Date *" error={errors?.date?.message}>

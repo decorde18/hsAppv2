@@ -3,7 +3,6 @@
 - ability to update schools - update coach for school
 
 - fix games and events with Google log in - allow Development to acces game form
-- DONE remove bootstrap - ButtonGroup in CreateGame
 
 - People Table - convert to overall table add view edit
 - SeasonSideBar.jsx:9 The component styled.img with the id of "sc-jdEkgJ" has been created dynamically.You may see this warning because you've called styled inside another component.To resolve this only create new StyledComponents outside of any render method and function component. at SeasonSideBar (http://localhost:5173/src/features/seasons/SeasonSideBar.jsx:19:26)
@@ -18,6 +17,8 @@
 - scheduleTable - see the todos
 - apiGames - updateGames - not only cancelGame but updateGameStatus and takes which status - update calendar
 - redo useSeason, if single season, if no season (use current , if no current, use Recent) - if no season (new program or new school using progam)- or All for all seasons (may still need to separate bevause we may need to have access to all seasons as well as the current season in Mutations) - add the auto season select on public pages, homepage, seasonSelector
+
+- ON stats, be sure to include only games that status is not completed or in progress- can't do in sql view because then the playergame will be added even though it is already included
 
 ## //TODO FIXME !!
 
@@ -71,6 +72,16 @@
 - create helper functions for all Date events (send to google calendar, with time, without time, etc)
 - create file upload page for team pics, player pics, etc - see https://www.youtube.com/watch?v=HvOvdD2nX1k
 - useMutation in create playerForm does not run on create parents because of iterations. If you can understand the useMutation hook later on as a developer, fix it
+
+# 7/24/2024
+
+- A lot of updates, game stats page in progress, new views being updaed on roster, universal api adding to more components
+
+- DONE remove bootstrap - ButtonGroup in CreateGame
+
+# 5/22/2024
+
+- DONE remove bootstrap - ButtonGroup in CreateGame
 
 ## 3/5/2024
 

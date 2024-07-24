@@ -89,11 +89,12 @@ body {
   color: var(--color-grey-700);
 
   transition: color 0.3s, background-color 0.3s;
-  min-height: 100dvh;
   line-height: 1.5;
   font-size: 1.6rem;
-  height: 100ddvh;
-  overflow: hidden;
+  height: 100dvh; 
+  /* height: 100dvh; */
+  /* overflow: hidden; */
+
 }
 
 input,

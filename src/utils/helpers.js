@@ -30,6 +30,9 @@ export function addDays(date, numberOfDays) {
   const newDate = moment(date).add(numberOfDays, 'days');
   return newDate.format('YYYY-MM-DD');
 }
+export const subtractTime = (startTime, endTime) => {
+  return converthmsToSecondsOnly(endTime) - converthmsToSecondsOnly(startTime);
+};
 export const getToday = function (options = {}) {
   const today = new Date();
 
@@ -41,6 +44,7 @@ export const getToday = function (options = {}) {
   return today.toISOString();
 };
 export const formatTime = (time, noSeconds) => {
+  if (!time) return;
   time = time.split(' ').length > 1 ? convert12To24(time) : time;
   const timeArr = time.split('+');
 
@@ -115,6 +119,7 @@ export function convertToGoogleDateTime(date, time, timeAdded = 0) {
   return dateTime.format('YYYY-MM-DDTHH:mm:s');
 }
 export function convertSecondsToMinutesSeconds(time) {
+  if (time < 0) return '00:00';
   const minutes = Math.floor(time / 60);
   let seconds = time % 60;
   seconds = seconds < 10 ? `0${seconds}` : seconds;
@@ -125,6 +130,35 @@ export function convertMinutesSecondsToSeconds(time) {
   const [minutes, seconds] = time.split(':');
   time = +minutes * 60 + +seconds;
   return time;
+} //TODO remove this and have all reference go to converthmsto secondsonly
+export function converthmsToSecondsOnly(str) {
+  if (!str) return;
+  var p = str.split(':'),
+    s = 0,
+    m = 1;
+
+  while (p.length > 0) {
+    s += m * parseInt(p.pop(), 10);
+    m *= 60;
+  }
+
+  return s;
+}
+export function getCurrentTime() {
+  // Create a new Date object
+  const now = new Date();
+
+  // Get the current hour
+  const hour = now.getHours();
+
+  // Get the current minute
+  const minute = now.getMinutes();
+
+  // Get the current second
+  const second = now.getSeconds();
+
+  // Display the current time in the format "HH:MM:SS"
+  return `${hour}:${minute}:${second}`;
 }
 // TIME AND DATE HELPER
 // new Date().toLocaleTimeString(); // 11:18:48 AM

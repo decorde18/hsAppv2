@@ -1,16 +1,15 @@
 import styled from 'styled-components';
-import Spinner from '../../ui/Spinner';
-
-import { useSeason } from '../seasons/useSeasons';
-import { usePlayerSeasonWithNumber } from './usePlayerSeasons';
-
-import Table from '../../ui/Table';
-import Empty from '../../ui/Empty';
-
-import Heading from '../../ui/Heading';
-import PublicPlayerRow from './PublicPlayerRow';
 
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
+import { useSeason } from '../seasons/useSeasons';
+import { useData } from '../../services/useUniversal';
+
+import Spinner from '../../ui/Spinner';
+import Table from '../../ui/Table';
+import Empty from '../../ui/Empty';
+import Heading from '../../ui/Heading';
+
+import PublicPlayerRow from './PublicPlayerRow';
 
 const Right = styled.div`
   text-align: right;
@@ -60,24 +59,27 @@ function PublicPlayerTable() {
   const { currentSeason } = useCurrentSeason();
   const { isLoadingSeason, season } = useSeason();
 
-  const { isLoadingPlayerSeasonWithNumber, playerSeasonWithNumber } =
-    usePlayerSeasonWithNumber(currentSeason);
+  const playerSeasons = useData({
+    table: 'playerSeasons',
+    filter: [
+      { field: 'seasonId', value: currentSeason, table: 'playerSeasons' },
+    ],
+    // sort: sort.playerSeasons,
+  });
 
   if (!currentSeason) return <div>Sorry You Must Have A Season Selected</div>;
-  if (isLoadingSeason || isLoadingPlayerSeasonWithNumber) return <Spinner />;
-  if (!playerSeasonWithNumber.length)
+  if (isLoadingSeason || playerSeasons.isLoading) return <Spinner />;
+  if (!playerSeasons.data.length)
     return (
       <Container>
         <Empty resource="Players" />
       </Container>
     );
 
-  const orderedRoster = playerSeasonWithNumber.sort(
-    (a, b) => a.number - b.number
-  );
+  const orderedRoster = playerSeasons.data.sort((a, b) => a.number - b.number);
   const positions = ['field', 'GK'];
   const teams = ['Varsity', 'JV'];
-
+  console.log(season);
   return (
     <Container>
       <Heading as="h2" location="center">
@@ -107,7 +109,7 @@ function PublicPlayerTable() {
                   </Table.PrintHeader>
                   <Table.Body
                     data={orderedRoster
-                      .filter((player) => player.teamLevel.includes(team))
+                      .filter((player) => player.teamLevel?.includes(team))
                       .filter((player) =>
                         position === 'GK' ? player.gknumber : player
                       )}
@@ -132,39 +134,39 @@ function PublicPlayerTable() {
             <strong>Head Coach:</strong>
             <span>
               {' '}
-              {`${season.people.firstName} ${season.people.lastName}`}
+              {`${season.people?.firstName} ${season.people?.lastName}`}
             </span>
           </People>
           <People>
             <strong>Assistant Coaches:</strong>
-            <span> {season.assistant_coaches}</span>
+            <span> {season?.assistant_coaches}</span>
           </People>
-          {season.manager ? (
+          {season?.manager ? (
             <People>
               <strong>Managers:</strong>
-              <span> {season.manager}</span>
+              <span> {season?.manager}</span>
             </People>
           ) : (
             <div></div>
           )}
           <People>
             <strong>Trainer:</strong>
-            <span> {season.trainer}</span>
+            <span> {season?.trainer}</span>
           </People>
         </Vertical>
         <Vertical>
           <Heading as="h3">Administration</Heading>
           <People>
             <strong>Principal:</strong>
-            <span> {season.principal}</span>
+            <span> {season?.principal}</span>
           </People>
           <People>
             <strong>Assistant Principals:</strong>
-            <span> {season.assistantPrincipals}</span>
+            <span> {season?.assistantPrincipals}</span>
           </People>
           <People>
             <strong>Athletic Director:</strong>
-            <span> {season.athleticDirector}</span>
+            <span> {season?.athleticDirector}</span>
           </People>
         </Vertical>
       </Sec>

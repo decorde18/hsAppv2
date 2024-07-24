@@ -1,14 +1,19 @@
 import styled from 'styled-components';
 
-import { HiChevronDown } from 'react-icons/hi2';
+import { useState } from 'react';
+
+import { useGameContext } from '../../../contexts/GameContext';
 
 import Heading from '../../../ui/Heading';
 import Row from '../../../ui/Row';
 import Button from '../../../ui/Button';
-import { useState } from 'react';
+import Collapsible from '../../../ui/Collapsible';
 import Checkbox from '../../../ui/Checkbox';
 import Input from '../../../ui/Input';
-import Collapsible from '../../../ui/Collapsible';
+
+import { useUpdateData } from '../../../services/useUniversal';
+
+import { HiChevronDown } from 'react-icons/hi2';
 
 const Container = styled.div`
   max-width: 128rem;
@@ -59,24 +64,23 @@ const StyledDivSmaller = styled.div`
 `;
 // GAME HEADER - use on (Game Break?, game stoppage? are these modals?),
 // before game , after game
-function GameSettings({ game, editGame, isEditingGame, expand }) {
+
+function GameSettings({ expand }) {
+  const { game } = useGameContext();
+  const { isUpdating, updateData } = useUpdateData();
+
   const [openSettings, setOpenSettings] = useState(expand);
-  const [overtime, setOvertime] = useState(game.ot_if_tied);
-  const [shootOut, setShootOut] = useState(game.so_if_tied);
+  const [gameSettings, setGameSettings] = useState(game);
+
   const [ot2, setOt2] = useState(game.max_ot_periods > game.min_ot_periods);
+
   function handleClick() {
     setOpenSettings(!openSettings);
   }
   function handleChange(e) {
-    const name = e.target.name;
-    if (name === 'overtime') {
-      setOvertime(!overtime);
-      editGame({ newData: { ot_if_tied: !overtime }, id: game.id });
-    }
-    if (name === 'shootout') {
-      setShootOut(!shootOut);
-      editGame({ newData: { so_if_tied: !shootOut }, id: game.id });
-    }
+    const { checked, name } = e.target;
+    const updatedSettings = { [name]: checked };
+    handleUpdate(updatedSettings);
   }
   function handleBlur(e) {
     const { value, name } = e.target;
@@ -99,9 +103,18 @@ function GameSettings({ game, editGame, isEditingGame, expand }) {
         e.target.value = game.max_ot_periods;
         updatedValue = game.max_ot_periods;
       }
-    editGame({ newData: { [name]: updatedValue }, id: game.id });
+    const updatedSettings = { [name]: updatedValue };
+    handleUpdate(updatedSettings);
   }
+  function handleUpdate(newValue) {
+    updateData({
+      table: 'games',
+      newData: { ...newValue },
+      id: game.id,
+    });
 
+    setGameSettings({ ...gameSettings, ...newValue });
+  }
   return (
     <Container>
       <Heading as="h5" case="upper" location="center">
@@ -128,7 +141,7 @@ function GameSettings({ game, editGame, isEditingGame, expand }) {
                   key="reg_periods"
                   defaultValue={game.reg_periods}
                   onBlur={handleBlur}
-                  disabled={isEditingGame}
+                  disabled={isUpdating}
                   name="reg_periods"
                   id="reg_periods"
                   size="10"
@@ -144,7 +157,7 @@ function GameSettings({ game, editGame, isEditingGame, expand }) {
                   key="reg_periods_minutes"
                   defaultValue={game.reg_periods_minutes / 60}
                   onBlur={handleBlur}
-                  disabled={isEditingGame}
+                  disabled={isUpdating}
                   name="reg_periods_minutes"
                   id="reg_periods_minutes"
                   size="10"
@@ -159,23 +172,23 @@ function GameSettings({ game, editGame, isEditingGame, expand }) {
             </div>
             <Checkbox
               size="large"
-              name="overtime"
-              checked={overtime}
+              name="ot_if_tied"
+              checked={gameSettings.ot_if_tied}
               onChange={handleChange}
-              disabled={isEditingGame}
+              disabled={isUpdating}
             />
             <div>
               If the game (or Overtime) ends in a tie, will there be a shootout?
             </div>
             <Checkbox
               size="large"
-              name="shootout"
-              checked={shootOut}
+              name="so_if_tied"
+              checked={gameSettings.so_if_tied}
               onChange={handleChange}
-              disabled={isEditingGame}
+              disabled={isUpdating}
             />
           </FirstColumn>
-          {overtime && (
+          {gameSettings.ot_if_tied && (
             <>
               <SecondColumn>
                 <StyledDivSmaller>Min OT Periods</StyledDivSmaller>
@@ -184,7 +197,7 @@ function GameSettings({ game, editGame, isEditingGame, expand }) {
                   key="min_ot_periods"
                   defaultValue={game.min_ot_periods}
                   onBlur={handleBlur}
-                  disabled={isEditingGame}
+                  disabled={isUpdating}
                   name="min_ot_periods"
                   id="min_ot_periods"
                   size="6.5"
@@ -195,7 +208,7 @@ function GameSettings({ game, editGame, isEditingGame, expand }) {
                   key="max_ot_periods"
                   defaultValue={game.max_ot_periods}
                   onBlur={handleBlur}
-                  disabled={isEditingGame}
+                  disabled={isUpdating}
                   name="max_ot_periods"
                   id="max_ot_periods"
                   size="6.5"
@@ -208,7 +221,7 @@ function GameSettings({ game, editGame, isEditingGame, expand }) {
                   key="ot_1_minutes"
                   defaultValue={game.ot_1_minutes / 60}
                   onBlur={handleBlur}
-                  disabled={isEditingGame}
+                  disabled={isUpdating}
                   name="ot_1_minutes"
                   id="ot_1_minutes"
                   size="6.5"
@@ -222,7 +235,7 @@ function GameSettings({ game, editGame, isEditingGame, expand }) {
                       key="ot_2_minutes"
                       defaultValue={game.ot_2_minutes / 60}
                       onBlur={handleBlur}
-                      disabled={isEditingGame}
+                      disabled={isUpdating}
                       name="ot_2_minutes"
                       id="ot_2_minutes"
                       size="6.5"
