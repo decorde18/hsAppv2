@@ -260,6 +260,7 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
       gf,
       ga,
       result,
+      seasonId: season,
       locations: loc,
       schools: sch,
       //     "date": "2024-08-29",
@@ -296,7 +297,7 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
     if (isEditSession) {
       sendToCalendar(newData);
       updateData(
-        { table: 'games', newData: { ...newData }, id: editId },
+        { table: 'games', newData: { ...newData, season }, id: editId },
         {
           onSuccess: (data) => {
             reset();
@@ -344,13 +345,14 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
       });
     }
     async function sendToCalendar(calData) {
+      console.log(schools, calData);
       const googleCalData = { ...calData };
       !calData.time && delete calData.time;
       googleCalData.opponent = schools.find(
-        (school) => +calData.schoolid === +school.id
+        (school) => +schoolid === +school.id
       ).school;
       googleCalData.location = locations.find(
-        (location) => +calData.locationid === +location.locationid
+        (location) => +locationid === +location.locationid
       ).name;
       googleCalData.timeZone = 'America/Chicago';
       if (googleCalData.time) {
