@@ -1,10 +1,4 @@
-import { useSearchParams } from 'react-router-dom';
-
 import Spinner from '../ui/Spinner';
-
-import GameHeader from '../features/games/gameStatsEntry/GameHeader';
-import GameSettings from '../features/games/gameStatsEntry/GameSettings';
-import { GameProgress } from '../features/games/gameStatsEntry/GameProgress';
 
 // import GameStatsEdit from '../features/games/gameStatsEntry/GameStatsEdit';
 import {
@@ -14,12 +8,7 @@ import {
 } from '../services/useUniversal';
 import { useEffect, useState, createContext, useContext } from 'react';
 
-import styled from 'styled-components';
-import {
-  converthmsToSecondsOnly,
-  getCurrentTime,
-  subtractTime,
-} from '../utils/helpers';
+import { converthmsToSecondsOnly } from '../utils/helpers';
 import { useGameContext } from './GameContext';
 
 const PlayerContext = createContext();
@@ -139,7 +128,6 @@ function PlayerContextProvider({ children }) {
             : 0,
       };
     });
-
 
   return (
     <PlayerContext.Provider value={activePlayers}>

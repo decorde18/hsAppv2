@@ -1,12 +1,15 @@
+import { useData } from '../../services/useUniversal';
 import Empty from '../../ui/Empty';
 import Menus from '../../ui/Menus';
 import Spinner from '../../ui/Spinner';
 import Table from '../../ui/Table';
 import UniformRow from './UniformRow';
-import { useUniforms } from './useUniforms';
+// import { useUniforms } from './useUniforms';
 
 function UniformTable() {
-  const { isLoadingUniforms, uniforms } = useUniforms();
+  const { isLoading: isLoadingUniforms, data: uniforms } = useData({
+    table: 'uniforms',
+  });
   if (isLoadingUniforms) return <Spinner />;
   if (!uniforms.length) return <Empty resource="Uniforms" />;
   const sortedUniforms = uniforms

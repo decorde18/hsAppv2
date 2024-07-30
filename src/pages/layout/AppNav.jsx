@@ -2,12 +2,12 @@ import { styled } from 'styled-components';
 
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 
-import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 
 import SeasonSelector from './SeasonSelector';
 
 import Button from '../../ui/Button';
+import { useAppNavContext } from '../../contexts/AppNavContext';
 
 const Ul = styled.ul`
   width: 80%;
@@ -23,29 +23,10 @@ const Flex = styled.div`
   justify-content: center;
 `;
 
-const menuButtons = [
-  { name: 'Main', link: 'seasonMain' },
-  { name: 'Players', link: 'players' },
-  { name: 'Games', link: 'games' },
-  { name: 'Statistics', link: 'stats' },
-  { name: 'Other', link: 'seasonMain' },
-];
-
 function AppNav() {
   const { currentSeason } = useCurrentSeason();
-  const result = /[^/]*$/.exec(window.location.href)[0].split('?')[0];
-  //grab the series of characters not containing a slash" ([^/]*)at the end of the string ($). Then it grabs the matched characters from the returned match object by indexing into it ([0]); then get what is before the ?
-  const [active, setActive] = useState();
-  useEffect(
-    () =>
-      setActive(
-        menuButtons.find((url) => result === url.link)?.name || 'Other'
-      ),
-    [result]
-  );
-  function handleToggle(e) {
-    e.target.name === 'Other' ? setActive('Main') : setActive(e.target.name);
-  }
+  const { active, handleToggle, menuButtons } = useAppNavContext();
+
   return (
     <>
       <Ul>

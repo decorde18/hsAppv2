@@ -6,35 +6,68 @@ import Input from '../../ui/Input';
 import Row from '../../ui/Row';
 
 import { useForm } from 'react-hook-form';
-import {
-  useUniformSeasons,
-  useUpdateUniformSeason,
-  useCreateUniformSeason,
-} from './useUniforms';
+
 import { useContext, useEffect, useState } from 'react';
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
+import {
+  useCreateData,
+  useData,
+  useDeleteData,
+  useUpdateData,
+} from '../../services/useUniversal';
+import { useSeason } from '../seasons/useSeasons';
+import Select from '../../ui/Select';
+
 function UniformSeasonCreateForm({ uniformToEdit = {}, onCloseModal }) {
   const { id: editId, ...editValues } = uniformToEdit;
-  const { currentSeason } = useCurrentSeason();
+  const { currentSeason, currentSeasonNew } = useCurrentSeason();
+
+  const teamLevels = [
+    ...currentSeasonNew.teamLevels.map((level) => ({
+      value: level,
+      label: level,
+    })),
+    { value: 'GK', label: 'GK' },
+  ];
+
   const isEditSession = Boolean(editId);
-  const { isLoadingUniformSeasons, uniforms } = useUniformSeasons();
+
+  // const { isLoading: isLoadingUniformSeasons, data: uniforms } = useData({
+  //   table: 'uniformSeasons',
+
+  // });
+  const { isLoading: isLoadingUniforms, data: uniforms } = useData({
+    table: 'uniforms',
+    filter: [{ field: 'active', value: true }],
+  });
+  const { isUpdating, updateData: updateUniformSeason } = useUpdateData({
+    table: 'uniformSeasons',
+  });
+  const {
+    isCreating: isCreatingUniformSeason,
+    createData: createUniformSeason,
+  } = useCreateData({ table: 'uniformSeasons' });
   const { register, handleSubmit, reset, getValues, formState } = useForm({
     defaultValues: isEditSession ? editValues : {},
   });
   const { errors } = formState;
-  const { isCreatingUniformSeason, createUniformSeason } =
-    useCreateUniformSeason();
-  const { isUpdating, updateUniformSeason } = useUpdateUniformSeason();
 
   const [isWorking, setIsWorking] = useState(false);
   useEffect(
     function () {
-      isUpdating || isCreatingUniformSeason || isLoadingUniformSeasons
+      isUpdating || isCreatingUniformSeason || isLoadingUniforms
         ? setIsWorking(true)
         : setIsWorking(false);
     },
-    [isCreatingUniformSeason, isUpdating]
+    [isCreatingUniformSeason, isLoadingUniforms, isUpdating]
   );
+  if (isLoadingUniforms) return;
+  const uniformTypes = [
+    ...uniforms.map((uniform) => ({
+      value: uniform.id,
+      label: `${uniform.type} ${uniform.brand} ${uniform.style} ${uniform.color}`,
+    })),
+  ];
 
   function onSubmit(data) {
     if (isEditSession) {
@@ -52,7 +85,14 @@ function UniformSeasonCreateForm({ uniformToEdit = {}, onCloseModal }) {
       return;
     } else
       createUniformSeason(
-        { ...data, season: currentSeason },
+        {
+          table: 'uniformSeasons',
+          newData: {
+            season: currentSeason,
+            team: data.field,
+            uniform: data.id,
+          },
+        },
         {
           onSuccess: (data) => {
             reset();
@@ -72,24 +112,54 @@ function UniformSeasonCreateForm({ uniformToEdit = {}, onCloseModal }) {
       <Row>
         <Heading as="h2">UniformSeason Information</Heading>
         <FormRow label="Team *" error={errors?.team?.message}>
-          <Input
+          <Select
+            options={teamLevels}
+            // onChange={handleSelectChange}
+            // name={each.field}
+            // disabled={isWorking}
+            // defaultValue={
+            //   selectFieldValues.find((field) => field.field === each.field)
+            //     .value
+            // }
+            register={{
+              ...register('field', {
+                // validate: errors?.uniform?.message,
+              }),
+            }}
+          />
+          {/* <Input
             type="text"
             id="team"
             {...register('team', {
               required: 'We need the type of uniform',
-            })}
-            disabled={isWorking}
-          />
+              })}
+              disabled={isWorking}
+              /> */}
         </FormRow>
         <FormRow label="Uniform *" error={errors?.uniform?.message}>
-          <Input
+          <Select
+            options={uniformTypes}
+            // onChange={handleSelectChange}
+            // name={each.field}
+            // disabled={isWorking}
+            // defaultValue={
+            //   selectFieldValues.find((field) => field.field === each.field)
+            //     .value
+            // }
+            register={{
+              ...register('id', {
+                // validate: errors?.uniform?.message,
+              }),
+            }}
+          />
+          {/* <Input
             type="number"
             id="uniform"
             {...register('uniform', {
               required: 'We need the type of uniform',
             })}
             disabled={isWorking}
-          />
+          /> */}
         </FormRow>
       </Row>
 

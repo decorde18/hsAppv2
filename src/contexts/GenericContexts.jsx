@@ -1,13 +1,26 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext } from 'react';
 
 const GenericContext = createContext();
+
+//change Generic Provider to new Provider
 function GenericProvider({ children }) {
-  return <GenericContext.Provider>{children}</GenericContext.Provider>;
+  //change GenericContect to new Context
+  return (
+    <GenericContext.Provider
+      //need to update value with whatever you want the context to hold
+      value={'example'}
+    >
+      {children}
+    </GenericContext.Provider>
+  );
 }
-function useGeneric() {
+//change useGeneric to new use_Context
+function useGenericContext() {
   const context = useContext(GenericContext);
   if (context === undefined)
-    throw new Error("GenericContext was used outside of GenericProvider");
+    throw new Error('GenericContext was used outside of GenericProvider');
+
+  return context;
 }
 
-export { GenericProvider, useGeneric };
+export { GenericProvider, useGenericContext };

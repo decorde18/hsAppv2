@@ -5,6 +5,7 @@ import Header from './Header';
 import Footer from './Footer';
 
 import { Outlet } from 'react-router-dom';
+import { AppNavContextProvider } from '../../contexts/AppNavContext';
 
 const StyledAppLayout = styled.div`
   //THIS IS FOR THE HEADER< BODY< FOOTER
@@ -45,18 +46,20 @@ const Main = styled.section`
 
 function AppLayout() {
   return (
-    <StyledAppLayout>
-      <Head>
-        <Header />
-      </Head>
-      <Aside>
-        <SideBar />
-      </Aside>
-      <Main>
-        <Outlet />
-      </Main>
-      <Footer />
-    </StyledAppLayout>
+    <AppNavContextProvider>
+      <StyledAppLayout>
+        <Head>
+          <Header />
+        </Head>
+        <Aside>
+          <SideBar />
+        </Aside>
+        <Main>
+          <Outlet />
+        </Main>
+        <Footer />
+      </StyledAppLayout>
+    </AppNavContextProvider>
   );
 }
 

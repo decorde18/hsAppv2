@@ -1,13 +1,6 @@
 import styled from 'styled-components';
 
 import UniformCreateForm from './UniformCreateForm';
-import {
-  useDeleteUniform,
-  useUniforms,
-  useCreateUniform,
-  useUpdateUniform,
-} from './useUniforms';
-
 import { HiSquare2Stack, HiPencil, HiTrash } from 'react-icons/hi2';
 
 import Modal from '../../ui/Modal';
@@ -16,6 +9,11 @@ import Table from '../../ui/Table';
 import Menus from '../../ui/Menus';
 import { useState } from 'react';
 import Switch from '../../ui/Switch';
+import {
+  useCreateData,
+  useDeleteData,
+  useUpdateData,
+} from '../../services/useUniversal';
 
 const Uniform = styled.div`
   font-size: 1.6rem;
@@ -25,13 +23,12 @@ const Uniform = styled.div`
 `;
 
 function UniformRow({ uniform }) {
-  const { isDeleting, deleteUniform } = useDeleteUniform();
-  const { createUniform, isCreating } = useCreateUniform();
-  const { isUpdating, updateUniform } = useUpdateUniform();
+  const { isUpdating, updateData: updateUniform } = useUpdateData();
+  const { isCreating, createData: createUniform } = useCreateData();
+  const { isDeleting, deleteData: deleteUniform } = useDeleteData();
 
   const { id, type, brand, color, style, year, active } = uniform;
   const [activeState, setActiveState] = useState(active);
-
   function handleDuplicate() {
     createUniform({
       type,
@@ -43,7 +40,8 @@ function UniformRow({ uniform }) {
   }
   function handleToggleActive() {
     updateUniform({
-      newUniformData: {
+      table: 'uniforms',
+      newData: {
         active: !activeState,
       },
       id,
@@ -60,9 +58,10 @@ function UniformRow({ uniform }) {
       <Uniform>{style}</Uniform>
       <Uniform>{year}</Uniform>
       <Switch
-        isOn={activeState}
+        checked={activeState}
         id2={`active-${id}`}
-        handleToggle={handleToggleActive}
+        onChange={handleToggleActive}
+        disabled={isUpdating}
       ></Switch>
 
       <div>

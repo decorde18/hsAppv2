@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import UniformSeasonCreateForm from './UniformSeasonCreateForm';
+import UniformSeasonCreateForm from '../uniforms/UniformSeasonCreateForm';
 import {
   useDeleteUniformSeason,
   useUniformSeasons,

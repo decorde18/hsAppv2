@@ -1,12 +1,6 @@
 import styled from 'styled-components';
 
-import UniformJerseyCreateForm from './UniformJerseyCreateForm';
-import {
-  useDeleteUniformJersey,
-  useUniformJerseys,
-  useCreateUniformJersey,
-  useUpdateUniformJersey,
-} from './useUniforms';
+// import UniformJerseyCreateForm from './UniformJerseyCreateForm';
 
 import { HiSquare2Stack, HiPencil, HiTrash } from 'react-icons/hi2';
 
@@ -16,6 +10,11 @@ import Table from '../../ui/Table';
 import Menus from '../../ui/Menus';
 import { useState } from 'react';
 import Switch from '../../ui/Switch';
+import {
+  useCreateData,
+  useDeleteData,
+  useUpdateData,
+} from '../../services/useUniversal';
 
 const UniformJersey = styled.div`
   font-size: 1.6rem;
@@ -26,24 +25,28 @@ const UniformJersey = styled.div`
 `;
 
 function UniformJerseyRow({ uniformJersey }) {
-  const { isDeleting, deleteUniformJersey } = useDeleteUniformJersey();
-  const { createUniformJersey, isCreating } = useCreateUniformJersey();
-  const { isUpdatingJersey, updateUniformJersey } = useUpdateUniformJersey();
+  const { isDeleting, deleteData } = useDeleteData();
+  const { isCreating, createData } = useCreateData();
+  const { isUpdating, updateData } = useUpdateData();
 
-  const { id, number, size, lost } = uniformJersey;
+  const { jerseyid: id, number, size, lost } = uniformJersey;
   const [lostState, setLostState] = useState(lost);
 
   function handleDuplicate() {
-    createUniformJersey({
-      id,
-      number,
-      size,
+    createData({
+      table: 'uniformJerseys',
+      newData: {
+        id,
+        number,
+        size,
+      },
     });
   }
   function handleToggleLost() {
-    updateUniformJersey({
-      newUniformData: {
-        active: !lostState,
+    updateData({
+      table: 'uniformJerseys',
+      newData: {
+        lost: !lostState,
       },
       id,
     });
@@ -56,9 +59,9 @@ function UniformJerseyRow({ uniformJersey }) {
       <UniformJersey>{number}</UniformJersey>
       <UniformJersey>{size}</UniformJersey>
       <Switch
-        isOn={!lostState}
+        checked={!lostState}
         id2={`lost-${id}`}
-        handleToggle={handleToggleLost}
+        onChange={handleToggleLost}
       ></Switch>
       <div>
         <Modal>
@@ -82,14 +85,14 @@ function UniformJerseyRow({ uniformJersey }) {
             </Menus.List>
 
             <Modal.Window name="edit">
-              {<UniformJerseyCreateForm uniformToEdit={uniformJersey} />}
+              {/* {<UniformJerseyCreateForm uniformToEdit={uniformJersey} />} */}
             </Modal.Window>
 
             <Modal.Window name="delete">
               <ModalConfirm
                 resourceName="uniforms"
                 disabled={isDeleting}
-                onConfirm={() => deleteUniformJersey(id)}
+                onConfirm={() => deleteData(id)}
                 confirmType="delete"
               />
             </Modal.Window>

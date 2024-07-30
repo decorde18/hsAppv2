@@ -47,11 +47,18 @@ new player form
                 value={buttons.allDayValue}
                 variation={buttons.allDayValue ? 'primary' : 'secondary'}
                 onClick={handleButtonClick}> type = selected  fullWidth
-        <ButtonGroup
-          btnArray={['Season', 'All-Time']}
-          defaultBtn={tableData}
-          onChange={handleButtonGroupChange}
-        />
+      
+  const [selectedBtn, setSelectedBtn] = useState('Season Uniforms');
+  function handleButtonGroupChange(e) {
+    setSelectedBtn(e.target.name);
+  }
+      <ButtonGroup
+        btnArray={['All Uniforms', 'Season Uniforms']}
+        defaultBtn={selectedBtn}
+        onChange={handleButtonGroupChange}
+      />
+   
+   
             <Input
               type={each.type}
               disabled={isWorking}
@@ -64,7 +71,31 @@ new player form
               size={each.size}
               ref={null}
             />
-
+                        <Select
+                          width={each.size}
+                          options={selectFields
+                            .find((field) => field.field === each.field)
+                            .values.map((val) => ({ ...val }))
+                            .filter((field) =>
+                              each.field === 'grade'
+                                ? field.filter === selectedCamp
+                                : field
+                            )}
+                          onChange={handleSelectChange}
+                          name={each.field}
+                          disabled={isWorking}
+                          defaultValue={
+                            selectFieldValues.find(
+                              (field) => field.field === each.field
+                            ).value
+                          }
+                          register={{
+                            ...register(each.field, {
+                              validate: (value) =>
+                                value !== '' || `${each.message}`,
+                            }),
+                          }}
+                        />
       <Select
         width={12.7}
         options={value, label}

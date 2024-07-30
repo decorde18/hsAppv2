@@ -2,6 +2,7 @@ import { styled } from 'styled-components';
 import Button from '../../ui/Button';
 import { NavLink } from 'react-router-dom';
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
+import { useAppNavContext } from '../../contexts/AppNavContext';
 const Aside = styled.aside`
   padding-left: 0.5rem;
   padding-right: 0.5rem;
@@ -12,12 +13,15 @@ const Aside = styled.aside`
 const Div = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  /* justify-content: center; */
+  /* align-items: center; */
   gap: 1rem;
+  /* width: 100%; */
 `;
+
 function SideBar() {
   const { currentSeason } = useCurrentSeason();
+  const { active } = useAppNavContext();
 
   const sideBarButtons = [
     {
@@ -25,89 +29,82 @@ function SideBar() {
       link: `../roster?season=${currentSeason}`,
       text: 'Print Roster',
       newWindow: true,
+      appNav: 'Main',
     },
     {
       name: 'printSchedule',
       link: `../schedule?season=${currentSeason}`,
       text: 'Print Schedule',
       newWindow: true,
+      appNav: 'Main',
     },
     {
       name: 'tssaaRoster',
       link: `../protected/rosterTSSAA?season=${currentSeason}`,
       text: 'TSSAA Roster',
       newWindow: true,
+      appNav: 'Main',
     },
     {
       name: 'communication',
       link: `./communication?season=${currentSeason}`,
       text: 'Communication',
       newWindow: false,
+      appNav: 'Main',
     },
     {
       name: 'people',
       link: `./people`,
       text: 'People',
       newWindow: false,
+      appNav: 'Main',
     },
     {
       name: 'uniformData',
       link: `./uniforms`,
       text: 'Uniform Data',
       newWindow: false,
+      appNav: 'Season',
     },
-    {
-      name: 'uniformJerseys',
-      link: `./uniformJerseys`,
-      text: 'Uniform Jerseys',
-      newWindow: false,
-    },
-    {
-      name: 'uniformAssignments',
-      link: `./uniformSeasonPlayers`,
-      text: 'Uniform Assignments',
-      newWindow: false,
-    },
-    {
-      name: 'uniformSeasons',
-      link: `./uniformSeasons`,
-      text: 'Uniform Seasons',
-      newWindow: false,
-    },
+
     {
       name: 'scheduleHelper',
       link: `./scheduleHelper`,
       text: 'Schedule Helper',
       newWindow: false,
+      appNav: 'Main',
     },
     {
       name: 'events',
       link: `./events`,
       text: 'Events',
       newWindow: false,
+      appNav: 'Main',
     },
   ];
 
   return (
     <Aside>
       <Div>
-        {sideBarButtons.map((button) => {
-          return (
-            <Button
-              key={`${button.name}sidebar`}
-              type="fullWidth"
-              variation="secondary"
-              name={button.name}
-            >
+        {sideBarButtons
+          .filter((button) => button.appNav === active)
+          .map((button) => {
+            return (
               <NavLink
+                key={`${button.name}sidebar`}
                 to={button.link}
                 target={button.newWindow ? '_blank' : null}
               >
-                {button.text}
+                <Button
+                  type="fullWidth"
+                  variation="secondary"
+                  name={button.name}
+                >
+                  {button.text}
+                </Button>
               </NavLink>
-            </Button>
-          );
-        })}
+            );
+          })}
       </Div>
     </Aside>
   );

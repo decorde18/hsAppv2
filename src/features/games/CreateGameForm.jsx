@@ -21,9 +21,15 @@ import { useSession, useSessionContext } from '@supabase/auth-helpers-react';
 import { useSeason } from '../seasons/useSeasons';
 import { useLocations } from '../locations/useLocations';
 import { useSchools } from '../schools/useSchools';
-import { useCreateGame, useEditGame } from './useGames';
+// import { useCreateGame, useEditGame } from './useGames';
 import { createEditGoogleCalendarGame } from '../../services/apiGoogle';
 import ButtonGroup from '../../ui/ButtonGroup';
+import {
+  useCreateData,
+  useData,
+  useUpdateData,
+} from '../../services/useUniversal';
+import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 
 const Div = styled.div`
   height: 100%;
@@ -111,14 +117,19 @@ const gameTypes = [
 function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
   const { isLoading: isLoadingSupabase } = useSessionContext();
   const session = useSession();
+  const { currentSeasonNew: season } = useCurrentSeason();
+  const { isCreating, createData } = useCreateData();
+  const { isUpdating, updateData } = useUpdateData();
 
-  const { isLoadingSeason, season } = useSeason();
-  const { isLoadingLocations, locations } = useLocations(0);
-  const { isLoadingSchools, schools } = useSchools();
+  const { isLoading: isLoadingSchools, data: schools } = useData({
+    table: 'schools',
+  });
+  const { isLoading: isLoadingLocations, data: locations } = useData({
+    table: 'locations',
+  });
 
   const { id: editId, ...editValues } = gameToEdit;
   const isEditSession = Boolean(editId);
-
   const {
     register,
     handleSubmit,
@@ -131,22 +142,19 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
     defaultValues: isEditSession ? editValues : {},
   });
 
-  const { isCreating, createGame } = useCreateGame();
-  const { isEditing, editGame } = useEditGame();
   const [googleUpdating, setGoogleUpdating] = useState(false);
 
   const { errors } = formState;
 
   const isLoading =
-    isLoadingSeason ||
     isLoadingLocations ||
     isLoadingSchools ||
     googleUpdating ||
     isLoadingSupabase;
-  const isWorking = isLoading || isCreating || isEditing || googleUpdating;
+  const isWorking = isLoading || isCreating || isUpdating || googleUpdating;
 
   const [gameOpponent, setGameOpponent] = useState(
-    getValues('opponent') || 'default'
+    getValues('schoolid') || 'default'
   );
   const [gameScheduleType, setGameScheduleType] = useState(
     getValues('teamType') || 'both'
@@ -167,7 +175,8 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
     function () {
       if (isLoading) return;
       const opponent = schools.find(
-        (school) => school.id === watch('opponent')
+        (school) => school.id === watch('schoolid')
+        // (school) => school.id === watch('opponent')
       );
       handleSetValue('classification', opponent?.classification || 'default');
       opponent?.region == season.region && opponent?.district == season.district
@@ -234,6 +243,40 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
       : handleSetValue('location', gameOpponent?.home_location);
   }
   function onSubmit(data) {
+    console.log(gameToEdit);
+    // TODO FIX only some of these items need to be added to the editValues
+    //  {
+    //     "date": "2024-08-29",
+    //     "time": "18:30:00",
+    //     "teamType": "Varsity",
+    //     "seasonTime": "Regular Season",
+    //     "status": "to be played",
+    //     "comment": "",
+    //     "seasonId": 23,
+    //     "school": "Brentwood Academy",
+    //     "locationName": "Brentwood Academy",
+    //     "gf": 0,
+    //     "ga": 0,
+    //     "result": "T",
+    //     "id": 1269,
+    //     "district": false,
+    //     "home": false,
+    //     "short_name": "Brentwood Academy",
+    //     "abbreviation": "BA",
+    //     "so_if_tied": false,
+    //     "ot_1_minutes": 10,
+    //     "ot_2_minutes": 5,
+    //     "ot_if_tied": false,
+    //     "max_ot_periods": 2,
+    //     "min_ot_periods": 2,
+    //     "reg_periods": 2,
+    //     "reg_periods_minutes": 2400,
+    //     "gameType": "Game",
+    //     "actualgametime": null,
+    //     "schoolid": 27,
+    //     "locationid": 42
+    // }
+
     data.home = !!data.home;
     setGoogleUpdating(true);
     let teamSchedules;
@@ -243,12 +286,41 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
       goals,
       locations: loc,
       schools: sch,
+      //     "date": "2024-08-29",
+      //     "time": "18:30:00",
+      //     "teamType": "Varsity",
+      //     "seasonTime": "Regular Season",
+      //     "status": "to be played",
+      //     "comment": "",
+      //     "seasonId": 23,
+      //     "school": "Brentwood Academy",
+      //     "locationName": "Brentwood Academy",
+      //     "gf": 0,
+      //     "ga": 0,
+      //     "result": "T",
+      //     "id": 1269,
+      //     "district": false,
+      //     "home": false,
+      //     "short_name": "Brentwood Academy",
+      //     "abbreviation": "BA",
+      //     "so_if_tied": false,
+      //     "ot_1_minutes": 10,
+      //     "ot_2_minutes": 5,
+      //     "ot_if_tied": false,
+      //     "max_ot_periods": 2,
+      //     "min_ot_periods": 2,
+      //     "reg_periods": 2,
+      //     "reg_periods_minutes": 2400,
+      //     "gameType": "Game",
+      //     "actualgametime": null,
+      //     "schoolid": 27,
+      //     "locationid": 42
       ...newData
     } = data;
     if (isEditSession) {
       sendToCalendar(newData);
-      editGame(
-        { newData: { ...newData }, id: editId },
+      updateData(
+        { table: 'games', newData: { ...newData }, id: editId },
         {
           onSuccess: (data) => {
             reset();
@@ -290,6 +362,7 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
           season: season.id,
           seasonTime,
         };
+
         //add calData
         sendToCalendar(teamData);
       });
@@ -298,10 +371,10 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
       const googleCalData = { ...calData };
       !calData.time && delete calData.time;
       googleCalData.opponent = schools.find(
-        (school) => +calData.opponent === +school.id
+        (school) => +calData.schoolid === +school.id
       ).school;
       googleCalData.location = locations.find(
-        (location) => +calData.location === +location.id
+        (location) => +calData.locationid === +location.locationid
       ).name;
       googleCalData.timeZone = 'America/Chicago';
       if (googleCalData.time) {
@@ -316,6 +389,12 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
         );
       }
       // addToCalendar and get ID
+      const newData = {
+        ...calData,
+        teamType: calData.teamType,
+        calId: data.id,
+      };
+      console.log({ ...googleCalData, calendar: calData.teamType });
       createEditGoogleCalendarGame(
         {
           ...googleCalData,
@@ -325,10 +404,9 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
       ).then((data) => {
         setGoogleUpdating(false);
         if (isEditSession) return;
-        createGame({
-          ...calData,
-          teamType: calData.teamType,
-          calId: data.id,
+        createData({
+          table: 'games',
+          newData,
         }).then(() => closeModal());
       });
 
@@ -517,13 +595,13 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
             <FormRow label="Opponent *" error={errors?.opponent?.message}>
               <StyledSelect
                 type="white"
-                id={'opponent'}
-                {...register('opponent', {
+                id={'schoolid'}
+                {...register('schoolid', {
                   validate: (value) =>
                     value !== 'default' || 'Please select an Opponent',
                 })}
                 onChange={handleSelectChange}
-                defaultValue={'default'}
+                defaultValue={isEditSession ? 'schoolid' : 'default'}
               >
                 <option value="default" disabled>
                   Please Select an Opponent
@@ -599,11 +677,12 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
                 />
               </FormRow>
               <FormRow />
+              {/* todo fix I am here location does not default - updating does not work */}
               <FormRow label="Location *" error={errors?.location?.message}>
                 <StyledSelect
                   type="white"
-                  id="location"
-                  {...register('location', {
+                  id="locationid"
+                  {...register('locationid', {
                     validate: (value) =>
                       value !== 'default' || 'Please select a location',
                   })}
@@ -614,7 +693,7 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
                     Please Select Location
                   </option>
                   {locations.map((loc) => (
-                    <option key={loc.id} value={loc.id}>
+                    <option key={loc.locationid} value={loc.locationid}>
                       {loc.name}
                     </option>
                   ))}

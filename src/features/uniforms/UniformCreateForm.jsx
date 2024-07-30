@@ -6,7 +6,11 @@ import Input from '../../ui/Input';
 import Row from '../../ui/Row';
 
 import { useForm } from 'react-hook-form';
-import { useUniforms, useUpdateUniform, useCreateUniform } from './useUniforms';
+import {
+  useUniforms,
+  useUpdateUniform,
+  useCreateUniform,
+} from '../uniformsOLD/useUniforms';
 import { useContext, useEffect, useState } from 'react';
 // import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 function UniformEditForm({ uniformToEdit = {}, onCloseModal }) {

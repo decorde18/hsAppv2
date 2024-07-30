@@ -64,6 +64,20 @@ const tables = [
     name: 'stoppages',
     view: 'schools_view',
   },
+  {
+    name: 'uniforms',
+  },
+  {
+    name: 'uniformSeasons',
+  },
+  {
+    name: 'uniformJerseys',
+    view: 'uniforms_view',
+  },
+  {
+    name: 'uniformSeasonPlayers',
+    view: 'uniforms_seasons_view',
+  },
 ];
 
 export function useCreateData() {

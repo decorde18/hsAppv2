@@ -4,8 +4,8 @@ import Menus from '../../ui/Menus';
 import Select from '../../ui/Select';
 import Spinner from '../../ui/Spinner';
 import Table from '../../ui/Table';
-import UniformSeasonRow from './UniformSeasonRow';
-import { useUniformSeasons, useUniforms } from './useUniforms';
+import UniformSeasonRow from '../uniformsOLD/UniformSeasonRow';
+import { useUniformSeasons, useUniforms } from '../uniformsOLD/useUniforms';
 
 function UniformSeasonTable() {
   const [selectedJersey, setSelectedJersey] = useState('default');

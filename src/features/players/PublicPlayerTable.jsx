@@ -79,7 +79,7 @@ function PublicPlayerTable() {
   const orderedRoster = playerSeasons.data.sort((a, b) => a.number - b.number);
   const positions = ['field', 'GK'];
   const teams = ['Varsity', 'JV'];
-  console.log(season);
+
   return (
     <Container>
       <Heading as="h2" location="center">

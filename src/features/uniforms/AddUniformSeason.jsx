@@ -1,6 +1,7 @@
 import Button from '../../ui/Button';
-import UniformSeasonCreateForm from './UniformSeasonCreateForm';
+
 import Modal from '../../ui/Modal';
+import UniformSeasonCreateForm from './UniformSeasonCreateForm';
 
 function AddUniformSeason() {
   return (

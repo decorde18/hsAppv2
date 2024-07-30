@@ -44,9 +44,6 @@ import AppLayoutPublic from './pages/layout/AppLayoutPublic';
 // import { PDFViewer } from '@react-pdf/renderer';
 
 import Uniforms from './pages/Uniforms';
-import UniformJerseys from './pages/UniformJerseys';
-import UniformSeasons from './pages/UniformSeasons';
-import UniformSeasonPlayers from './pages/UniformSeasonPlayers';
 import ScheduleHelper from './pages/ScheduleHelper';
 import Game from './pages/Game';
 
@@ -103,13 +100,7 @@ function App() {
                 <Route path="events" element={<Events />} />
                 <Route path="newseason" element={<NewSeason />} />
                 <Route path="uniforms" element={<Uniforms />} />
-                <Route path="uniformJerseys" element={<UniformJerseys />} />
-                <Route path="uniformSeasons" element={<UniformSeasons />} />
                 <Route path="scheduleHelper" element={<ScheduleHelper />} />
-                <Route
-                  path="uniformSeasonPlayers"
-                  element={<UniformSeasonPlayers />}
-                />
                 <Route path="users" element={<Users />} />
                 <Route path="settings" element={<Settings />} />
               </Route>
