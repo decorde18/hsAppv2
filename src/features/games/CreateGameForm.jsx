@@ -281,6 +281,12 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
     setGoogleUpdating(true);
     let teamSchedules;
     const {
+      schoolid,
+      locationid,
+      short_name,
+      abbreviation,
+      school,
+      locationName,
       created_at,
       updated_at,
       goals,
@@ -394,7 +400,7 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
         teamType: calData.teamType,
         calId: data.id,
       };
-      console.log({ ...googleCalData, calendar: calData.teamType });
+
       createEditGoogleCalendarGame(
         {
           ...googleCalData,
