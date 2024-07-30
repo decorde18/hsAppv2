@@ -243,40 +243,6 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
       : handleSetValue('location', gameOpponent?.home_location);
   }
   function onSubmit(data) {
-    console.log(gameToEdit);
-    // TODO FIX only some of these items need to be added to the editValues
-    //  {
-    //     "date": "2024-08-29",
-    //     "time": "18:30:00",
-    //     "teamType": "Varsity",
-    //     "seasonTime": "Regular Season",
-    //     "status": "to be played",
-    //     "comment": "",
-    //     "seasonId": 23,
-    //     "school": "Brentwood Academy",
-    //     "locationName": "Brentwood Academy",
-    //     "gf": 0,
-    //     "ga": 0,
-    //     "result": "T",
-    //     "id": 1269,
-    //     "district": false,
-    //     "home": false,
-    //     "short_name": "Brentwood Academy",
-    //     "abbreviation": "BA",
-    //     "so_if_tied": false,
-    //     "ot_1_minutes": 10,
-    //     "ot_2_minutes": 5,
-    //     "ot_if_tied": false,
-    //     "max_ot_periods": 2,
-    //     "min_ot_periods": 2,
-    //     "reg_periods": 2,
-    //     "reg_periods_minutes": 2400,
-    //     "gameType": "Game",
-    //     "actualgametime": null,
-    //     "schoolid": 27,
-    //     "locationid": 42
-    // }
-
     data.home = !!data.home;
     setGoogleUpdating(true);
     let teamSchedules;
@@ -287,6 +253,7 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
       abbreviation,
       school,
       locationName,
+      actualgametime,
       created_at,
       updated_at,
       goals,
