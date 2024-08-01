@@ -33,7 +33,6 @@ function UniformJerseyTable() {
   const sortedUniformJerseys = uniformJerseys.sort(
     (a, b) => a.number - b.number
   );
-
   return (
     <Container>
       {uniforms.map((uniform) => (

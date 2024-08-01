@@ -345,7 +345,6 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
       });
     }
     async function sendToCalendar(calData) {
-      console.log(schools, calData);
       const googleCalData = { ...calData };
       !calData.time && delete calData.time;
       googleCalData.opponent = schools.find(

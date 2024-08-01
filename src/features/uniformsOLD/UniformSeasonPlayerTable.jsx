@@ -83,7 +83,6 @@ function UniformSeasonPlayerTable() {
         .filter((uniform) => !uniform.seasonPlayer)
         .some((uniform) => uniform.jerseyid)
   );
-  console.log(uniformSeasonPlayers);
   //todo future if varsity shirts don't match ie 3 in navy is large and 3 in white is medium or lost, allow player to choose a different number for that color
   return (
     <>
@@ -112,7 +111,7 @@ function UniformSeasonPlayerTable() {
                   uniformSeason.uniformid === uniform.uniformid ? (
                     <UniformSeasonPlayerRow
                       uniformSeason={uniformSeason}
-                      key={uniformSeason.uniformid}
+                      key={uniformSeason.jerseyid}
                     />
                   ) : null
                 }
