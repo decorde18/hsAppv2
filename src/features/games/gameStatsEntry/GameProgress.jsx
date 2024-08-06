@@ -8,18 +8,21 @@ import GameBefore from './GameBefore';
 import styled from 'styled-components';
 import { useGameContext } from '../../../contexts/GameContext';
 import { PlayerContextProvider } from '../../../contexts/PlayerContext';
+import GamePeriodBreak from './GamePeriodBreak';
 
 const Div = styled.div`
   /* display: flex; */
   /* height: 100%; */
 `;
 
-function GameProgress() {
+function GameProgress({ gameStatus, setGameStatus }) {
   const {
     game,
     periods,
     setGameData,
+    currentPeriod,
     setCurrentPeriod,
+
     minorEventCategories,
     setMinorEventCategories,
   } = useGameContext();
@@ -35,7 +38,12 @@ function GameProgress() {
     });
     createPeriod({ period: 1, default_time: game.reg_periods_minutes });
   }
+  function startNextPeriod() {
+    const period = currentPeriod.period + 1;
+    createPeriod({ period, default_time: game.reg_periods_minutes });
+  }
   function createPeriod({ period, default_time }) {
+    setGameStatus('periodActive');
     setCurrentPeriod({
       game: game.id,
       period,
@@ -51,6 +59,19 @@ function GameProgress() {
         default_time,
       },
       view: 'periods',
+      toast: false,
+    });
+  }
+  function endPeriod() {
+    setGameStatus('betweenPeriods');
+    setCurrentPeriod({
+      ...currentPeriod,
+      end: getCurrentTime(),
+    });
+    updateData({
+      table: 'periods',
+      newData: [{ end: getCurrentTime() }],
+      id: currentPeriod.id,
     });
   }
   function updateStates({ state, data }) {
@@ -75,19 +96,25 @@ function GameProgress() {
     <PlayerContextProvider>
       <Div>
         {(() => {
-          switch (game.status) {
-            case 'completed':
+          switch (gameStatus) {
+            case 'endGame':
               return <GameAfter isWorking={isWorking} />;
-            case 'to be played':
+            case 'beforeGame':
               return (
                 <GameBefore
                   handleStartGame={handleStartGame}
                   isWorking={isWorking}
                 />
               );
+            case 'betweenPeriods':
+              return <GamePeriodBreak startNextPeriod={startNextPeriod} />;
             default:
               return (
-                <GameDuring updateStates={updateStates} isWorking={isWorking} />
+                <GameDuring
+                  updateStates={updateStates}
+                  isWorking={isWorking}
+                  endPeriod={endPeriod}
+                />
               );
           }
         })()}

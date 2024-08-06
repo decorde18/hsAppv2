@@ -1,5 +1,7 @@
 ## //TODO FIXME !!!
 
+- uniforms - take the number away from the size when it is being used. when primary uniform is selected, update secondary as well.
+
 - ability to update schools - update coach for school
 
 - fix games and events with Google log in - allow Development to acces game form

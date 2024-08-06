@@ -103,6 +103,7 @@ function PlayerContextProvider({ children }) {
       const outMinutes = subs
         .filter((sub) => sub?.subOut === player.playerId)
         .reduce((acc, min) => acc + min.gameMinute, 0);
+
       return {
         ...player,
         ins,
@@ -128,9 +129,9 @@ function PlayerContextProvider({ children }) {
             : 0,
       };
     });
-
+  console.log(activePlayers);
   return (
-    <PlayerContext.Provider value={activePlayers}>
+    <PlayerContext.Provider value={{ players, activePlayers }}>
       {children}
     </PlayerContext.Provider>
   );

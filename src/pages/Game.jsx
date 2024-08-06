@@ -5,6 +5,7 @@ import { GameProgress } from '../features/games/gameStatsEntry/GameProgress';
 import styled from 'styled-components';
 
 import { GameContextProvider } from '../contexts/GameContext';
+import { useState } from 'react';
 
 const Div = styled.div`
   height: 100%;
@@ -12,11 +13,13 @@ const Div = styled.div`
 `;
 
 function Game() {
+  const [gameStatus, setGameStatus] = useState();
+
   return (
-    <GameContextProvider>
+    <GameContextProvider gameStatus={gameStatus} setGameStatus={setGameStatus}>
       <Div>
-        <GameHeader />
-        <GameProgress />
+        <GameHeader gameStatus={gameStatus} />
+        <GameProgress gameStatus={gameStatus} setGameStatus={setGameStatus} />
       </Div>
     </GameContextProvider>
   );

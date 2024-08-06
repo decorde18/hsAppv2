@@ -24,7 +24,8 @@ function PlayerTableRow({ player, status, type }) {
     }, 1000);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [player]);
-
+  //TODO on half change, last in/out need to reflect previous in/out from previous half
+  //TODO at end of game, final minutes needs to be calculated differently a starter will not have the full time they were in and a sub will have more time. see game 7
   function getField(column) {
     let field = player[column.field];
     //do we need to get the value of the field

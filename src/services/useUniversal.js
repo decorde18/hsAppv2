@@ -62,7 +62,7 @@ const tables = [
   },
   {
     name: 'stoppages',
-    view: 'schools_view',
+    view: 'stoppages_game_view',
   },
   {
     name: 'uniforms',

@@ -16,7 +16,7 @@ const columnWidths = columns.reduce((acc, cur) => {
 
 function GameAfter({ editGame, isWorking }) {
   const { game } = useGameContext();
-  const activePlayers = usePlayerContext();
+  const { activePlayers } = usePlayerContext();
   const playersWhoPlayed = activePlayers.filter(
     (player) =>
       player.ins > 0 ||

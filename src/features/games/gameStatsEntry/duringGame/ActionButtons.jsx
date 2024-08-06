@@ -44,6 +44,8 @@ const Div2 = styled.div`
 function ActionButtons({ updateStates }) {
   const {
     game: { abbreviation: section },
+    modalOpen,
+    setModalOpen,
     minorEventCategories,
   } = useGameContext();
 
@@ -58,6 +60,8 @@ function ActionButtons({ updateStates }) {
     else updateStates({ state: 'minorEventCategories', data: category });
   }
   function handleStoppage(type) {
+    console.log(type);
+    setModalOpen(true);
     //type is which kind of stopppage
     //create a pop up modal that doesn't close without buttons
     // todo goal

@@ -31,7 +31,7 @@ const Clock = styled.div`
 `;
 /* GAME HEADER - use on (Game Break?, game stoppage? are these modals?),
  before game , after game */
-function GameHeader() {
+function GameHeader({ gameStatus }) {
   const { currentPeriod, game } = useGameContext();
   const [currentPeriodTime, setCurrentPeriodTime] = useState(0);
   const [countDown, setCountDown] = useState(true);
@@ -39,7 +39,8 @@ function GameHeader() {
   useEffect(() => {
     //start scoreboard clock
     if (!currentPeriod) return;
-    if (currentPeriod.start && !currentPeriod.end) {
+
+    if (gameStatus === 'periodActive') {
       const interval = setInterval(() => {
         setCurrentPeriodTime(
           subtractTimes(currentPeriod.start, getCurrentTime())
@@ -48,7 +49,7 @@ function GameHeader() {
 
       return () => clearInterval(interval);
     }
-  }, [currentPeriod]);
+  }, [currentPeriod, gameStatus]);
 
   return (
     <>
@@ -58,7 +59,7 @@ function GameHeader() {
             <div>IHS</div>
             <div>{game.gf}</div>
           </Heading>
-          {game.status !== 'in progress' ? (
+          {gameStatus !== 'periodActive' ? (
             <div>
               <Heading as="h4" case="upper" location="center">
                 <div>{game.short_name}</div>
@@ -79,7 +80,7 @@ function GameHeader() {
                 <Clock>
                   {countDown === true
                     ? convertSecondsToMinutesSeconds(
-                        currentPeriod.default_time - currentPeriodTime
+                        currentPeriod?.default_time - currentPeriodTime
                       )
                     : convertSecondsToMinutesSeconds(currentPeriodTime)}
                 </Clock>
@@ -88,7 +89,7 @@ function GameHeader() {
                     {countDown ? <FaArrowDown /> : <FaArrowUp />}
                   </button>
                 </div>
-                <div>Period {currentPeriod.period}</div>
+                <div>Period {currentPeriod?.period}</div>
               </div>
             )
           )}
@@ -98,7 +99,7 @@ function GameHeader() {
           </Heading>
         </Row>
       </StyledDiv>
-      {game.status !== 'in progress' && <GameSettings expand={false} />}
+      {gameStatus !== 'periodActive' && <GameSettings expand={false} />}
     </>
   );
 }

@@ -30,9 +30,9 @@ const Row = styled.div`
   grid-column: 1 / -1;
 `;
 
-function GameDuring({ updateStates }) {
+function GameDuring({ updateStates, endPeriod }) {
   const { game, getGameTime, subs, currentPeriod } = useGameContext();
-  const activePlayers = usePlayerContext();
+  const { activePlayers } = usePlayerContext();
 
   const { isCreating, createData } = useCreateData();
   const { isUpdating, updateData } = useUpdateData();
@@ -190,6 +190,7 @@ function GameDuring({ updateStates }) {
       ].sort((a, b) => a.number - b.number),
     }));
   }
+
   return (
     <Container>
       <NavLink to={`./?gameId=${game.id}&edit=true`}>
@@ -201,6 +202,9 @@ function GameDuring({ updateStates }) {
           Edit Stats
         </Button>
       </NavLink>
+      <Button name="endPeriod" onClick={endPeriod} variation="primary">
+        End period
+      </Button>
 
       <Div>
         <Row>

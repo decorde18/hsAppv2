@@ -17,7 +17,7 @@ const meCategories = {
 
 const GameContext = createContext();
 
-function GameContextProvider({ children }) {
+function GameContextProvider({ children, gameStatus, setGameStatus }) {
   const [searchParams] = useSearchParams();
   const gameId = searchParams.get('gameId');
 
@@ -25,7 +25,7 @@ function GameContextProvider({ children }) {
   const [gameData, setGameData] = useState();
   const [minorEventCategories, setMinorEventCategories] =
     useState(meCategories);
-  const [modalOpen, setModalOpen] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const game = useData({
     table: 'games',
@@ -37,6 +37,10 @@ function GameContextProvider({ children }) {
   });
   const minorEvents = useData({
     table: 'minorEvents',
+    filter: [{ field: 'game', value: gameId }],
+  });
+  const stoppages = useData({
+    table: 'stoppages',
     filter: [{ field: 'game', value: gameId }],
   });
   const subTotals = useData({
@@ -54,9 +58,26 @@ function GameContextProvider({ children }) {
   }, [game.data]);
   useEffect(() => {
     //set current period
-    if (!periods.data) return;
-    setCurrentPeriod(periods.data.sort((a, b) => b.period - a.period)[0]);
-  }, [periods]);
+    if (game.isLoading) return;
+    if (periods.isLoading) return;
+    if (stoppages.isLoading) return;
+    const current = periods.data.sort((a, b) => b.period - a.period)[0];
+    setCurrentPeriod(current);
+    const noOfPeriods =
+      game.data[0].reg_periods +
+      (game.data[0].ot_if_tied && game.data[0].max_ot_periods);
+
+    if (gameStatus) return;
+    let status = 'periodActive';
+
+    if (!current?.start) status = 'beforeGame';
+    if (current?.start && current?.end)
+      if (current.period === noOfPeriods) status = 'endGame';
+      else status = 'betweenPeriods';
+    if (stoppages.data?.some((stoppage) => !stoppage.end)) setModalOpen(true);
+    setGameStatus(status);
+  }, [game, gameStatus, periods, stoppages]);
+
   useEffect(() => {
     //updateminorEventsCategories
     if (!minorEvents.data) return;
@@ -79,13 +100,21 @@ function GameContextProvider({ children }) {
   }, [minorEvents.data]);
 
   function getGameTime() {
-    return (
-      (converthmsToSecondsOnly(game.actualgametime) || 0) +
-      (currentPeriod?.end
-        ? 0
-        : subtractTime(currentPeriod.start, getCurrentTime()))
-    );
+    return periods.data
+      .filter((period) => period.end)
+      .reduce((acc, period) => {
+        return (acc = acc + subtractTime(period.start, period.end));
+      }, 0) + !currentPeriod.end
+      ? subtractTime(currentPeriod?.start, getCurrentTime())
+      : 0;
+    // return (
+    //   (converthmsToSecondsOnly(game.actualgametime) || 0) +
+    //   (currentPeriod?.end
+    //     ? 0
+    //     : subtractTime(currentPeriod?.start, getCurrentTime()))
+    // );
   }
+
   if (
     periods.isLoading ||
     minorEvents.isLoading ||
@@ -109,8 +138,11 @@ function GameContextProvider({ children }) {
         setMinorEventCategories,
         subTotals: subTotals.data,
         subs: subs.data,
+        gameStatus,
+        setGameStatus,
         modalOpen,
         setModalOpen,
+        stoppages,
       }}
     >
       {modalOpen ? <ModalStoppages>{children}</ModalStoppages> : children}

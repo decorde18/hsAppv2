@@ -108,7 +108,7 @@ const HeaderDiv = styled.div`
 `;
 
 function GameBefore({ handleStartGame }) {
-  const players = usePlayerContext();
+  const { players } = usePlayerContext();
   const { isUpdating, updateData } = useUpdateData();
   const [beginGame, setBeginGame] = useState(false);
   const [playerGameStatus, setPlayerGameStatus] = useState([]);
@@ -184,7 +184,6 @@ function GameBefore({ handleStartGame }) {
   // fix menus so they close when clicked somewhere else
 
   if (!playerGameStatus) return <Spinner />;
-
   const gkSelectArray = [
     { label: 'PLEASE SELECT A GK', value: 0 },
     ...playerGameStatus

@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { useGameContext } from '../contexts/GameContext';
+import GameStoppage from '../features/games/gameStatsEntry/GameStoppage';
 
 const Background = styled.div`
   width: 100dvw;
@@ -96,7 +97,10 @@ function ModalStoppages() {
           </button>
         </CloseBtn>
         <Title>This is the MOdal</Title>
-        <Body>Here are all the questions</Body>
+        <Body>
+          Here are all the questions
+          <GameStoppage />
+        </Body>
         <Footer>
           <CancelBtn onClick={closeModal}>Cancel</CancelBtn>
           <SaveBtn>Save</SaveBtn>

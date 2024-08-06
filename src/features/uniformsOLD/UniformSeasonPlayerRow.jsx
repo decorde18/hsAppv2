@@ -1,23 +1,9 @@
 import styled from 'styled-components';
 
-// import UniformSeasonPlayerCreateForm from './UniformSeasonPlayerCreateForm';
-import {
-  useDeleteUniformSeasonPlayers,
-  useUniformSeasonPlayers,
-  useCreateUniformSeasonPlayers,
-  useUpdateUniformSeasonPlayers,
-} from './useUniforms';
-import { usePlayerSeason } from '../players/usePlayerSeasons';
-
-import { HiSquare2Stack, HiPencil, HiTrash } from 'react-icons/hi2';
-
-import Modal from '../../ui/Modal';
-import ModalConfirm from '../../ui/ModalConfirm';
 import Table from '../../ui/Table';
-import Menus from '../../ui/Menus';
+
 import { useEffect, useState } from 'react';
-import Switch from '../../ui/Switch';
-import Spinner from '../../ui/Spinner';
+
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 import {
   useCreateData,
@@ -82,8 +68,10 @@ function UniformSeasonPlayerRow({ uniformSeason }) {
   function handleJerseyAssignment(e) {
     const newUniformSeasonPlayers = {
       seasonPlayer: +e.target.value,
+      id: selectedUniformSeason.id,
       uniform: jerseyid,
     };
+
     const [newPlayer] = playerSeason
       .filter((player) => player.id === newUniformSeasonPlayers.seasonPlayer)
       .map((player) => ({
@@ -103,7 +91,7 @@ function UniformSeasonPlayerRow({ uniformSeason }) {
       updateUniformSeasonPlayers({
         table: 'uniformSeasonPlayers',
         newData: {
-          newUniformSeasonPlayers,
+          ...newUniformSeasonPlayers,
         },
         id: selectedUniformSeason.id,
       });
