@@ -38,6 +38,7 @@ export async function getData({ table, filter, search, sort }) {
   search &&
     search.map((each) => (query = query.ilike(each.field, `%${each.value}%`)));
   query;
+
   const { data, error } = await query;
 
   if (error) {

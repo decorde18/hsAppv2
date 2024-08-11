@@ -2,8 +2,9 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { useLocalStorageState } from '../hooks/useLocalStorageState';
-import { useRecentSeason } from '../features/seasons/useSeasons';
+
 import { useData } from '../services/useUniversal';
+
 import Spinner from '../ui/Spinner';
 
 const CurrentSeasonContext = createContext();
@@ -14,10 +15,9 @@ function CurrentSeasonProvider({ children }) {
     table: 'seasons',
     sort: [{ field: 'season', direction: false }],
   });
+
   const [currentSeasonNew, setCurrentSeasonNew] = useState();
   const [recentSeasonNew, setRecentSeasonNew] = useState();
-
-  const { isLoadingRecent, recentSeason: recent } = useRecentSeason();
   const [currentSeason, setCurrentSeason] = useLocalStorageState(
     null,
     'currentSeason'
@@ -30,19 +30,15 @@ function CurrentSeasonProvider({ children }) {
   const curSeason = +searchParams.get('season');
 
   useEffect(() => {
-    if (isLoadingRecent) return;
-    if (!recentSeason) updateRecentSeason(recent.id);
-    if (curSeason === 0 || !currentSeason) updateCurrentSeason(recent.id);
-    if (curSeason > 0 && curSeason !== currentSeason)
-      updateCurrentSeason(curSeason);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [curSeason, isLoadingRecent]);
-
-  useEffect(() => {
     if (isLoading) return;
+
     const recent = seasons[0];
+    if (!recentSeason) updateRecentSeason(recent.id);
+
+    const updatedCurrent = curSeason === curSeason ? curSeason : currentSeason;
     const current =
-      seasons.find((season) => season.id === +currentSeason) || recent;
+      seasons.find((season) => season.id === +updatedCurrent) || recent;
+
     //get recent season from API
     setRecentSeasonNew(recent);
     //if current season is stored locally, use it
@@ -65,7 +61,8 @@ function CurrentSeasonProvider({ children }) {
   function updateRecentSeason(season) {
     setRecentSeason(season);
   }
-  if (isLoadingRecent || isLoading) return <Spinner />;
+
+  if (!currentSeason || !recentSeason || isLoading) return <Spinner />;
 
   return (
     <CurrentSeasonContext.Provider
