@@ -11,8 +11,8 @@ import { PlayerContextProvider } from '../../../contexts/PlayerContext';
 import GamePeriodBreak from './GamePeriodBreak';
 
 const Div = styled.div`
-  /* display: flex; */
-  /* height: 100%; */
+  /* max-height: 90%; */
+  /* overflow: hidden; */
 `;
 
 function GameProgress({ gameStatus, setGameStatus }) {
@@ -93,8 +93,8 @@ function GameProgress({ gameStatus, setGameStatus }) {
   }
   const isWorking = isCreating || isUpdating;
   return (
-    <PlayerContextProvider>
-      <Div>
+    <Div>
+      <PlayerContextProvider>
         {(() => {
           switch (gameStatus) {
             case 'endGame':
@@ -118,8 +118,8 @@ function GameProgress({ gameStatus, setGameStatus }) {
               );
           }
         })()}
-      </Div>
-    </PlayerContextProvider>
+      </PlayerContextProvider>
+    </Div>
   );
   //TODO Modal for stats edit - needed for game during and game after
 }

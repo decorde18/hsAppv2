@@ -17,14 +17,13 @@ import { usePlayerContext } from '../../../contexts/PlayerContext';
 import { useCreateData, useUpdateData } from '../../../services/useUniversal';
 
 const Container = styled.div`
-  /* display: inline-block; */
+  display: grid;
+  grid-template-rows: 15.9rem 44rem 1fr;
 `;
 const Div = styled.div`
-  display: grid;
-  /* height: 100%; */
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto 1fr;
-  gap: 2rem;
+  padding: 1rem 0;
+  display: flex;
+  justify-content: center;
 `;
 const Row = styled.div`
   grid-column: 1 / -1;
@@ -192,7 +191,7 @@ function GameDuring({ updateStates, endPeriod }) {
   }
 
   return (
-    <Container>
+    <>
       <NavLink to={`./?gameId=${game.id}&edit=true`}>
         <Button
           name="manualGame"
@@ -206,32 +205,34 @@ function GameDuring({ updateStates, endPeriod }) {
         End period
       </Button>
 
-      <Div>
+      <Container>
         <Row>
           <ActionButtons updateStates={updateStates} />
         </Row>
-        <div>
-          <Heading as="h2" case="upper" location="center">
-            PLAYERS ON THE FIELD
-          </Heading>
-          <OnFieldPlayers players={currentPlayers.onField} />
-          <Heading as="h2" case="upper" location="center">
-            PLAYERS ON THE BENCH
-          </Heading>
-          <OffFieldPlayers players={currentPlayers.offField} />
-        </div>
-        <div>
-          <Substitutions
-            players={currentPlayers}
-            subsInWaiting={subsInWaiting}
-            handleSubChange={handleSubChange}
-            handleBtnClick={handleBtnClick}
-            enterAllSubs={enterAllSubs}
-            isWorking={isCreating}
-          />
-        </div>
-      </Div>
-    </Container>
+        <Div>
+          <div>
+            <Heading as="h2" case="upper" location="center">
+              PLAYERS ON THE FIELD
+            </Heading>
+            <OnFieldPlayers players={currentPlayers.onField} />
+          </div>
+          <div>
+            <Heading as="h2" case="upper" location="center">
+              PLAYERS ON THE BENCH
+            </Heading>
+            <OffFieldPlayers players={currentPlayers.offField} />
+          </div>
+        </Div>
+        <Substitutions
+          players={currentPlayers}
+          subsInWaiting={subsInWaiting}
+          handleSubChange={handleSubChange}
+          handleBtnClick={handleBtnClick}
+          enterAllSubs={enterAllSubs}
+          isWorking={isCreating}
+        />
+      </Container>
+    </>
   );
 }
 

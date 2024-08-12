@@ -54,9 +54,9 @@ function CurrentSeasonProvider({ children }) {
   }, [currentSeason, isLoading, seasons, setRecentSeason]);
 
   function updateCurrentSeason(season) {
-    searchParams.set('season', season);
     setSearchParams(searchParams);
     setCurrentSeason(season);
+    searchParams.set('season', season);
   }
   function updateRecentSeason(season) {
     setRecentSeason(season);

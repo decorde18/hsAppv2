@@ -6,6 +6,14 @@ import ButtonIcon from '../../../../ui/ButtonIcon';
 import { HiTrash } from 'react-icons/hi2';
 import { CgEnter } from 'react-icons/cg';
 
+const Container2 = styled.div`
+  /* max-height: 50%; */
+  display: flex;
+  flex-direction: column;
+`;
+const Container = styled.div`
+  overflow-y: auto;
+`;
 const Div = styled.div`
   display: flex;
   margin: 1rem auto;
@@ -19,6 +27,7 @@ const Div3 = styled.div`
   display: flex;
   justify-content: space-around;
   margin-top: 2rem;
+  /* position: fixed; */
 `;
 function Substitutions({
   players,
@@ -29,99 +38,105 @@ function Substitutions({
   isWorking,
 }) {
   return (
-    <>
-      {subsInWaiting.map((subs, index) => (
-        <Div key={`${index}-sub`}>
-          <Select
-            width={19}
-            options={[
-              //then the value of the player that is selected if there is one
-              !subs.subOut //the options first add blank label
-                ? { value: 'out', label: 'SUBBING OUT' }
-                : {
-                    value: players.onField.find(
+    <Container2>
+      <Container>
+        {subsInWaiting.map((subs, index) => (
+          <Div key={`${index}-sub`}>
+            <Select
+              width={25}
+              options={[
+                //then the value of the player that is selected if there is one
+                !subs.subOut //the options first add blank label
+                  ? { value: 'out', label: 'SUBBING OUT' }
+                  : {
+                      value: players.onField.find(
+                        (player) => +subs.subOut === player.playerId
+                      )?.playerId,
+                      label: players.onField.find(
+                        (player) => +subs.subOut === player.playerId
+                      )?.fullname,
+                    }, //then only the players who are not already being subbed out
+                ...players.onField
+                  .filter(
+                    (player) =>
+                      !subsInWaiting.some(
+                        (sub) => sub.subOut === player.playerId
+                      )
+                  )
+                  .map((player) => ({
+                    value: player.playerId,
+                    label: player.fullname,
+                  })),
+              ]}
+              onChange={handleSubChange}
+              name={`subOut-${index}`}
+              value={
+                subs.subOut
+                  ? players.onField.find(
                       (player) => +subs.subOut === player.playerId
-                    )?.playerId,
-                    label: players.onField.find(
-                      (player) => +subs.subOut === player.playerId
-                    )?.fullname,
-                  }, //then only the players who are not already being subbed out
-              ...players.onField
-                .filter(
-                  (player) =>
-                    !subsInWaiting.some((sub) => sub.subOut === player.playerId)
-                )
-                .map((player) => ({
-                  value: player.playerId,
-                  label: player.fullname,
-                })),
-            ]}
-            onChange={handleSubChange}
-            name={`subOut-${index}`}
-            value={
-              subs.subOut
-                ? players.onField.find(
-                    (player) => +subs.subOut === player.playerId
-                  )?.playerId
-                : 'out'
-            }
-            disabled={isWorking}
-          />
-          <Select
-            width={19}
-            options={[
-              //then the value of the player that is selected if there is one
-              !subs.subIn //the options first add blank label
-                ? { value: 'in', label: 'SUBBING IN' }
-                : {
-                    value: players.offField.find(
+                    )?.playerId
+                  : 'out'
+              }
+              disabled={isWorking}
+            />
+            <Select
+              width={25}
+              options={[
+                //then the value of the player that is selected if there is one
+                !subs.subIn //the options first add blank label
+                  ? { value: 'in', label: 'SUBBING IN' }
+                  : {
+                      value: players.offField.find(
+                        (player) => +subs.subIn === player.playerId
+                      )?.playerId,
+                      label: players.offField.find(
+                        (player) => +subs.subIn === player.playerId
+                      )?.fullname,
+                    }, //then only the players who are not already being subbed in
+                ...players.offField
+                  .filter(
+                    (player) =>
+                      !subsInWaiting.some(
+                        (sub) => sub.subIn === player.playerId
+                      )
+                  )
+                  .map((player) => ({
+                    value: player.playerId,
+                    label: player.fullname,
+                  })),
+              ]}
+              onChange={handleSubChange}
+              name={`subIn-${index}`}
+              value={
+                subs.subIn
+                  ? players.offField.find(
                       (player) => +subs.subIn === player.playerId
-                    )?.playerId,
-                    label: players.offField.find(
-                      (player) => +subs.subIn === player.playerId
-                    )?.fullname,
-                  }, //then only the players who are not already being subbed in
-              ...players.offField
-                .filter(
-                  (player) =>
-                    !subsInWaiting.some((sub) => sub.subIn === player.playerId)
-                )
-                .map((player) => ({
-                  value: player.playerId,
-                  label: player.fullname,
-                })),
-            ]}
-            onChange={handleSubChange}
-            name={`subIn-${index}`}
-            value={
-              subs.subIn
-                ? players.offField.find(
-                    (player) => +subs.subIn === player.playerId
-                  )?.playerId
-                : 'in'
-            }
-            disabled={isWorking}
-          />
-          {(subs.subIn || subs.subOut) && (
-            <Div2>
-              <ButtonIcon
-                name={`delete-${index}`}
-                disabled={isWorking}
-                onClick={handleBtnClick}
-              >
-                <HiTrash style={{ color: 'red' }} />
-              </ButtonIcon>
-              <ButtonIcon
-                name={`enter-${index}`}
-                disabled={isWorking}
-                onClick={handleBtnClick}
-              >
-                <CgEnter style={{ color: 'green' }} />
-              </ButtonIcon>
-            </Div2>
-          )}
-        </Div>
-      ))}
+                    )?.playerId
+                  : 'in'
+              }
+              disabled={isWorking}
+            />
+            {(subs.subIn || subs.subOut) && (
+              <Div2>
+                <ButtonIcon
+                  name={`delete-${index}`}
+                  disabled={isWorking}
+                  onClick={handleBtnClick}
+                >
+                  <HiTrash style={{ color: 'red' }} />
+                </ButtonIcon>
+                <ButtonIcon
+                  name={`enter-${index}`}
+                  disabled={isWorking}
+                  onClick={handleBtnClick}
+                >
+                  <CgEnter style={{ color: 'green' }} />
+                </ButtonIcon>
+              </Div2>
+            )}
+          </Div>
+        ))}
+      </Container>
       <Div3>
         {subsInWaiting.length > 1 && (
           <Button onClick={enterAllSubs} disabled={isWorking}>
@@ -129,7 +144,7 @@ function Substitutions({
           </Button>
         )}
       </Div3>
-    </>
+    </Container2>
   );
 }
 

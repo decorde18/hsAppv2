@@ -8,8 +8,15 @@ import { GameContextProvider } from '../contexts/GameContext';
 import { useState } from 'react';
 
 const Div = styled.div`
-  height: 100%;
-  padding: 1rem;
+  /* width: 99dvw;*/
+  max-height: 100dvh;
+
+  /* overflow: hidden; */
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-height: 0;
 `;
 
 function Game() {

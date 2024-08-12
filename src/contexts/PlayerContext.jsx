@@ -129,7 +129,7 @@ function PlayerContextProvider({ children }) {
             : 0,
       };
     });
-  console.log(activePlayers);
+
   return (
     <PlayerContext.Provider value={{ players, activePlayers }}>
       {children}
