@@ -77,7 +77,6 @@ function Substitutions({
                     )?.playerId
                   : 'out'
               }
-              disabled={isWorking}
             />
             <Select
               width={25}
@@ -114,7 +113,6 @@ function Substitutions({
                     )?.playerId
                   : 'in'
               }
-              disabled={isWorking}
             />
             {(subs.subIn || subs.subOut) && (
               <Div2>

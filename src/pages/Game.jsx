@@ -13,10 +13,6 @@ const Div = styled.div`
 
   /* overflow: hidden; */
   padding: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  min-height: 0;
 `;
 
 function Game() {

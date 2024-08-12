@@ -14,7 +14,11 @@ import Heading from '../../../ui/Heading';
 
 import { useGameContext } from '../../../contexts/GameContext';
 import { usePlayerContext } from '../../../contexts/PlayerContext';
-import { useCreateData, useUpdateData } from '../../../services/useUniversal';
+import {
+  useCreateData,
+  useDeleteData,
+  useUpdateData,
+} from '../../../services/useUniversal';
 
 const Container = styled.div`
   display: grid;
@@ -35,6 +39,7 @@ function GameDuring({ updateStates, endPeriod }) {
 
   const { isCreating, createData } = useCreateData();
   const { isUpdating, updateData } = useUpdateData();
+  const { isDeleting, deleteData } = useDeleteData();
   const [currentPlayers, setCurrentPlayers] = useState(
     setCurrentPlayerStatus()
   );
@@ -132,6 +137,9 @@ function GameDuring({ updateStates, endPeriod }) {
         id: clickedSub.id,
       });
     }
+    if (type === 'delete') {
+      deleteData({ table: 'subs', id: clickedSub.id, toast: false });
+    }
     handleNewSubsInWaiting(newSubs);
   }
   function handleNewSubsInWaiting(newSubs) {
@@ -223,14 +231,16 @@ function GameDuring({ updateStates, endPeriod }) {
             <OffFieldPlayers players={currentPlayers.offField} />
           </div>
         </Div>
-        <Substitutions
-          players={currentPlayers}
-          subsInWaiting={subsInWaiting}
-          handleSubChange={handleSubChange}
-          handleBtnClick={handleBtnClick}
-          enterAllSubs={enterAllSubs}
-          isWorking={isCreating}
-        />
+        <Div>
+          <Substitutions
+            players={currentPlayers}
+            subsInWaiting={subsInWaiting}
+            handleSubChange={handleSubChange}
+            handleBtnClick={handleBtnClick}
+            enterAllSubs={enterAllSubs}
+            isWorking={isCreating}
+          />
+        </Div>
       </Container>
     </>
   );

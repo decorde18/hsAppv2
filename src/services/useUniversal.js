@@ -120,8 +120,8 @@ export function useDeleteData() {
   const queryClient = useQueryClient(); //from App
   const { isLoading: isDeleting, mutate: deleteData } = useMutation({
     mutationFn: deleteDataApi,
-    onSuccess: ({ table, view }) => {
-      toast.success(`${table}  successfully deleted`);
+    onSuccess: ({ table, view, toast }) => {
+      if (toast) toast.success(`${table}  successfully deleted`);
       queryClient.invalidateQueries({ queryKey: [view] });
     },
     onError: (err) => toast.error(err.message),
