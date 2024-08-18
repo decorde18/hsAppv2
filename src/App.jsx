@@ -46,6 +46,7 @@ import AppLayoutPublic from './pages/layout/AppLayoutPublic';
 import Uniforms from './pages/Uniforms';
 import ScheduleHelper from './pages/ScheduleHelper';
 import Game from './pages/Game';
+import GameStatsEdit from './features/games/gameStatsEntry/GameStatsEdit';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -118,6 +119,7 @@ function App() {
                 <Route path="rosterTSSAA" element={<RosterTSSAA />} />
                 <Route path="account" element={<Account />} />
                 <Route path="game" element={<Game />} />
+                <Route path="gamesEdit" element={<GameStatsEdit />} />
               </Route>
             </Routes>
 

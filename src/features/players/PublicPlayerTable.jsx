@@ -63,12 +63,19 @@ function PublicPlayerTable() {
     table: 'playerSeasons',
     filter: [
       { field: 'seasonId', value: currentSeason, table: 'playerSeasons' },
+      { field: 'status', value: 'Rostered', table: 'playerSeasons' },
     ],
+    // sort: sort.playerSeasons,
+  });
+  const playerUniforms = useData({
+    table: 'uniformSeasonPlayers',
+    filter: [{ field: 'season', value: currentSeason }],
     // sort: sort.playerSeasons,
   });
 
   if (!currentSeason) return <div>Sorry You Must Have A Season Selected</div>;
-  if (isLoadingSeason || playerSeasons.isLoading) return <Spinner />;
+  if (isLoadingSeason || playerSeasons.isLoading || playerUniforms.isLoading)
+    return <Spinner />;
   if (!playerSeasons.data.length)
     return (
       <Container>
@@ -79,7 +86,13 @@ function PublicPlayerTable() {
   const orderedRoster = playerSeasons.data.sort((a, b) => a.number - b.number);
   const positions = ['field', 'GK'];
   const teams = ['Varsity', 'JV'];
-
+  const fieldJerseys = playerUniforms.data.filter(
+    (uniform) => uniform.type === 'Jersey'
+  );
+  const gkJerseys = playerUniforms.data.filter(
+    (uniform) => uniform.type === 'GK Jersey'
+  );
+  console.log(fieldJerseys);
   return (
     <Container>
       <Heading as="h2" location="center">

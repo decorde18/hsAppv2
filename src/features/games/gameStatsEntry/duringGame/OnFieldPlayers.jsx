@@ -1,3 +1,4 @@
+import styled from 'styled-components';
 import Table from '../../../../ui/Table';
 import PlayerTableRow from '../PlayerTableRow';
 import { duringGameColumns } from '../gameTableColumns';
@@ -27,7 +28,6 @@ function OnFieldPlayers({ players }) {
             </div>
           ))}
       </Table.Header>
-
       <Table.Body
         data={players}
         render={(player) => (

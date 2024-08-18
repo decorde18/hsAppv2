@@ -1,7 +1,8 @@
 ## //TODO FIXME !!!
 
+- ihssoccergirls.net does not take you to public or app
 - uniforms - take the number away from the size when it is being used. when primary uniform is selected, update secondary as well.
-
+- all things uniforms, add uniform fixed, add jerseys fixed, ability to add gk fixed, roster with GK jersey not just player listed as GK fixed, GK needs gk in roster positions even though they have a gk jersey, roster needs to be based on jersey types
 - ability to update schools - update coach for school
 
 - fix games and events with Google log in - allow Development to acces game form

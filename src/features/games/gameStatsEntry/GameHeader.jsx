@@ -20,8 +20,7 @@ import GameSettings from './GameSettings';
 import { FaArrowDown, FaArrowUp } from 'react-icons/fa';
 
 const StyledDiv = styled.div`
-  padding: 2rem;
-  /* height: 15dvh; */
+  padding: 1rem;
 `;
 const Clock = styled.div`
   font-size: 90px;

@@ -21,11 +21,6 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   padding: 2.5rem;
-  /* width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  flex-direction: column; */
 `;
 const Title = styled.div`
   display: inline-block;
@@ -45,7 +40,7 @@ const Footer = styled.div`
   justify-content: center;
   align-items: center;
 `;
-const CloseBtn = styled.div`
+const CloseBtnContainer = styled.div`
   display: flex;
   justify-content: flex-end;
   background-color: transparent;
@@ -74,6 +69,12 @@ const SaveBtn = styled.button`
   font-size: 2rem;
   cursor: pointer;
 `;
+const CloseBtn = styled.button`
+  background-color: transparent;
+  border: none;
+  font-size: 2.5rem;
+  cursor: pointer;
+`;
 
 function ModalStoppages() {
   const { setModalOpen } = useGameContext();
@@ -83,22 +84,11 @@ function ModalStoppages() {
   return (
     <Background>
       <Container>
-        <CloseBtn>
-          <button
-            style={{
-              backgroundColor: 'transparent',
-              border: 'none',
-              fontSize: '2.5rem',
-              cursor: 'pointer',
-            }}
-            onClick={closeModal}
-          >
-            X
-          </button>
-        </CloseBtn>
+        <CloseBtnContainer>
+          <CloseBtn onClick={closeModal}>X</CloseBtn>
+        </CloseBtnContainer>
         <Title>This is the MOdal</Title>
         <Body>
-          Here are all the questions
           <GameStoppage />
         </Body>
         <Footer>

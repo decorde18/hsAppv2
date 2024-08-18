@@ -10,9 +10,9 @@ import { useGameContext } from '../../../contexts/GameContext';
 import { PlayerContextProvider } from '../../../contexts/PlayerContext';
 import GamePeriodBreak from './GamePeriodBreak';
 
-const Div = styled.div`
-  /* max-height: 90%; */
-  /* overflow: hidden; */
+const Container = styled.div`
+  display: inline-block;
+  overflow: hidden;
 `;
 
 function GameProgress({ gameStatus, setGameStatus }) {
@@ -93,7 +93,7 @@ function GameProgress({ gameStatus, setGameStatus }) {
   }
   const isWorking = isCreating || isUpdating;
   return (
-    <Div>
+    <Container>
       <PlayerContextProvider>
         {(() => {
           switch (gameStatus) {
@@ -119,7 +119,7 @@ function GameProgress({ gameStatus, setGameStatus }) {
           }
         })()}
       </PlayerContextProvider>
-    </Div>
+    </Container>
   );
   //TODO Modal for stats edit - needed for game during and game after
 }

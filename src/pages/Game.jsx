@@ -7,12 +7,12 @@ import styled from 'styled-components';
 import { GameContextProvider } from '../contexts/GameContext';
 import { useState } from 'react';
 
-const Div = styled.div`
-  /* width: 99dvw;*/
+const Container = styled.div`
   max-height: 100dvh;
-
-  /* overflow: hidden; */
   padding: 0.5rem;
+  display: grid;
+  grid-template-rows: 12.5rem 1fr;
+  overflow: hidden;
 `;
 
 function Game() {
@@ -20,10 +20,10 @@ function Game() {
 
   return (
     <GameContextProvider gameStatus={gameStatus} setGameStatus={setGameStatus}>
-      <Div>
+      <Container>
         <GameHeader gameStatus={gameStatus} />
         <GameProgress gameStatus={gameStatus} setGameStatus={setGameStatus} />
-      </Div>
+      </Container>
     </GameContextProvider>
   );
 }
