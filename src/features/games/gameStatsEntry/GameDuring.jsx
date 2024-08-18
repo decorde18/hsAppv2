@@ -30,7 +30,7 @@ const Container = styled.div`
 const Grid = styled.div`
   flex: 0 0 100%;
   display: grid;
-  grid-template-rows: 15.9rem 0.7fr 0.25fr;
+  grid-template-rows: 15.9rem 1fr 1fr;
   align-items: stretch;
 `;
 const Div = styled.div`
