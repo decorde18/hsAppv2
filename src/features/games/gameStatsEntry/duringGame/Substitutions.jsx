@@ -7,16 +7,16 @@ import { HiTrash } from 'react-icons/hi2';
 import { CgEnter } from 'react-icons/cg';
 
 const Container2 = styled.div`
-  /* max-height: 50%; */
-  display: flex;
-  flex-direction: column;
-`;
-const Container = styled.div`
+  max-height: 100%;
   overflow-y: auto;
+  /* display: grid; */
+  /* grid-template-rows: 1fr 7rem; */
+  /* flex-direction: column; */
 `;
+const Container = styled.div``;
 const Div = styled.div`
   display: flex;
-  margin: 1rem auto;
+  margin: 0.5rem auto;
 `;
 const Div2 = styled.div`
   display: flex;

@@ -17,7 +17,7 @@ const meCategories = {
 
 const GameContext = createContext();
 
-function GameContextProvider({ children, gameStatus, setGameStatus }) {
+function GameContextProvider({ children }) {
   const [searchParams] = useSearchParams();
   const gameId = searchParams.get('gameId');
 
@@ -25,6 +25,8 @@ function GameContextProvider({ children, gameStatus, setGameStatus }) {
   const [gameData, setGameData] = useState();
   const [minorEventCategories, setMinorEventCategories] =
     useState(meCategories);
+  const [gameStatus, setGameStatus] = useState();
+
   const [modalOpen, setModalOpen] = useState(false);
 
   const game = useData({

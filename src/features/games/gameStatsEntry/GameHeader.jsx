@@ -30,8 +30,8 @@ const Clock = styled.div`
 `;
 /* GAME HEADER - use on (Game Break?, game stoppage? are these modals?),
  before game , after game */
-function GameHeader({ gameStatus }) {
-  const { currentPeriod, game } = useGameContext();
+function GameHeader() {
+  const { currentPeriod, game, gameStatus } = useGameContext();
   const [currentPeriodTime, setCurrentPeriodTime] = useState(0);
   const [countDown, setCountDown] = useState(true);
 

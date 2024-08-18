@@ -21,11 +21,12 @@ import {
 } from '../../../services/useUniversal';
 
 const Container = styled.div`
-  max-height: 100%;
+  padding: 1rem 1rem;
   display: flex;
-  flex-direction: column;
   flex-wrap: nowrap;
   justify-content: space-between;
+  height: 95%;
+  margin-bottom: 1rem;
 `;
 const Grid = styled.div`
   flex: 0 0 100%;
@@ -35,7 +36,7 @@ const Grid = styled.div`
 `;
 const Div = styled.div`
   justify-content: center;
-  padding: 1rem 0;
+  margin: 1rem;
   display: flex;
   overflow: auto;
 `;

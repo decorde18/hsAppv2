@@ -11,11 +11,11 @@ import { PlayerContextProvider } from '../../../contexts/PlayerContext';
 import GamePeriodBreak from './GamePeriodBreak';
 
 const Container = styled.div`
-  display: inline-block;
+  /* display: inline-block; */
   overflow: hidden;
 `;
 
-function GameProgress({ gameStatus, setGameStatus }) {
+function GameProgress() {
   const {
     game,
     periods,
@@ -25,6 +25,8 @@ function GameProgress({ gameStatus, setGameStatus }) {
 
     minorEventCategories,
     setMinorEventCategories,
+    gameStatus,
+    setGameStatus,
   } = useGameContext();
   const { isCreating, createData } = useCreateData();
   const { isUpdating, updateData } = useUpdateData();
@@ -93,8 +95,8 @@ function GameProgress({ gameStatus, setGameStatus }) {
   }
   const isWorking = isCreating || isUpdating;
   return (
-    <Container>
-      <PlayerContextProvider>
+    <PlayerContextProvider>
+      <Container>
         {(() => {
           switch (gameStatus) {
             case 'endGame':
@@ -118,8 +120,8 @@ function GameProgress({ gameStatus, setGameStatus }) {
               );
           }
         })()}
-      </PlayerContextProvider>
-    </Container>
+      </Container>
+    </PlayerContextProvider>
   );
   //TODO Modal for stats edit - needed for game during and game after
 }
