@@ -20,6 +20,16 @@ const GameContext = createContext();
 function GameContextProvider({ children }) {
   const [searchParams] = useSearchParams();
   const gameId = searchParams.get('gameId');
+  const [gameDetails, setGameDetails] = useState({
+    gameId,
+    currentPeriod: 0,
+    periods: [],
+    minorEventCategories: [],
+    stoppages: [],
+    subs: [],
+    subTotals: [],
+    gameStatus: '',
+  });
 
   const [currentPeriod, setCurrentPeriod] = useState();
   const [gameData, setGameData] = useState();
@@ -83,6 +93,23 @@ function GameContextProvider({ children }) {
   useEffect(() => {
     //updateminorEventsCategories
     if (!minorEvents.data) return;
+    setGameDetails({
+      ...gameDetails,
+      minorEventCategories: Object.keys(meCategories)
+        .map((team) => ({
+          //cycle through each category team
+          [team]: Object.keys(meCategories[team]) //add to an object
+            .map((eventType) => ({
+              //cycle through each category iitemType
+              [eventType]: minorEvents.data.filter(
+                //add to an object
+                (each) => each.team === team && each.eventType === eventType
+              ),
+            }))
+            .reduce((acc, item) => ({ ...acc, ...item }), {}), //convert itemType array to object
+        }))
+        .reduce((acc, item) => ({ ...acc, ...item }), {}),
+    });
     setMinorEventCategories(
       Object.keys(meCategories)
         .map((team) => ({
@@ -99,6 +126,8 @@ function GameContextProvider({ children }) {
         }))
         .reduce((acc, item) => ({ ...acc, ...item }), {})
     ); //convert team array to object
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [minorEvents.data]);
 
   function getGameTime() {
@@ -145,6 +174,8 @@ function GameContextProvider({ children }) {
         modalOpen,
         setModalOpen,
         stoppages,
+        gameDetails,
+        setGameDetails,
       }}
     >
       {modalOpen ? <ModalGames>{children}</ModalGames> : children}

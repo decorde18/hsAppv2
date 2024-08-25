@@ -17,6 +17,8 @@ const Container = styled.div`
 
 function GameProgress() {
   const {
+    gameDetails,
+    setGameDetails,
     game,
     periods,
     setGameData,

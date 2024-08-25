@@ -30,7 +30,7 @@ function PlayerContextProvider({ children }) {
     ],
   });
 
-  const [missingPlayers, setMissingPlayers] = useState([]);
+  const [missingPlayers, setMissingPlayers] = useState(['loading']);
 
   useEffect(() => {
     //update playerGames if they are missing
@@ -49,12 +49,14 @@ function PlayerContextProvider({ children }) {
           ? 'dressed'
           : 'notDressed',
       }));
+    console.log(missing);
     setMissingPlayers(missing);
     if (missing.length)
       createData({
         table: 'playerGames',
         newData: missing,
         bulk: true,
+        toast: false,
       });
   }, [
     createData,

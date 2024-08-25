@@ -7,6 +7,7 @@ export async function createDataApi({
   bulk = false,
   toast = true,
 }) {
+  console.log(newData, table);
   const { data, error } = await supabase
     .from(table)
     .insert(bulk ? newData : [{ ...newData }]) // ??? DOES THIS WORK?
