@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 import Select from '../../../../ui/Select';
 import Button from '../../../../ui/Button';
-import Menus from '../../../../ui/Menus';
 import ButtonIcon from '../../../../ui/ButtonIcon';
 import { HiTrash } from 'react-icons/hi2';
 import { CgEnter } from 'react-icons/cg';
@@ -9,9 +8,6 @@ import { CgEnter } from 'react-icons/cg';
 const Container2 = styled.div`
   max-height: 100%;
   overflow-y: auto;
-  /* display: grid; */
-  /* grid-template-rows: 1fr 7rem; */
-  /* flex-direction: column; */
 `;
 const Container = styled.div``;
 const Div = styled.div`
@@ -27,7 +23,6 @@ const Div3 = styled.div`
   display: flex;
   justify-content: space-around;
   margin-top: 2rem;
-  /* position: fixed; */
 `;
 function Substitutions({
   players,

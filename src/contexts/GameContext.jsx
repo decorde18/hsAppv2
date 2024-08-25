@@ -8,7 +8,7 @@ import {
   getCurrentTime,
   subtractTime,
 } from '../utils/helpers';
-import ModalStoppages from '../ui/ModalStoppages';
+import ModalGames from '../features/games/gameStatsEntry/modalGames/ModalGames';
 
 const meCategories = {
   for: { foul: [], corner: [], offside: [], shots: [] },
@@ -147,7 +147,7 @@ function GameContextProvider({ children }) {
         stoppages,
       }}
     >
-      {modalOpen ? <ModalStoppages>{children}</ModalStoppages> : children}
+      {modalOpen ? <ModalGames>{children}</ModalGames> : children}
     </GameContext.Provider>
   );
 }

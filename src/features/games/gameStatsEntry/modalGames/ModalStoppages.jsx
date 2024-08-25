@@ -1,17 +1,7 @@
 import styled from 'styled-components';
-import { useGameContext } from '../contexts/GameContext';
-import GameStoppage from '../features/games/gameStatsEntry/GameStoppage';
+import { useGameContext } from '../../../../contexts/GameContext';
+import GameStoppage from '../GameStoppage';
 
-const Background = styled.div`
-  width: 100dvw;
-  height: 100dvh;
-  background-color: var(--backdrop-color);
-  backdrop-filter: blur(4px);
-  position: fixed;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
 const Container = styled.div`
   width: 75%;
   height: 75%;
@@ -82,21 +72,19 @@ function ModalStoppages() {
     setModalOpen(false);
   }
   return (
-    <Background>
-      <Container>
-        <CloseBtnContainer>
-          <CloseBtn onClick={closeModal}>X</CloseBtn>
-        </CloseBtnContainer>
-        <Title>This is the MOdal</Title>
-        <Body>
-          <GameStoppage />
-        </Body>
-        <Footer>
-          <CancelBtn onClick={closeModal}>Cancel</CancelBtn>
-          <SaveBtn>Save</SaveBtn>
-        </Footer>
-      </Container>
-    </Background>
+    <Container>
+      <CloseBtnContainer>
+        <CloseBtn onClick={closeModal}>X</CloseBtn>
+      </CloseBtnContainer>
+      <Title>This is the MOdal</Title>
+      <Body>
+        <GameStoppage />
+      </Body>
+      <Footer>
+        <CancelBtn onClick={closeModal}>Cancel</CancelBtn>
+        <SaveBtn>Save</SaveBtn>
+      </Footer>
+    </Container>
   );
 }
 

@@ -65,15 +65,12 @@ function PublicPlayerTable() {
       { field: 'seasonId', value: currentSeason, table: 'playerSeasons' },
       { field: 'status', value: 'Rostered', table: 'playerSeasons' },
     ],
-    // sort: sort.playerSeasons,
   });
   const playerUniforms = useData({
     table: 'uniformSeasonPlayers',
     filter: [{ field: 'season', value: currentSeason }],
-    // sort: sort.playerSeasons,
   });
 
-  if (!currentSeason) return <div>Sorry You Must Have A Season Selected</div>;
   if (isLoadingSeason || playerSeasons.isLoading || playerUniforms.isLoading)
     return <Spinner />;
   if (!playerSeasons.data.length)
@@ -84,15 +81,18 @@ function PublicPlayerTable() {
     );
 
   const orderedRoster = playerSeasons.data.sort((a, b) => a.number - b.number);
-  const positions = ['field', 'GK'];
   const teams = ['Varsity', 'JV'];
-  const fieldJerseys = playerUniforms.data.filter(
-    (uniform) => uniform.type === 'Jersey'
-  );
-  const gkJerseys = playerUniforms.data.filter(
-    (uniform) => uniform.type === 'GK Jersey'
-  );
-  console.log(fieldJerseys);
+
+  const gkJerseys = playerUniforms.data
+    .filter((uniform) => uniform.type === 'GK Jersey')
+    .map((uniform) => ({
+      gkUniform: uniform.number,
+      ...playerSeasons.data.find(
+        (player) => player.id === uniform.seasonPlayer
+      ),
+    }))
+    .sort((a, b) => a.gkUniform - b.gkUniform);
+
   return (
     <Container>
       <Heading as="h2" location="center">
@@ -102,44 +102,52 @@ function PublicPlayerTable() {
       <Section>
         {teams.map((team) => (
           <Vertical key={team}>
-            {positions.map((position) => (
-              <div key={`${team}-${position}`}>
-                {position === 'GK' ? (
-                  <Heading as="h3" location="center">{`GK`}</Heading>
-                ) : (
-                  <Heading
-                    as="h3"
-                    location="center"
-                  >{`${team} Roster`}</Heading>
+            <Heading as="h3" location="center">{`${team} Roster`}</Heading>
+            <Table columns=".25fr .5fr 2fr .5fr .75fr">
+              <Table.PrintHeader>
+                <div></div>
+                <Right>#</Right>
+                <Center>Player Name</Center>
+                <Center>Grade</Center>
+                <Center>Pos</Center>
+              </Table.PrintHeader>
+              <Table.Body
+                data={orderedRoster.filter((player) =>
+                  player.teamLevel?.includes(team)
                 )}
-                <Table columns=".25fr .5fr 2fr .5fr .75fr">
-                  <Table.PrintHeader>
-                    <div></div>
-                    <Right>#</Right>
-                    <Center>Player Name</Center>
-                    <Center>Grade</Center>
-                    {position !== 'GK' && <Center>Pos</Center>}
-                  </Table.PrintHeader>
-                  <Table.Body
-                    data={orderedRoster
-                      .filter((player) => player.teamLevel?.includes(team))
-                      .filter((player) =>
-                        position === 'GK' ? player.gknumber : player
-                      )}
-                    render={(player) => (
-                      <PublicPlayerRow
-                        player={player}
-                        position={position}
-                        key={`${team}-${position}-${player.id}`}
-                      />
-                    )}
+                render={(player) => (
+                  <PublicPlayerRow
+                    player={player}
+                    key={`${team}-${player.id}`}
                   />
-                </Table>
-              </div>
-            ))}
+                )}
+              />
+            </Table>
+            <Heading as="h3" location="center">{`Goalkeepers`}</Heading>
+            <Table columns=".25fr .5fr 2fr .5fr .75fr">
+              <Table.PrintHeader>
+                <div></div>
+                <Right>#</Right>
+                <Center>Player Name</Center>
+                <Center>Grade</Center>
+              </Table.PrintHeader>
+              <Table.Body
+                data={gkJerseys.filter((player) =>
+                  player.teamLevel?.includes(team)
+                )}
+                render={(player) => (
+                  <PublicPlayerRow
+                    player={player}
+                    position={'GK'}
+                    key={`${team}-GK-${player.id}`}
+                  />
+                )}
+              />
+            </Table>
           </Vertical>
         ))}
       </Section>
+
       <Sec>
         <Vertical>
           <Heading as="h3">Team Personnel</Heading>
