@@ -48,7 +48,15 @@ function ModalConfirm({
         >
           No
         </Button>
-        <Button variation="danger" disabled={disabled} onClick={onConfirm}>
+        <Button
+          variation="danger"
+          disabled={disabled}
+          onClick={() => {
+            //close modal
+            onCloseModal();
+            onConfirm();
+          }}
+        >
           Yes
         </Button>
       </div>

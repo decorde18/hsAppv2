@@ -59,8 +59,7 @@ function GameRow({ game, teams }) {
       updateData({ table: 'games', newData: { status: 'canceled' }, id });
     } else
       deleteData({ table: 'games', id, calendarEvent: { calendar, calId } });
-    //todo close modal
-    onCloseModal();
+
     //todo how do we show canceled games in the app
   }
   function handleSelectChange(e) {
