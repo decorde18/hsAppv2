@@ -7,8 +7,13 @@ import GameBefore from './GameBefore';
 
 import styled from 'styled-components';
 import { useGameContext } from '../../../contexts/GameContext';
-import { PlayerContextProvider } from '../../../contexts/PlayerContext';
+import {
+  PlayerContextProvider,
+  usePlayerContext,
+} from '../../../contexts/PlayerContext';
 import GamePeriodBreak from './GamePeriodBreak';
+import { useEffect, useState } from 'react';
+import ModalGames from './modalGames/ModalGames';
 
 const Container = styled.div`
   /* display: inline-block; */
@@ -17,30 +22,52 @@ const Container = styled.div`
 
 function GameProgress() {
   const {
+    getGameTime,
     gameDetails,
     setGameDetails,
-    game,
-    periods,
-    setGameData,
     currentPeriod,
     setCurrentPeriod,
-
-    minorEventCategories,
-    setMinorEventCategories,
     gameStatus,
     setGameStatus,
+    minorEventCategories,
+    setMinorEventCategories,
   } = useGameContext();
+  const { enterAllSubs } = usePlayerContext();
+  const {
+    game,
+    periods,
+    // minorEventCategories,
+    // gameStatus,
+    // setGameStatus,
+  } = gameDetails;
+
+  const [modalOpen, setModalOpen] = useState(false);
+
   const { isCreating, createData } = useCreateData();
   const { isUpdating, updateData } = useUpdateData();
 
+  //todo updateStoppages open on any stoppage without end
+  useEffect(() => {
+    if (gameDetails.stoppageStatus) setModalOpen(true);
+    else setModalOpen(false);
+    if (gameDetails.stoppages.data?.some((stoppage) => !stoppage.end))
+      setModalOpen(true);
+  }, [gameDetails.stoppageStatus, gameDetails.stoppages.data]);
+
   function handleStartGame() {
-    setGameData(() => ({ ...game, status: 'in progress' }));
-    updateData({
-      table: 'games',
-      newData: [{ status: 'in progress' }],
-      id: game.id,
-    });
-    createPeriod({ period: 1, default_time: game.reg_periods_minutes });
+    // setGameData(() => ({ ...game, status: 'in progress' }));
+    setGameDetails(() => ({
+      ...gameDetails,
+      gameStatus: 'periodActive',
+      game: { ...game, status: 'in progress' },
+    }));
+
+    // updateData({
+    //   table: 'games',
+    //   newData: [{ status: 'in progress' }],
+    //   id: game.id,
+    // });
+    // createPeriod({ period: 1, default_time: game.reg_periods_minutes });
   }
   function startNextPeriod() {
     const period = currentPeriod.period + 1;
@@ -48,23 +75,31 @@ function GameProgress() {
   }
   function createPeriod({ period, default_time }) {
     setGameStatus('periodActive');
-    setCurrentPeriod({
+    setCurrentPeriod(() => ({
       game: game.id,
       period,
       start: getCurrentTime(),
+      end: null,
       default_time,
-    });
-    createData({
-      table: 'periods',
-      newData: {
-        game: game.id,
-        period,
-        start: getCurrentTime(),
-        default_time,
+    }));
+    createData(
+      {
+        table: 'periods',
+        newData: {
+          game: game.id,
+          period,
+          start: getCurrentTime(),
+          default_time,
+        },
+        view: 'periods',
+        toast: false,
       },
-      view: 'periods',
-      toast: false,
-    });
+      {
+        onSuccess: (data) => {
+          enterAllSubs(data.data[0].id);
+        },
+      }
+    );
   }
   function endPeriod() {
     setGameStatus('betweenPeriods');
@@ -79,25 +114,40 @@ function GameProgress() {
     });
   }
   function updateStates({ state, data }) {
+    const gameMinute = getGameTime();
+    const gameId = game.id;
+    const periodId = periods[0].id;
     if (state === 'minorEventCategories') {
       const newData = {
-        [data.team]: {
-          ...minorEventCategories[data.team],
+        eventType: data.type,
+        team: data.section,
+        gameMinute,
+        periodId,
+        // player, //todo add this for shots, saves only
+      };
+      const newEvent = {
+        [data.section]: {
+          ...minorEventCategories[data.section],
           [data.type]: [
-            ...minorEventCategories[data.team][data.type],
-            { periodId: periods[0].id, game: game.id, gameMinute: 2 }, //TODO make this object what it needs to be to update DB //todo on shot, need more information to get the player number
+            ...minorEventCategories[data.section][data.type],
+            { periodId, game: gameId, gameMinute },
+            //todo on shot, need more information to get the player number
           ],
         },
       };
       setMinorEventCategories({
         ...minorEventCategories,
-        ...newData,
+        ...newEvent,
       });
+
+      createData({ table: 'minorEvents', newData, toast: false });
     }
   }
+
   const isWorking = isCreating || isUpdating;
   return (
-    <PlayerContextProvider>
+    <>
+      {modalOpen && <ModalGames />}
       <Container>
         {(() => {
           switch (gameStatus) {
@@ -123,7 +173,7 @@ function GameProgress() {
           }
         })()}
       </Container>
-    </PlayerContextProvider>
+    </>
   );
   //TODO Modal for stats edit - needed for game during and game after
 }

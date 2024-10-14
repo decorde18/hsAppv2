@@ -1,3 +1,4 @@
+import { deleteGoogleCalendarEvent } from './apiGoogle';
 import supabase from './supabase';
 
 export async function createDataApi({
@@ -7,7 +8,6 @@ export async function createDataApi({
   bulk = false,
   toast = true,
 }) {
-  console.log(newData, table);
   const { data, error } = await supabase
     .from(table)
     .insert(bulk ? newData : [{ ...newData }]) // ??? DOES THIS WORK?
@@ -61,12 +61,17 @@ export async function updateDataApi({ table, newData, id, view }) {
   }
   return { data, table, view };
 }
-export async function deleteDataApi({ view, table, id }) {
+export async function deleteDataApi({ view, table, id, calendarEvent }) {
   const { error } = await supabase.from(table).delete().eq('id', id);
-  // .eq("some_column", "someValue");
+
   if (error) {
     console.log(error);
     throw new Error(`${table} Could Not Be Deleted`);
+  }
+
+  if (calendarEvent) {
+    const { calendar, calId } = calendarEvent;
+    deleteGoogleCalendarEvent(calendar, calId);
   }
 
   return { view, table };

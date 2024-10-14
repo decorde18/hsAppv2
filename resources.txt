@@ -52,10 +52,13 @@ new player form
   function handleButtonGroupChange(e) {
     setSelectedBtn(e.target.name);
   }
-      <ButtonGroup
-        btnArray={['All Uniforms', 'Season Uniforms']}
-        defaultBtn={selectedBtn}
-        onChange={handleButtonGroupChange}
+  ButtonGroup({ btnArray, defaultBtn, onChange })
+      <ButtonGroup   
+       name={btn}
+          size="medium"
+          variation={btn === defaultBtn ? 'primary' : 'secondary'}
+          key={key}
+          onClick={onChange}
       />
    
    

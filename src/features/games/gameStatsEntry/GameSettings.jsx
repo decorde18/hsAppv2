@@ -66,7 +66,8 @@ const StyledDivSmaller = styled.div`
 // before game , after game
 
 function GameSettings({ expand }) {
-  const { game } = useGameContext();
+  const { gameDetails } = useGameContext();
+  const { game } = gameDetails;
   const { isUpdating, updateData } = useUpdateData();
 
   const [openSettings, setOpenSettings] = useState(expand);

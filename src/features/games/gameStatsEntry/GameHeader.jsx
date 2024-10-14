@@ -31,10 +31,10 @@ const Clock = styled.div`
 /* GAME HEADER - use on (Game Break?, game stoppage? are these modals?),
  before game , after game */
 function GameHeader() {
-  const { currentPeriod, game, gameStatus } = useGameContext();
+  const { gameDetails, currentPeriod } = useGameContext();
+  const { game, gameStatus } = gameDetails;
   const [currentPeriodTime, setCurrentPeriodTime] = useState(0);
   const [countDown, setCountDown] = useState(true);
-
   useEffect(() => {
     //start scoreboard clock
     if (!currentPeriod) return;

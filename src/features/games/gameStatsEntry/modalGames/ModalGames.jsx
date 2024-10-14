@@ -11,6 +11,7 @@ const Background = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 `;
 const Container = styled.div`
   width: 75%;
@@ -24,10 +25,6 @@ const Container = styled.div`
 `;
 
 function ModalGames() {
-  const { setModalOpen } = useGameContext();
-  function closeModal() {
-    setModalOpen(false);
-  }
   return (
     <Background>
       {/* <Container> */}

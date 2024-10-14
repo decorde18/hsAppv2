@@ -6,6 +6,7 @@ import {
   HiOutlineChartBar,
   HiVideoCamera,
 } from 'react-icons/hi2';
+import { MdFreeCancellation } from 'react-icons/md';
 
 import Table from '../../ui/Table';
 import Row from '../../ui/Row';
@@ -15,7 +16,8 @@ import Switch from '../../ui/Switch';
 import Menus from '../../ui/Menus';
 import Modal from '../../ui/Modal';
 
-import { useUpdateData } from '../../services/useUniversal';
+import { useDeleteData, useUpdateData } from '../../services/useUniversal';
+import { useSession } from '@supabase/auth-helpers-react';
 
 import { statusFilterLabel } from '../../utils/filterHelpers';
 import {
@@ -24,12 +26,12 @@ import {
   formatTime,
 } from '../../utils/helpers';
 
-// import CreatePlayerForm from './CreatePlayerModalForm';
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import AddGame from './AddGame';
 import CreateGameForm from './CreateGameForm';
-// import PlayerIndividualPage from './PlayerIndividualPage';
+import ModalConfirm from '../../ui/ModalConfirm';
+import CreateGoogleSignedInError from '../Calendar/CreateGoogleSignedInError';
 
 const Game = styled.div`
   font-size: 1.6rem;
@@ -38,14 +40,29 @@ const Game = styled.div`
 `;
 
 //TODO DEPATURE TIME - SET departure time / bus - pop up
+//TODO delete game / change to canceled
 
 function GameRow({ game, teams }) {
+  const session = useSession();
   const { isUpdating, updateData } = useUpdateData();
+  const { isDeleting, deleteData } = useDeleteData();
 
   const [toggleStates, setToggleStates] = useState({});
 
   const isWorking = isUpdating;
 
+  function updateGameStatus(game, update) {
+    const { id } = game;
+    const { teamType: calendar } = game;
+    const { calId } = game; //   id, calendar, calId;
+    if (update) {
+      updateData({ table: 'games', newData: { status: 'canceled' }, id });
+    } else
+      deleteData({ table: 'games', id, calendarEvent: { calendar, calId } });
+    //todo close modal
+    onCloseModal();
+    //todo how do we show canceled games in the app
+  }
   function handleSelectChange(e) {
     const value = +e.target.value;
     const status = statusFilterLabel.find((val) => val.value === value).label;
@@ -78,13 +95,6 @@ function GameRow({ game, teams }) {
   }
   return (
     <Table.Row>
-      {/* if I want to do this, ...
-      {columns.map((column) => {
-        switch (column.columnType) {
-          case 'string':
-            return <Player key={column.field}>{player[column.field]}</Player>;
-        }
-      })} */}
       <Game>{game.date && formatDate(new Date(game.date))}</Game>
       <Game>{game.time && formatTime(game.time, true)}</Game>
       <Game>{game.school}</Game>
@@ -106,10 +116,12 @@ function GameRow({ game, teams }) {
             <Modal.Open opens="edit">
               <Menus.Button icon={<HiPencil />}>edit</Menus.Button>
             </Modal.Open>
-            {/* TODO ? THE DELETE MODAL IS TURNED OFF BECAUSE IT DELETES THE PLAYER (not playerseason), DO I WANT THAT? */}
-            {/* <Modal.Open opens="delete">
+            <Modal.Open opens="cancel">
+              <Menus.Button icon={<MdFreeCancellation />}>cancel</Menus.Button>
+            </Modal.Open>
+            <Modal.Open opens="delete">
               <Menus.Button icon={<HiTrash />}>delete</Menus.Button>
-            </Modal.Open> */}
+            </Modal.Open>
 
             <NavLink
               to={`/protected/Game?gameId=${game.id}`}
@@ -131,15 +143,32 @@ function GameRow({ game, teams }) {
           <Modal.Window name="edit">
             {<CreateGameForm gameToEdit={game} />}
           </Modal.Window>
-
-          {/* <Modal.Window name="delete">
-            <ModalConfirm
-              resourceName="player"
-              disabled={isDeleting}
-              onConfirm={() => deletePlayer(player.playerId)}
-              confirmType="delete"
-            />
-          </Modal.Window> */}
+          <Modal.Window name="cancel">
+            {!session?.provider_token &&
+            process.env.NODE_ENV !== 'development' ? (
+              <CreateGoogleSignedInError />
+            ) : (
+              <ModalConfirm
+                resourceName="game"
+                disabled={isUpdating}
+                onConfirm={() => updateGameStatus(game, 'cancel')}
+                confirmType="cancel"
+              />
+            )}
+          </Modal.Window>
+          <Modal.Window name="delete">
+            {!session?.provider_token &&
+            process.env.NODE_ENV !== 'development' ? (
+              <CreateGoogleSignedInError />
+            ) : (
+              <ModalConfirm
+                resourceName="game"
+                disabled={isDeleting}
+                onConfirm={() => updateGameStatus(game)}
+                confirmType="delete"
+              />
+            )}
+          </Modal.Window>
         </Menus.Menu>
       </Modal>
     </Table.Row>

@@ -4,21 +4,7 @@ import Heading from '../../../../ui/Heading';
 
 import { useContext, useEffect, useState } from 'react';
 import { useGameContext } from '../../../../contexts/GameContext';
-
-const buttons = [
-  { id: 1, type: 'foul', section: 'for' },
-  { id: 2, type: 'offside', section: 'for' },
-  { id: 3, type: 'corner', section: 'for' },
-  { id: 4, type: 'shots', section: 'for' },
-  { id: 5, type: 'foul', section: 'against' },
-  { id: 6, type: 'offside', section: 'against' },
-  { id: 7, type: 'corner', section: 'against' },
-  { id: 8, type: 'shots', section: 'against' },
-  { id: 9, type: 'goal', section: 'stoppage' },
-  { id: 10, type: 'discipline', section: 'stoppage' },
-  { id: 11, type: 'weather', section: 'stoppage' },
-  { id: 12, type: 'other', section: 'stoppage' },
-];
+import { useCreateData } from '../../../../services/useUniversal';
 
 const Div = styled.div`
   /* height: 100%;
@@ -43,11 +29,17 @@ const Div2 = styled.div`
 
 function ActionButtons({ updateStates }) {
   const {
-    game: { abbreviation: section },
-    modalOpen,
-    setModalOpen,
+    gameDetails,
+    setGameDetails,
+    getGameTime,
+    buttons,
     minorEventCategories,
+    currentPeriod,
   } = useGameContext();
+  const {
+    game: { abbreviation: section },
+  } = gameDetails;
+  const { isCreating, createData } = useCreateData();
 
   useEffect(() => {
     //todo create a modal open on load if there is no end time for stoppage
@@ -60,17 +52,36 @@ function ActionButtons({ updateStates }) {
     else updateStates({ state: 'minorEventCategories', data: category });
   }
   function handleStoppage(type) {
-    console.log(type);
-    setModalOpen(true);
+    const begin = getGameTime();
     //type is which kind of stopppage
-    //create a pop up modal that doesn't close without buttons
-    // todo goal
+    const status = { event: type, begin, periodId: currentPeriod.id };
+    createData(
+      {
+        table: 'stoppages',
+        newData: status,
+        toast: false,
+      },
+      {
+        onSuccess: (data) =>
+          setGameDetails((game) => ({
+            ...game,
+            stoppageStatus: {
+              ...status,
+              id: data.data[0].id,
+              clockStopped: true,
+              details: '',
+            },
+          })),
+      }
+    );
+
+    //todo create stoppage in DB - need id
+
     //todo discipline
     // todo weather
     //todo other
     //todo close modal by adding end time to stoppage
   }
-
   return (
     <Div>
       <div>

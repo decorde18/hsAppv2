@@ -26,14 +26,24 @@ function PlayerTableRow({ player, status, type }) {
   }, [player]);
   //TODO on half change, last in/out need to reflect previous in/out from previous half
   //TODO at end of game, final minutes needs to be calculated differently a starter will not have the full time they were in and a sub will have more time. see game 7
+
   function getField(column) {
     let field = player[column.field];
     //do we need to get the value of the field
     if (column.field === 'lastOut') field = lastOut;
     if (column.field === 'lastIn') field = lastIn;
     //is the field min played and player on field
-    if (type === 'onField' && column.field === 'minPlayed')
-      field = player.minPlayed + (lastIn || gameTime);
+    if (
+      (type === 'onField' || type === 'played') &&
+      column.field === 'minPlayed'
+    )
+      //field = player.minPlayed + (lastIn || gameTime);
+      field =
+        player.outMinutes -
+        player.inMinutes +
+        (player.subStatus === 1
+          ? player.lastIn + (gameTime - player.lastIn)
+          : 0);
 
     // do we need to get the time for the field
     if (field && column.type === 'time')

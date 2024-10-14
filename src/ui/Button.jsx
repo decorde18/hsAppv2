@@ -31,6 +31,19 @@ const sizes = {
     padding: 1.2rem 2.4rem;
     font-weight: 500;
   `,
+  xlarge: css`
+    padding: 1.2rem 2.4rem;
+    font-weight: 500;
+
+    width: 15rem;
+    /* height: 4.5rem;
+    margin: 1rem;
+    margin: 1rem;
+    border: none;
+    border-radius: 8px; */
+    font-size: 2rem;
+    cursor: pointer;
+  `,
 };
 
 const variations = {

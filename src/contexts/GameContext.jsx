@@ -14,6 +14,20 @@ const meCategories = {
   for: { foul: [], corner: [], offside: [], shots: [] },
   against: { foul: [], corner: [], offside: [], shots: [] },
 };
+const buttons = [
+  { id: 1, type: 'foul', section: 'for' },
+  { id: 2, type: 'offside', section: 'for' },
+  { id: 3, type: 'corner', section: 'for' },
+  { id: 4, type: 'shots', section: 'for' },
+  { id: 5, type: 'foul', section: 'against' },
+  { id: 6, type: 'offside', section: 'against' },
+  { id: 7, type: 'corner', section: 'against' },
+  { id: 8, type: 'shots', section: 'against' },
+  { id: 9, type: 'goal', section: 'stoppage' },
+  { id: 10, type: 'discipline', section: 'stoppage' },
+  { id: 11, type: 'injury', section: 'stoppage' },
+  { id: 12, type: 'other', section: 'stoppage' },
+];
 
 const GameContext = createContext();
 
@@ -28,7 +42,7 @@ function GameContextProvider({ children }) {
     stoppages: [],
     subs: [],
     subTotals: [],
-    gameStatus: '',
+    gameStatus: 'periodActive',
   });
 
   const [currentPeriod, setCurrentPeriod] = useState();
@@ -36,8 +50,6 @@ function GameContextProvider({ children }) {
   const [minorEventCategories, setMinorEventCategories] =
     useState(meCategories);
   const [gameStatus, setGameStatus] = useState();
-
-  const [modalOpen, setModalOpen] = useState(false);
 
   const game = useData({
     table: 'games',
@@ -63,35 +75,95 @@ function GameContextProvider({ children }) {
     table: 'sub',
     filter: [{ field: 'game', value: gameId }],
   });
+
+  const isWorking =
+    subs.isLoading ||
+    subTotals.isLoading ||
+    stoppages.isLoading ||
+    minorEvents.isLoading ||
+    periods.isLoading ||
+    game.isLoading;
+
+  //set gameStatus - before Game, during gae, between period, end of game - also if inside a stoppage
   useEffect(() => {
-    //setgameData
-    if (!game.data) return;
-    setGameData(() => game.data[0]);
-  }, [game.data]);
-  useEffect(() => {
-    //set current period
-    if (game.isLoading) return;
-    if (periods.isLoading) return;
-    if (stoppages.isLoading) return;
+    if (isWorking) return;
     const current = periods.data.sort((a, b) => b.period - a.period)[0];
-    setCurrentPeriod(current);
     const noOfPeriods =
       game.data[0].reg_periods +
       (game.data[0].ot_if_tied && game.data[0].max_ot_periods);
 
-    if (gameStatus) return;
     let status = 'periodActive';
 
     if (!current?.start) status = 'beforeGame';
     if (current?.start && current?.end)
       if (current.period === noOfPeriods) status = 'endGame';
       else status = 'betweenPeriods';
-    if (stoppages.data?.some((stoppage) => !stoppage.end)) setModalOpen(true);
-    setGameStatus(status);
-  }, [game, gameStatus, periods, stoppages]);
+    if (stoppages.data?.some((stoppage) => !stoppage.end))
+      setGameDetails(
+        () => stoppages.data.find((stoppage) => !stoppage.end).event
+      );
 
+    setGameDetails({
+      ...gameDetails,
+      subs: subs.data,
+      subTotals: subTotals.data,
+      stoppages: stoppages.data,
+      stoppageStatus: stoppages.data.find((stoppage) => !stoppage.end) || false,
+      minorEvents: minorEvents.data,
+      periods: periods.data,
+      game: game.data[0],
+      gameStatus: status,
+      minorEventCategories: Object.keys(meCategories)
+        .map((team) => ({
+          //cycle through each category team
+          [team]: Object.keys(meCategories[team]) //add to an object
+            .map((eventType) => ({
+              //cycle through each category iitemType
+              [eventType]: minorEvents.data.filter(
+                //add to an object
+                (each) => each.team === team && each.eventType === eventType
+              ),
+            }))
+            .reduce((acc, item) => ({ ...acc, ...item }), {}), //convert itemType array to object
+        }))
+        .reduce((acc, item) => ({ ...acc, ...item }), {}),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isWorking]);
+  //setgameData
   useEffect(() => {
-    //updateminorEventsCategories
+    if (!game.data) return;
+    setGameData(() => game.data[0]);
+  }, [game.data]);
+  //set current period
+  useEffect(() => {
+    if (game.isLoading) return;
+    if (periods.isLoading) return;
+    if (stoppages.isLoading) return;
+    const current = periods.data.sort((a, b) => b.period - a.period)[0];
+    setCurrentPeriod(() => current);
+    // setGameDetails((g) => ({ ...g, currentPeriod: current }));
+  }, [game, periods, stoppages]);
+  //todo set Gamedetails. is this repetitive? the useEffect above may be doing the same thing
+  useEffect(() => {
+    if (!currentPeriod) return;
+    if (gameStatus) return;
+    const noOfPeriods =
+      game.data[0].reg_periods +
+      (game.data[0].ot_if_tied && game.data[0].max_ot_periods);
+
+    let status = 'periodActive';
+
+    if (!currentPeriod?.start) status = 'beforeGame';
+    if (currentPeriod?.start && currentPeriod?.end)
+      if (currentPeriod.period === noOfPeriods) status = 'endGame';
+      else status = 'betweenPeriods';
+
+    setGameStatus(status);
+    setGameDetails((g) => ({ ...g, currentPeriod }));
+  }, [currentPeriod, game.data, gameStatus]);
+  //updateminorEventsCategories
+  useEffect(() => {
     if (!minorEvents.data) return;
     setGameDetails({
       ...gameDetails,
@@ -131,13 +203,21 @@ function GameContextProvider({ children }) {
   }, [minorEvents.data]);
 
   function getGameTime() {
-    return periods.data
-      .filter((period) => period.end)
-      .reduce((acc, period) => {
-        return (acc = acc + subtractTime(period.start, period.end));
-      }, 0) + !currentPeriod.end
-      ? subtractTime(currentPeriod?.start, getCurrentTime())
-      : 0;
+    // todo on new period, setCurrentPeriod needs to be updated
+    //TODO gametime and elapsedgamtime/truegamtime/modifiedgametime, somehting, need to be adjusted to include clockStopped
+    /* the gametime is only for saving the minute entered for start, end, subin/out */
+
+    return (
+      periods.data
+        .filter((period) => period.end && period.start)
+        .reduce((acc, period) => {
+          return (acc = acc + subtractTime(period.start, period.end));
+        }, 0) +
+      (currentPeriod.start && !currentPeriod.end
+        ? subtractTime(currentPeriod.start, getCurrentTime())
+        : 0)
+    );
+    // ? subtractTime(currentPeriod?.start, getCurrentTime())
     // return (
     //   (converthmsToSecondsOnly(game.actualgametime) || 0) +
     //   (currentPeriod?.end
@@ -146,42 +226,36 @@ function GameContextProvider({ children }) {
     // );
   }
 
-  if (
-    periods.isLoading ||
-    minorEvents.isLoading ||
-    game.isLoading ||
-    subTotals.isLoading ||
-    subs.isLoading ||
-    !gameData
-  )
-    return;
+  if (isWorking || !gameDetails.game) return;
 
   return (
     <GameContext.Provider
       value={{
-        periods: periods.data,
-        currentPeriod,
-        game: gameData,
-        minorEventCategories,
         getGameTime,
-        setGameData,
-        setCurrentPeriod,
-        setMinorEventCategories,
-        subTotals: subTotals.data,
-        subs: subs.data,
-        gameStatus,
-        setGameStatus,
-        modalOpen,
-        setModalOpen,
-        stoppages,
         gameDetails,
         setGameDetails,
+        buttons,
+        currentPeriod,
+        setCurrentPeriod,
+        gameStatus,
+        setGameStatus,
+        minorEventCategories,
+        setMinorEventCategories,
       }}
+      // value={{gamedetails:{gameDetails, setGameDetails},
+      // currentPeriod:{currentPeriod,setCurrentPeriod},
+      // gameStatus:{gameStatus, setGameStatus},
+      // minorEventCategories:{minorEventCategories, setMinorEventCategories},
+      //   getGameTime,
+      //   buttons,
+
+      // }}
     >
-      {modalOpen ? <ModalGames>{children}</ModalGames> : children}
+      {children}
     </GameContext.Provider>
   );
 }
+
 function useGameContext() {
   const context = useContext(GameContext);
   if (context === undefined)

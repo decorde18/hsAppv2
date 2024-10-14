@@ -5,6 +5,7 @@ import { GameProgress } from '../features/games/gameStatsEntry/GameProgress';
 import styled from 'styled-components';
 
 import { GameContextProvider } from '../contexts/GameContext';
+import { PlayerContextProvider } from '../contexts/PlayerContext';
 
 const MainContainer = styled.div`
   max-height: 100dvh;
@@ -19,16 +20,17 @@ const Container = styled.div`
   grid-template-rows: 12.5rem 1fr;
   align-items: stretch;
 `;
-
 function Game() {
   return (
     <GameContextProvider>
-      <MainContainer>
-        <Container>
-          <GameHeader />
-          <GameProgress />
-        </Container>
-      </MainContainer>
+      <PlayerContextProvider>
+        <MainContainer>
+          <Container>
+            <GameHeader />
+            <GameProgress />
+          </Container>
+        </MainContainer>
+      </PlayerContextProvider>
     </GameContextProvider>
   );
 }
