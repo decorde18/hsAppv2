@@ -20,11 +20,14 @@ const Flex = styled.div`
 `;
 
 function ModalStoppagesNav({ changeStoppageType, stoppageTypes, changeTeam }) {
-  const { gameDetails, setGameDetails, getGameTime, buttons } =
-    useGameContext();
-  const { stoppageStatus } = gameDetails;
+  const { gameDataArrays, gameData } = useGameContext();
+  const { stoppageStatus } = gameData;
 
-  const team = ['Independence High', gameDetails.game.short_name];
+  const team = [
+    { team: 'for', name: 'Independence High' },
+    { team: 'against', name: gameDataArrays.game.short_name },
+  ];
+
   return (
     <>
       <Ul>
@@ -50,16 +53,18 @@ function ModalStoppagesNav({ changeStoppageType, stoppageTypes, changeTeam }) {
         <Ul>
           <Flex>
             {team.map((button) => (
-              <li key={button}>
+              <li key={button.team}>
                 <Button
-                  name={button}
+                  name={button.team}
                   size="large"
                   variation={
-                    stoppageStatus.team === button ? 'primary' : 'secondary'
+                    stoppageStatus?.team === button.team
+                      ? 'primary'
+                      : 'secondary'
                   }
                   onClick={changeTeam}
                 >
-                  {button}
+                  {button.name}
                 </Button>
               </li>
             ))}

@@ -1,255 +1,412 @@
+import { useEffect, useState, createContext, useContext } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { useData } from '../services/useUniversal';
-import { useEffect, useState, createContext, useContext } from 'react';
+import {
+  useCreateData,
+  useData,
+  useDeleteData,
+  useUpdateData,
+} from '../services/useUniversal';
 
 import {
-  converthmsToSecondsOnly,
-  getCurrentTime,
-  subtractTime,
-} from '../utils/helpers';
-import ModalGames from '../features/games/gameStatsEntry/modalGames/ModalGames';
-
-const meCategories = {
-  for: { foul: [], corner: [], offside: [], shots: [] },
-  against: { foul: [], corner: [], offside: [], shots: [] },
-};
-const buttons = [
-  { id: 1, type: 'foul', section: 'for' },
-  { id: 2, type: 'offside', section: 'for' },
-  { id: 3, type: 'corner', section: 'for' },
-  { id: 4, type: 'shots', section: 'for' },
-  { id: 5, type: 'foul', section: 'against' },
-  { id: 6, type: 'offside', section: 'against' },
-  { id: 7, type: 'corner', section: 'against' },
-  { id: 8, type: 'shots', section: 'against' },
-  { id: 9, type: 'goal', section: 'stoppage' },
-  { id: 10, type: 'discipline', section: 'stoppage' },
-  { id: 11, type: 'injury', section: 'stoppage' },
-  { id: 12, type: 'other', section: 'stoppage' },
-];
+  getStatuses,
+  meCategories,
+} from '../features/games/gameStatsEntry/gameStatsEntryHelperFunctions';
+import { getCurrentTime, subtractTime } from '../utils/helpers';
 
 const GameContext = createContext();
 
-function GameContextProvider({ children }) {
-  const [searchParams] = useSearchParams();
-  const gameId = searchParams.get('gameId');
-  const [gameDetails, setGameDetails] = useState({
-    gameId,
-    currentPeriod: 0,
+function GameContextProvider({ gameDetails, children }) {
+  const { game, subs, subTotals, stoppages, minorEvents, periods } =
+    gameDetails;
+
+  const gameId = game.id;
+
+  const { isCreating, createData } = useCreateData();
+  const { isUpdating, updateData } = useUpdateData();
+  const { isDeleting, deleteData } = useDeleteData();
+
+  const [gameDataArrays, setGameDataArrays] = useState({
+    game: {},
     periods: [],
-    minorEventCategories: [],
+    minorEvents: [],
     stoppages: [],
     subs: [],
     subTotals: [],
-    gameStatus: 'periodActive',
   });
 
-  const [currentPeriod, setCurrentPeriod] = useState();
-  const [gameData, setGameData] = useState();
-  const [minorEventCategories, setMinorEventCategories] =
-    useState(meCategories);
-  const [gameStatus, setGameStatus] = useState();
+  const [gameData, setGameData] = useState({
+    gameStatus: '',
+    gameProgress: '',
+    currentPeriod: {},
+    periodStatus: 'regulation',
+    stoppageStatus: false,
+  });
+  // const game = useData({
+  //   table: 'games',
+  //   filter: [{ field: 'id', value: gameId, table: 'games' }],
+  // });
+  // const periods = useData({
+  //   table: 'periods',
+  //   filter: [{ field: 'game', value: gameId }],
+  // });
+  // const minorEvents = useData({
+  //   table: 'minorEvents',
+  //   filter: [{ field: 'game', value: gameId }],
+  // });
+  // const stoppages = useData({
+  //   table: 'stoppages',
+  //   filter: [{ field: 'game', value: gameId }],
+  // });
+  // const subTotals = useData({
+  //   table: 'subs',
+  //   filter: [{ field: 'game', value: gameId }],
+  // });
+  // const subs = useData({
+  //   table: 'sub',
+  //   filter: [{ field: 'game', value: gameId }],
+  // });
 
-  const game = useData({
-    table: 'games',
-    filter: [{ field: 'id', value: gameId, table: 'games' }],
-  });
-  const periods = useData({
-    table: 'periods',
-    filter: [{ field: 'game', value: gameId }],
-  });
-  const minorEvents = useData({
-    table: 'minorEvents',
-    filter: [{ field: 'game', value: gameId }],
-  });
-  const stoppages = useData({
-    table: 'stoppages',
-    filter: [{ field: 'game', value: gameId }],
-  });
-  const subTotals = useData({
-    table: 'subs',
-    filter: [{ field: 'game', value: gameId }],
-  });
-  const subs = useData({
-    table: 'sub',
-    filter: [{ field: 'game', value: gameId }],
-  });
+  // const isWorking =
+  //   subs.isLoading ||
+  //   subTotals.isLoading ||
+  //   stoppages.isLoading ||
+  //   minorEvents.isLoading ||
+  //   periods.isLoading;
 
-  const isWorking =
-    subs.isLoading ||
-    subTotals.isLoading ||
-    stoppages.isLoading ||
-    minorEvents.isLoading ||
-    periods.isLoading ||
-    game.isLoading;
-
-  //set gameStatus - before Game, during gae, between period, end of game - also if inside a stoppage
   useEffect(() => {
-    if (isWorking) return;
-    const current = periods.data.sort((a, b) => b.period - a.period)[0];
-    const noOfPeriods =
-      game.data[0].reg_periods +
-      (game.data[0].ot_if_tied && game.data[0].max_ot_periods);
+    //sets the arrays on load
+    // if (isWorking) return;
 
-    let status = 'periodActive';
-
-    if (!current?.start) status = 'beforeGame';
-    if (current?.start && current?.end)
-      if (current.period === noOfPeriods) status = 'endGame';
-      else status = 'betweenPeriods';
-    if (stoppages.data?.some((stoppage) => !stoppage.end))
-      setGameDetails(
-        () => stoppages.data.find((stoppage) => !stoppage.end).event
-      );
-
-    setGameDetails({
-      ...gameDetails,
-      subs: subs.data,
-      subTotals: subTotals.data,
-      stoppages: stoppages.data,
-      stoppageStatus: stoppages.data.find((stoppage) => !stoppage.end) || false,
-      minorEvents: minorEvents.data,
-      periods: periods.data,
-      game: game.data[0],
-      gameStatus: status,
-      minorEventCategories: Object.keys(meCategories)
-        .map((team) => ({
-          //cycle through each category team
-          [team]: Object.keys(meCategories[team]) //add to an object
-            .map((eventType) => ({
-              //cycle through each category iitemType
-              [eventType]: minorEvents.data.filter(
-                //add to an object
-                (each) => each.team === team && each.eventType === eventType
-              ),
-            }))
-            .reduce((acc, item) => ({ ...acc, ...item }), {}), //convert itemType array to object
-        }))
-        .reduce((acc, item) => ({ ...acc, ...item }), {}),
+    setGameDataArrays({
+      game,
+      periods,
+      stoppages,
+      minorEvents: minorEvents.reduce(
+        (acc, each) => ({
+          ...acc,
+          [each.team]: {
+            ...acc[each.team],
+            [each.eventType]: [...acc[each.team][each.eventType], each],
+          },
+        }),
+        meCategories
+      ),
+      subs,
+      subTotals,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isWorking]);
-  //setgameData
+  }, [game, minorEvents, periods, stoppages, subTotals, subs]);
   useEffect(() => {
-    if (!game.data) return;
-    setGameData(() => game.data[0]);
-  }, [game.data]);
-  //set current period
-  useEffect(() => {
-    if (game.isLoading) return;
-    if (periods.isLoading) return;
-    if (stoppages.isLoading) return;
-    const current = periods.data.sort((a, b) => b.period - a.period)[0];
-    setCurrentPeriod(() => current);
-    // setGameDetails((g) => ({ ...g, currentPeriod: current }));
-  }, [game, periods, stoppages]);
-  //todo set Gamedetails. is this repetitive? the useEffect above may be doing the same thing
-  useEffect(() => {
-    if (!currentPeriod) return;
-    if (gameStatus) return;
-    const noOfPeriods =
-      game.data[0].reg_periods +
-      (game.data[0].ot_if_tied && game.data[0].max_ot_periods);
-
-    let status = 'periodActive';
-
-    if (!currentPeriod?.start) status = 'beforeGame';
-    if (currentPeriod?.start && currentPeriod?.end)
-      if (currentPeriod.period === noOfPeriods) status = 'endGame';
-      else status = 'betweenPeriods';
-
-    setGameStatus(status);
-    setGameDetails((g) => ({ ...g, currentPeriod }));
-  }, [currentPeriod, game.data, gameStatus]);
-  //updateminorEventsCategories
-  useEffect(() => {
-    if (!minorEvents.data) return;
-    setGameDetails({
-      ...gameDetails,
-      minorEventCategories: Object.keys(meCategories)
-        .map((team) => ({
-          //cycle through each category team
-          [team]: Object.keys(meCategories[team]) //add to an object
-            .map((eventType) => ({
-              //cycle through each category iitemType
-              [eventType]: minorEvents.data.filter(
-                //add to an object
-                (each) => each.team === team && each.eventType === eventType
-              ),
-            }))
-            .reduce((acc, item) => ({ ...acc, ...item }), {}), //convert itemType array to object
-        }))
-        .reduce((acc, item) => ({ ...acc, ...item }), {}),
+    //updates the status and progress on change in periods, game or stoppages
+    if (!gameDataArrays.game.id) return;
+    const statusUpdates = getStatuses({
+      game: gameDataArrays.game,
+      periods: gameDataArrays.periods,
+      stoppages: gameDataArrays.stoppages,
     });
-    setMinorEventCategories(
-      Object.keys(meCategories)
-        .map((team) => ({
-          //cycle through each category team
-          [team]: Object.keys(meCategories[team]) //add to an object
-            .map((eventType) => ({
-              //cycle through each category iitemType
-              [eventType]: minorEvents.data.filter(
-                //add to an object
-                (each) => each.team === team && each.eventType === eventType
-              ),
-            }))
-            .reduce((acc, item) => ({ ...acc, ...item }), {}), //convert itemType array to object
-        }))
-        .reduce((acc, item) => ({ ...acc, ...item }), {})
-    ); //convert team array to object
+    if (statusUpdates.gameStatus === 'pending') {
+      periodHandle.newPeriod(statusUpdates.newPeriodNeeded);
+    } else {
+      setGameData({
+        gameStatus: statusUpdates.gameStatus,
+        gameProgress: statusUpdates.gameProgress,
+        currentPeriod: statusUpdates.currentPeriod,
+        stoppageStatus: statusUpdates.stoppageStatus,
+      });
+      if (statusUpdates.gameStatus !== gameDataArrays.game.gameStatus)
+        updateData({
+          table: 'games',
+          newData: { status: statusUpdates.gameStatus },
+          id: gameId,
+        });
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [minorEvents.data]);
+  }, [gameDataArrays.game, gameDataArrays.periods, gameDataArrays.stoppages]);
 
-  function getGameTime() {
-    // todo on new period, setCurrentPeriod needs to be updated
-    //TODO gametime and elapsedgamtime/truegamtime/modifiedgametime, somehting, need to be adjusted to include clockStopped
-    /* the gametime is only for saving the minute entered for start, end, subin/out */
+  const getGameTime = {
+    gameTime: () =>
+      //current time  - used for subs, stoppages, (in Seconds)
+      //get previous period times
+      {
+        return (
+          gameDataArrays.periods
+            .filter((period) => period.period < gameData.currentPeriod.period)
+            .reduce(
+              (acc, period) =>
+                (acc = acc + subtractTime(period.start, period.end)),
+              0
+              //add them together
+            ) + subtractTime(gameData.currentPeriod.start, getCurrentTime())
+          //get he current period time
+        );
+      },
+    periodTime: () => {
+      //period time difference - includes stoppages - used for clocks
 
-    return (
-      periods.data
-        .filter((period) => period.end && period.start)
-        .reduce((acc, period) => {
-          return (acc = acc + subtractTime(period.start, period.end));
-        }, 0) +
-      (currentPeriod.start && !currentPeriod.end
-        ? subtractTime(currentPeriod.start, getCurrentTime())
-        : 0)
-    );
-    // ? subtractTime(currentPeriod?.start, getCurrentTime())
-    // return (
-    //   (converthmsToSecondsOnly(game.actualgametime) || 0) +
-    //   (currentPeriod?.end
-    //     ? 0
-    //     : subtractTime(currentPeriod?.start, getCurrentTime()))
-    // );
+      return gameData.stoppageStatus.clockStopped
+        ? gameData.stoppageStatus.begin
+        : subtractTime(gameData.currentPeriod.start, getCurrentTime()) -
+            (gameDataArrays.stoppages
+              .filter(
+                (stoppage) => stoppage.periodId === gameData.currentPeriod.id
+              )
+              .stoppages?.reduce(
+                (acc, val) =>
+                  (acc = acc + (val.end - val.begin) * val.clockStopped),
+                0
+              ) || 0);
+    },
+
+    elapsedGameTime: () => {},
+    // game time - used for summarizing minute of game
+  };
+
+  const periodHandle = {
+    startGame: () =>
+      createPeriod({
+        period: 1,
+        start: getCurrentTime(),
+        default_time: gameDataArrays.game.reg_periods_minutes,
+      }),
+    newPeriod: (data) =>
+      createPeriod({
+        period: data.period,
+        default_time: data.default_time,
+      }),
+    endPeriod: (data) => updatePeriod({ end: getCurrentTime() }),
+    startPeriod: (data) => updatePeriod({ start: data.start }),
+    updatePeriod,
+    deletePeriod,
+  };
+  const minorEventHandle = {
+    createMinorEvent,
+    updateMinorEvent,
+    deleteMinorEvent,
+  };
+  const stoppageHandle = {
+    newStoppage: (data) => {
+      updateGame({ field: 'stoppageStatus', value: true });
+      createStoppage(data);
+    },
+    updateStoppage: (data) => {
+      const newData = { ...gameData.stoppageStatus, ...data };
+      updateGame({ field: 'stoppageStatus', value: newData });
+      updateStoppage(data);
+    },
+    updateClockStopped: () => {
+      const clockStopped = !gameData.stoppageStatus.clockStopped;
+      const newData = { ...gameData.stoppageStatus, clockStopped };
+      updateGame({
+        field: 'stoppageStatus',
+        value: newData,
+      });
+      updateStoppage({ clockStopped });
+    },
+    saveStoppage: (details) => {
+      const end = getGameTime.gameTime();
+      updateGame({ field: 'stoppageStatus', value: false });
+      updateStoppage({ end, details });
+    },
+    cancelStoppage: () => deleteStoppage(),
+    endStoppage: (data) => updateStoppage(data),
+  };
+  const goalHandle = {
+    createGoal: (goalScored, details) => {
+      const end = getGameTime.gameTime();
+      const team = gameData.stoppageStatus.team;
+      const event = team === 'for' ? 'Goal Scored' : 'Goal Against';
+      const { goal, ...extraDetails } = goalScored;
+
+      updateGame({ field: 'stoppageStatus', value: false });
+
+      if (team === 'for') {
+        //todo I AM HERE,
+        updateGame({
+          field: 'game',
+          value: {
+            ...gameDataArrays,
+            game: { ...gameDataArrays.game, gf: gameDataArrays.game.gf++ },
+          },
+        });
+        //todo send to server
+        updateStoppage({ event, end, details }, extraDetails);
+      } else {
+        updateGame({
+          field: 'game',
+          value: {
+            ...gameDataArrays,
+            game: { ...gameDataArrays.game, ga: gameDataArrays.game.ga++ },
+          },
+        });
+        //todo send to server
+      }
+    },
+  };
+  const disciplineHandle = {};
+
+  function updateGame({ field, value }) {
+    setGameData((prev) => ({ ...prev, [field]: value }));
+  }
+  function updateGameArrays({ field, value }) {
+    setGameDataArrays((prev) => {
+      const updatedArray = [
+        ...prev[field].filter((item) => item.id !== value.id),
+        value,
+      ];
+
+      return { ...prev, [field]: updatedArray };
+    });
   }
 
-  if (isWorking || !gameDetails.game) return;
+  function createPeriod(newData) {
+    newData = { game: gameId, ...newData };
+    createData(
+      {
+        table: 'periods',
+        newData,
+        view: 'periods',
+        toast: false,
+      },
+      {
+        onSuccess: (data) => {
+          updateGameArrays({ field: 'periods', value: data.data[0] });
+        },
+      }
+    );
+  }
+  function updatePeriod(newData) {
+    const id = gameData.currentPeriod.id;
+    updateData(
+      {
+        table: 'periods',
+        newData,
+        id,
+      },
+      {
+        onSuccess: (data) => {
+          updateGameArrays({
+            field: 'periods',
+            value: data.data[0],
+          });
+        },
+      }
+    );
+  }
+  function deletePeriod() {
+    const id = gameData.currentPeriod.id;
+  }
+  function createMinorEvent(data) {
+    const { type, section } = data;
+    const gameMinute = getGameTime.gameTime();
+    const periodId = gameData.currentPeriod.id;
+
+    setGameDataArrays((prev) => ({
+      ...gameDataArrays,
+      minorEvents: {
+        ...prev.minorEvents,
+        [section]: {
+          ...prev.minorEvents[section],
+          [type]: [
+            ...prev.minorEvents[section][type],
+            { gameMinute, eventType: type, team: section, periodId },
+          ],
+        },
+      },
+    }));
+    const newData = {
+      eventType: type,
+      team: section,
+      gameMinute,
+      periodId,
+    };
+    createData({
+      table: 'minorEvents',
+      newData,
+      toast: false,
+    });
+  }
+  function updateMinorEvent(data) {}
+  function deleteMinorEvent(data) {}
+  function createStoppage(data) {
+    const begin = getGameTime.gameTime();
+    const clockStopped =
+      Math.abs(gameDataArrays.game.gf - gameDataArrays.game.ga) < 5;
+    //type is which kind of stopppage
+    const status = {
+      event: data,
+      begin,
+      periodId: gameData.currentPeriod.id,
+      clockStopped,
+    };
+
+    createData(
+      {
+        table: 'stoppages',
+        newData: status,
+        toast: false,
+      },
+      {
+        onSuccess: (data) =>
+          updateGame({
+            field: 'stoppageStatus',
+            value: data.data[0],
+          }),
+      }
+    );
+  }
+  function updateStoppage(newData, extraDetails) {
+    const id = gameData.stoppageStatus.id;
+    updateData(
+      {
+        table: 'stoppages',
+        newData,
+        id,
+      },
+      {
+        onSuccess: (data) => {
+          if (newData.event === 'Goal Scored')
+            createData({
+              table: 'goalsFor',
+              newData: { eventId: data.data[0].id, ...extraDetails },
+              toast: false,
+            });
+
+          if (newData.event === 'Goal Against')
+            createData({
+              table: 'goalsAgainst',
+              newData: { eventId: data.data[0].id, ...extraDetails },
+              toast: false,
+            });
+          //extraDetails runs only if there is a discpline or a goal
+        },
+      }
+    );
+  }
+  function deleteStoppage() {
+    const id = gameData.stoppageStatus.id;
+    updateGame({ field: 'stoppageStatus', value: false });
+
+    deleteData({
+      table: 'stoppages',
+      id,
+      toast: false,
+    });
+  }
+  if (!gameDataArrays.game.id || !gameData.gameStatus) return;
 
   return (
     <GameContext.Provider
       value={{
+        gameData,
+        gameDataArrays,
+        periodHandle,
+        minorEventHandle,
+        stoppageHandle,
+        goalHandle,
+        disciplineHandle,
         getGameTime,
-        gameDetails,
-        setGameDetails,
-        buttons,
-        currentPeriod,
-        setCurrentPeriod,
-        gameStatus,
-        setGameStatus,
-        minorEventCategories,
-        setMinorEventCategories,
       }}
-      // value={{gamedetails:{gameDetails, setGameDetails},
-      // currentPeriod:{currentPeriod,setCurrentPeriod},
-      // gameStatus:{gameStatus, setGameStatus},
-      // minorEventCategories:{minorEventCategories, setMinorEventCategories},
-      //   getGameTime,
-      //   buttons,
-
-      // }}
     >
       {children}
     </GameContext.Provider>

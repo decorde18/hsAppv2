@@ -8,43 +8,48 @@ import { afterGameColumns } from './gameTableColumns';
 
 import { useGameContext } from '../../../contexts/GameContext';
 import { usePlayerContext } from '../../../contexts/PlayerContext';
+import ModalGamesEditButton from './modalGamesEdit/ModalGamesEditButton';
+import PlayerTable from './components/PlayerTable';
 
 const columns = afterGameColumns;
-const columnWidths = columns.reduce((acc, cur) => {
-  return (acc = acc.concat(' ', cur.width));
-}, '');
+// const columnWidths = columns.reduce((acc, cur) => {
+//   return (acc = acc.concat(' ', cur.width));
+// }, '');
 
 function GameAfter({ editGame, isWorking }) {
-  const { gameDetails } = useGameContext();
-  const { game } = gameDetails;
+  const { gameDataArrays } = useGameContext();
+  const { game } = gameDataArrays;
   const { activeGamePlayers } = usePlayerContext();
   const activePlayers = activeGamePlayers.current;
-  const playersWhoPlayed = activePlayers.filter(
-    (player) =>
-      player.ins > 0 ||
-      player.gameStatus === 'starter' ||
-      player.gameStatus === 'gkStarter'
-  );
-  const playersWhoDidNotPlay = activePlayers.filter(
-    (player) =>
-      player.ins === 0 &&
-      player.gameStatus !== 'starter' &&
-      player.gameStatus !== 'gkStarter'
-  );
+
+  //TODO use PlayerTable - currently it is used for GamePeriodBreak
   return (
     <div>
-      This is after
       <Row type="horizontal" justify="center">
-        <NavLink to={`./?gameId=${game.id}&edit=true`}>
-          <Button name="manualGame" disabled={isWorking} variation="secondary">
-            Enter Stats Manually
-          </Button>
-        </NavLink>
+        <ModalGamesEditButton />
       </Row>
-      <Table columns={columnWidths}>
+      DID NOT PLAY
+      <PlayerTable
+        displayTable={'DNP'}
+        status={'after'}
+        sortArr={[
+          { field: 'number', order: 'asc' },
+          { field: 'minPlayed', order: 'dec' },
+        ]}
+      />
+      PLAYED
+      <PlayerTable
+        displayTable={'played'}
+        status={'after'}
+        sortArr={[
+          { field: 'number', order: 'asc' },
+          { field: 'minPlayed', order: 'dec' },
+        ]}
+      />
+      {/* <Table columns={columnWidths}>
         <Table.Header>
           {columns
-            .filter((column) => column.displaySheet.includes('played'))
+            .filter((column) => column.displayTable.includes('played'))
             .map((column) => (
               <div
                 key={column.field}
@@ -90,7 +95,7 @@ function GameAfter({ editGame, isWorking }) {
       <Table columns={columnWidths}>
         <Table.Header>
           {columns
-            .filter((column) => column.displaySheet.includes('DNP'))
+            .filter((column) => column.displayTable.includes('DNP'))
             .map((column) => (
               <div key={column.field}>{column.label}</div>
               // <HeaderSortFilter
@@ -123,7 +128,7 @@ function GameAfter({ editGame, isWorking }) {
             />
           )}
         />
-      </Table>
+      </Table> */}
     </div>
   );
 }

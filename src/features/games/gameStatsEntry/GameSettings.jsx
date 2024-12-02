@@ -14,6 +14,7 @@ import Input from '../../../ui/Input';
 import { useUpdateData } from '../../../services/useUniversal';
 
 import { HiChevronDown } from 'react-icons/hi2';
+import Select from '../../../ui/Select';
 
 const Container = styled.div`
   max-width: 128rem;
@@ -62,16 +63,22 @@ const StyledDiv = styled.div`
 const StyledDivSmaller = styled.div`
   font-size: 1.5rem;
 `;
-// GAME HEADER - use on (Game Break?, game stoppage? are these modals?),
-// before game , after game
 
+const gameStatus = [
+  { label: 'Game Has Not Started', value: 'to be played' },
+  { label: 'Game is in Progress', value: 'in progress' },
+  { label: 'Game was canceled', value: 'canceled' },
+  { label: 'Game is Complete', value: 'completed' },
+  { label: 'Game is in a suspended status', value: 'suspended' },
+];
 function GameSettings({ expand }) {
-  const { gameDetails } = useGameContext();
-  const { game } = gameDetails;
+  const { gameDataArrays } = useGameContext();
+  const { game } = gameDataArrays;
   const { isUpdating, updateData } = useUpdateData();
 
   const [openSettings, setOpenSettings] = useState(expand);
   const [gameSettings, setGameSettings] = useState(game);
+  const [gameStatusChange, setGameStatusChange] = useState(game.status);
 
   const [ot2, setOt2] = useState(game.max_ot_periods > game.min_ot_periods);
 
@@ -116,6 +123,14 @@ function GameSettings({ expand }) {
 
     setGameSettings({ ...gameSettings, ...newValue });
   }
+  function handleStatusChange(e) {
+    setGameStatusChange(e.target.value);
+    updateData({
+      table: 'games',
+      newData: { status: e.target.value },
+      id: game.id,
+    });
+  }
   return (
     <Container>
       <Heading as="h5" case="upper" location="center">
@@ -131,6 +146,11 @@ function GameSettings({ expand }) {
       </Heading>
 
       <Collapsible open={openSettings}>
+        <Select
+          options={gameStatus}
+          onChange={handleStatusChange}
+          value={gameStatusChange}
+        />
         <MainSection>
           <FirstRow>
             <Row type="horizontal" justify="center">

@@ -13,11 +13,18 @@ import { useGameContext } from '../../../../contexts/GameContext';
 
 import { usePlayerContext } from '../../../../contexts/PlayerContext';
 
-const Container2 = styled.div`
-  max-height: 100%;
-  overflow-y: auto;
+const Main = styled.div`
+  overflow-y: auto; /* Enable scrolling for table content */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
-const Container = styled.div``;
+const ButtonArea = styled.div`
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 const Div = styled.div`
   display: flex;
   margin: 0.5rem auto;
@@ -26,29 +33,20 @@ const Div2 = styled.div`
   display: flex;
   justify-content: space-around;
 `;
-const Div3 = styled.div`
-  width: 75%;
-  display: flex;
-  justify-content: center;
-  margin: 0 auto;
-  margin-top: 2rem;
-  text-align: center;
-`;
+
 function Substitutions({ isWorking, children }) {
-  const { gameDetails, getGameTime, currentPeriod, gameStatus } =
-    useGameContext();
-  const { game } = gameDetails;
+  const { gameData, gameDataArrays, getGameTime } = useGameContext();
+  const { currentPeriod, gameStatus } = gameData;
+  const { game } = gameDataArrays;
   const { isCreating, createData } = useCreateData();
   const { isUpdating, updateData } = useUpdateData();
   const { isDeleting, deleteData } = useDeleteData();
-
   const {
     currentPlayers,
     subsInWaiting,
     setSubsInWaiting,
     updateCurrentPlayers,
   } = usePlayerContext();
-
   function handleSubChange(e) {
     //updates a line of subs with new player out or new player in
     //it gets the type and index of the player selected
@@ -96,7 +94,7 @@ function Substitutions({ isWorking, children }) {
     const [type, index] = e.target.closest('button').name.split('-');
     const clickedSub = subsInWaiting.find((sub, idx) => +index === idx);
     const newSubs = subsInWaiting.filter((sub, idx) => +index !== idx);
-    const gameTime = getGameTime();
+    const gameTime = getGameTime.gameTime();
 
     if (type === 'enter') {
       if (!clickedSub.subIn || !clickedSub.subOut) return;
@@ -108,6 +106,9 @@ function Substitutions({ isWorking, children }) {
       });
     }
     if (type === 'delete') {
+      setSubsInWaiting((subs) =>
+        subs.filter((sub) => sub.id !== +clickedSub.id)
+      );
       deleteData({ table: 'subs', id: clickedSub.id, toast: false });
     }
     handleNewSubsInWaiting(newSubs);
@@ -129,8 +130,8 @@ function Substitutions({ isWorking, children }) {
   }
 
   return (
-    <Container2>
-      <Container>
+    <>
+      <Main>
         {subsInWaiting.map((subs, index) => (
           <Div key={`${index}-sub`}>
             <Select
@@ -225,21 +226,23 @@ function Substitutions({ isWorking, children }) {
             )}
           </Div>
         ))}
-      </Container>
-      <Div3>
+      </Main>
+      <div>
         {(subsInWaiting.length > 1 || gameStatus === 'betweenPeriods') && (
           <div>
             {!subsInWaiting.some(
               (sub) => (!sub.subIn && sub.subOut) || (sub.subIn && !sub.subOut)
             ) ? (
-              <div>{children}</div>
+              <ButtonArea>{children}</ButtonArea>
             ) : (
-              <h2>Each Line Must have a sub in and sub out</h2>
+              <ButtonArea>
+                <h2>Each Line Must have a sub in and sub out</h2>
+              </ButtonArea>
             )}
           </div>
         )}
-      </Div3>
-    </Container2>
+      </div>
+    </>
   );
 }
 

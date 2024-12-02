@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 const defaultAnimationValues = {
-  size: 15,
+  size: '15rem',
 };
 
 export const StyledInput = styled.input`
@@ -11,7 +11,7 @@ export const StyledInput = styled.input`
   box-shadow: var(--shadow-sm);
   font-size: 1.6rem;
   padding: 0.5rem 1rem;
-  width: ${(props) => props.size}rem;
+  width: ${(props) => props.size};
 `;
 
 const Input = ({ size = defaultAnimationValues.size, register, ...props }) => {

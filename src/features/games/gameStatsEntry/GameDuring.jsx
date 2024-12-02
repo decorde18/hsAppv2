@@ -1,99 +1,99 @@
-import { NavLink } from 'react-router-dom';
-
-import Button from '../../../ui/Button';
-
-import { useState } from 'react';
-
 import styled from 'styled-components';
-import OnFieldPlayers from './duringGame/OnFieldPlayers';
-import OffFieldPlayers from './duringGame/OffFieldPlayers';
-import ActionButtons from './duringGame/ActionButtons';
-import Substitutions from './duringGame/Substitutions';
-
-import Heading from '../../../ui/Heading';
 
 import { useGameContext } from '../../../contexts/GameContext';
 import { usePlayerContext } from '../../../contexts/PlayerContext';
-import {
-  useCreateData,
-  useDeleteData,
-  useUpdateData,
-} from '../../../services/useUniversal';
 
+import ActionButtons from './duringGame/ActionButtons';
+import Substitutions from './duringGame/Substitutions';
+
+import Button from '../../../ui/Button';
+import Heading from '../../../ui/Heading';
+import ModalGamesEditButton from './modalGamesEdit/ModalGamesEditButton';
+import PlayerTable from './components/PlayerTable';
+
+//todo it was wrapped in this
 const Container = styled.div`
-  padding: 1rem 1rem;
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: space-between;
-  height: 95%;
-  margin-bottom: 1rem;
-`;
-const Grid = styled.div`
-  flex: 0 0 100%;
   display: grid;
-  grid-template-rows: 15.9rem 1fr 1fr;
-  align-items: stretch;
+  grid-template-rows: auto auto minmax(auto, 1fr) auto;
+  overflow: hidden;
 `;
-const Div = styled.div`
-  justify-content: center;
+const MainHeader = styled.div`
+  flex-shrink: 0;
+  height: 15.9rem;
+  margin: 1rem 0;
+`;
+const Main = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Two equal-width columns */
+  overflow-y: auto;
+`;
+
+const Column = styled.div`
+  flex: 1;
+  overflow-y: auto;
   margin: 1rem;
-  display: flex;
-  overflow: auto;
+  border: 1px solid var(--color-grey-50);
+  border-radius: 1rem;
 `;
-const Row = styled.div`
-  grid-column: 1 / -1;
+const Footer = styled.div`
+  display: grid;
+  grid-template-rows: 1fr auto; /* Scrollable area and fixed buttons */
+  overflow: hidden;
 `;
 
-function GameDuring({ updateStates, endPeriod }) {
-  const { gameDetails, getGameTime, currentPeriod } = useGameContext();
-  const { game, subs } = gameDetails;
+function GameDuring() {
+  const { periodHandle } = useGameContext();
 
-  const { currentPlayers, enterAllSubs } = usePlayerContext();
-
+  const { enterAllSubs } = usePlayerContext();
   return (
-    <>
+    <Container>
       <div>
-        <NavLink to={`./?gameId=${game.id}&edit=true`}>
-          <Button
-            name="manualGame"
-            // disabled={isEditingGame}
-            variation="secondary"
-          >
-            Edit Stats
-          </Button>
-        </NavLink>
-        <Button name="endPeriod" onClick={endPeriod} variation="primary">
+        <ModalGamesEditButton />
+        <Button
+          name="endPeriod"
+          onClick={periodHandle.endPeriod}
+          variation="primary"
+        >
           End period
         </Button>
       </div>
 
-      <Container>
-        <Grid>
-          <Row>
-            <ActionButtons updateStates={updateStates} />
-          </Row>
-          <Div>
-            <div>
-              <Heading as="h2" case="upper" location="center">
-                PLAYERS ON THE FIELD
-              </Heading>
-              <OnFieldPlayers players={currentPlayers.onField} />
-            </div>
-            <div>
-              <Heading as="h2" case="upper" location="center">
-                PLAYERS ON THE BENCH
-              </Heading>
-              <OffFieldPlayers players={currentPlayers.offField} />
-            </div>
-          </Div>
-          <Div>
-            <Substitutions>
-              <Button onClick={enterAllSubs}>Enter all Subs</Button>
-            </Substitutions>
-          </Div>
-        </Grid>
-      </Container>
-    </>
+      <MainHeader>
+        <ActionButtons updateStates={periodHandle.endPeriod} />
+      </MainHeader>
+
+      <Main>
+        <Column>
+          <Heading as="h2" case="upper" location="center">
+            PLAYERS ON THE FIELD
+          </Heading>
+          <PlayerTable
+            displayTable={'onField'}
+            sortArr={[
+              { field: 'number', order: 'asc' },
+              { field: 'minPlayed', order: 'dec' },
+            ]}
+          />
+        </Column>
+        <Column>
+          <Heading as="h2" case="upper" location="center">
+            PLAYERS ON THE BENCH
+          </Heading>
+          <PlayerTable
+            displayTable={'offField'}
+            sortArr={[
+              { field: 'number', order: 'asc' },
+              { field: 'minPlayed', order: 'dec' },
+            ]}
+          />{' '}
+        </Column>
+      </Main>
+      <Footer>
+        <Substitutions>
+          <Button onClick={enterAllSubs}>Enter all Subs</Button>
+        </Substitutions>
+      </Footer>
+    </Container>
   );
 }
 

@@ -2,6 +2,7 @@ import styled from 'styled-components';
 
 import { useEffect, useState } from 'react';
 import { usePlayerContext } from '../../../contexts/PlayerContext';
+import { useGameContext } from '../../../contexts/GameContext';
 
 import Menus from '../../../ui/Menus';
 import Select from '../../../ui/Select';
@@ -20,68 +21,90 @@ const columnTypes = [
     label: 'GK Starter',
     field: 'gkStarter',
     emptyLabel: 'We Need A GK',
-    rowStart: 1,
-    rowEnd: 2,
     iconColor: 'black',
     icon: <HiMiniHandRaised />,
+    layout: 'firstColumn',
   },
   {
-    label: 'Starters',
+    label: 'Field Starters',
     field: 'starter',
     emptyLabel: 'Starting Players',
-    rowStart: 2,
-    rowEnd: 3,
     icon: <IoShirt color="green" />,
+    layout: 'firstColumn',
   },
   {
     label: 'Dressed',
     field: 'dressed',
     emptyLabel: 'Dressed Players',
-    rowStart: 1,
-    rowEnd: -1,
     icon: <IoShirt color="black" />,
   },
   {
     label: 'Not Dressed',
     field: 'notDressed',
     emptyLabel: 'Non-Dressed Players',
-    rowStart: 1,
-    rowEnd: -1,
     icon: <IoShirt color="red" />,
   },
   {
     label: 'Injured',
     field: 'injured',
     emptyLabel: 'Injured Players',
-    rowStart: 3,
-    rowEnd: 4,
     icon: <FaBriefcaseMedical color="red" />,
+    layout: 'firstColumn',
   },
   {
     label: 'Unavailable',
     field: 'unavailable',
     emptyLabel: 'Unavailable Players',
-    rowStart: 4,
-    rowEnd: 5,
     icon: <MdDoNotDisturbAlt color="black" />,
+    layout: 'firstColumn',
   },
 ];
 
-//TODO we need to be able to scroll columns
-const Container = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, auto);
-  grid-template-rows: repeat(4, auto);
+const GameStartContainer = styled.div`
   gap: 1rem;
   margin: 1rem;
 `;
-const GameStartContainer = styled.div`
+const MainSection = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr; /* 3 equal-width columns */
+  grid-template-rows: 8rem minmax(20rem, 1fr) minmax(8rem, auto) minmax(
+      8rem,
+      auto
+    ); /* Fixed 10rem row and remaining height */
+  gap: 1rem; /* Optional spacing between items */
+  grid-auto-flow: dense; /* Automatically place items based on content order */
+  max-height: 100%; /*Ensure grid fills its container*/
+  overflow: hidden; /* Prevent grid from exceeding the page */
   margin: 1rem;
 `;
 const Column = styled.div`
-  margin: 0 auto;
-  width: 100%;
-  max-width: 30rem;
+  text-align: center;
+
+  /* Conditional placement based on layout */
+  ${({ layout, index }) => {
+    if (layout === 'firstColumn') return `grid-column: 1;`;
+    else
+      return `
+          grid-column: ${index}; 
+          grid-row: 1/-1 ; `;
+  }}
+  /* Ensure the content within the column is /* Make each column's content scrollable */
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  max-height: 100%; /* Ensure the column does not exceed the height of its container */
+`;
+const HeaderDiv = styled.div`
+  background-color: var(--color-grey-200);
+  margin-bottom: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  border-radius: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+`;
+const Div = styled.div`
+  max-height: 100%;
+  overflow-y: auto;
 `;
 const StyledRow = styled.div`
   margin: 0 auto;
@@ -92,22 +115,12 @@ const StyledRow = styled.div`
   border: 1px solid var(--color-grey-100);
   border-radius: 5px;
   padding: 0.5rem 1rem;
-`;
-const Div = styled.div`
-  /* flex: 1; */
-  margin-bottom: 2rem;
-  overflow-y: auto;
-`;
-const HeaderDiv = styled.div`
-  background-color: var(--color-grey-200);
-  margin-bottom: 0.5rem;
-  padding: 0.75rem 1.75rem;
-  border-radius: 0.5rem;
-  display: flex;
-  justify-content: space-between;
+  flex-shrink: 0;
+  width: 100%; /* Ensure the rows don't extend beyond the column */
 `;
 
-function GameBefore({ handleStartGame }) {
+function GameBefore() {
+  const { periodHandle } = useGameContext();
   const { players } = usePlayerContext();
   const { isUpdating, updateData } = useUpdateData();
   const [beginGame, setBeginGame] = useState(false);
@@ -121,9 +134,12 @@ function GameBefore({ handleStartGame }) {
     //on no GK, can not start game
     if (!playerGameStatus.length) return;
     setBeginGame(
-      playerGameStatus.some((player) => player.gameStatus === 'gkStarter') &&
-        playerGameStatus.filter((player) => player.gameStatus === 'starter')
-          .length >= 6
+      playerGameStatus.some(
+        (player) => player.playergamestatus === 'gkStarter'
+      ) &&
+        playerGameStatus.filter(
+          (player) => player.playergamestatus === 'starter'
+        ).length >= 6
     );
   }, [playerGameStatus]); //update beginGame status when playerGameStatus changes
 
@@ -155,19 +171,20 @@ function GameBefore({ handleStartGame }) {
 
     //remove current gk
     const previousGK = playerGameStatus.find(
-      (play) => play.gameStatus === 'gkStarter'
-    )?.playerId;
+      (play) => play.playergamestatus === 'gkStarter'
+    )?.playerid;
     previousGK && updateGameStatus(previousGK, 'dressed');
 
     //add new gk
     updateGameStatus(playerId, 'gkStarter');
   }
   function updateGameStatus(playerId, status) {
-    const playerGameId = players.find((play) => play.playerId === +playerId);
+    const playerGameId = players.find((play) => play.playerid === +playerId);
+
     setPlayerGameStatus((prev) =>
       prev.map((playG) =>
-        playG.id === playerGameId.id
-          ? { ...playG, gameStatus: status }
+        playG.playerid === playerGameId.playerid
+          ? { ...playG, playergamestatus: status }
           : { ...playG }
       )
     );
@@ -175,12 +192,11 @@ function GameBefore({ handleStartGame }) {
     updateData({
       table: 'playerGames',
       newData: { status },
-      id: playerGameId.playergameid,
+      id: playerGameId.id,
     });
   }
 
   //TODO
-  // and change game status
   // fix menus so they close when clicked somewhere else
 
   if (!playerGameStatus) return <Spinner />;
@@ -195,62 +211,64 @@ function GameBefore({ handleStartGame }) {
       )
       .map((play) => ({
         label: `${play.number}   ${play.fullname}`,
-        value: play.playerId,
+        value: play.playerid,
       })),
   ];
+
   return (
     <>
       <GameStartContainer>
         {beginGame ? (
-          <Button onClick={handleStartGame}>START GAME</Button>
+          <Button onClick={() => periodHandle.startGame()}>START GAME</Button>
         ) : (
           <StyledRow style={{ backgroundColor: 'red' }}>
             You must have at least 7 starters and must declare a GK
           </StyledRow>
         )}
       </GameStartContainer>
-      <Container>
-        {columnTypes.map((column) => (
+      <MainSection>
+        {columnTypes.map((column, index) => (
           <Column
             key={`col-${column.field}`}
-            style={{ gridRowStart: column.rowStart, gridRowEnd: column.rowEnd }}
+            layout={column.layout}
+            index={index}
           >
             <HeaderDiv>
               {column.label}
               <span>
                 {
                   playerGameStatus.filter(
-                    (play) => play.gameStatus === column.field
+                    (play) => play.playergamestatus === column.field
                   ).length
                 }
               </span>
             </HeaderDiv>
-            <Div>
-              {column.field === 'gkStarter' ? (
-                <Select
-                  options={gkSelectArray}
-                  type="dark"
-                  onChange={updateGk}
-                  value={
-                    playerGameStatus.find(
-                      (play) => play.gameStatus === 'gkStarter'
-                    )?.playerId || 0
-                  }
-                  id={'gkStarter'}
-                  disabled={isUpdating}
-                  style={{
-                    width: '100%',
-                  }}
-                />
-              ) : (
-                playerGameStatus
-                  .filter((play) => play.gameStatus === column.field)
+            {column.field === 'gkStarter' ? (
+              <Select
+                options={gkSelectArray}
+                type="dark"
+                onChange={updateGk}
+                value={
+                  playerGameStatus.find(
+                    (play) => play.playergamestatus === 'gkStarter'
+                  )?.playerid || 0
+                }
+                id={'gkStarter'}
+                disabled={isUpdating}
+                style={{
+                  width: '100%',
+                }}
+              />
+            ) : (
+              <Div>
+                {playerGameStatus
+                  .filter((play) => play.playergamestatus === column.field)
                   .sort((a, b) => a.number - b.number)
                   .map((play) => (
                     <StyledRow
                       onClick={handleClick}
-                      key={play.playerId}
-                      id={`${column.field}-${play.playerId}`}
+                      key={play.playerid}
+                      id={`${column.field}-${play.playerid}`}
                     >
                       <span> {play.number}</span>
                       <span>{play.fullname}</span>
@@ -263,9 +281,9 @@ function GameBefore({ handleStartGame }) {
                               (col) =>
                                 col.field !== column.field && (
                                   <Menus.Button
-                                    key={`menu-${col.field}-${play.playerId}`}
+                                    key={`menu-${col.field}-${play.playerid}`}
                                     icon={col.icon}
-                                    name={`${col.field}-${play.playerId}`}
+                                    name={`${col.field}-${play.playerid}`}
                                   >
                                     {col.label}
                                   </Menus.Button>
@@ -274,12 +292,12 @@ function GameBefore({ handleStartGame }) {
                         </Menus.List>
                       </Menus>
                     </StyledRow>
-                  ))
-              )}
-            </Div>
+                  ))}
+              </Div>
+            )}
           </Column>
         ))}
-      </Container>
+      </MainSection>
     </>
   );
 }

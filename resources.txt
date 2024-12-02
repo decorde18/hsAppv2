@@ -11,6 +11,7 @@ triangle down - HiChevronDown , triangle up- HiChevronUp, HiChevronUpDown
 HiOutlineChartBar stats
 HiEye - eyeball
 
+creDat
 useCreateData({ newData, table, view })
   isCreating, createData
           createData(
@@ -20,8 +21,11 @@ useCreateData({ newData, table, view })
           },)
 useData({ table, filter, sort })
   isLoading, data
+
+upDat
 useUpdateData({ table, newData, id, view })
   isUpdating, updateData
+
 useDeleteData({ view, table, id })
    isDeleting, deleteData
      const playerSeasons = useData({

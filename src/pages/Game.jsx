@@ -1,35 +1,37 @@
-import GameHeader from '../features/games/gameStatsEntry/GameHeader';
-
-import { GameProgress } from '../features/games/gameStatsEntry/GameProgress';
-
-import styled from 'styled-components';
-
+import { useSearchParams } from 'react-router-dom';
 import { GameContextProvider } from '../contexts/GameContext';
 import { PlayerContextProvider } from '../contexts/PlayerContext';
+import GameContainer from '../features/games/gameStatsEntry/GameContainer';
+import Spinner from '../ui/Spinner';
+import useGameData from '../hooks/useGameData';
 
-const MainContainer = styled.div`
-  max-height: 100dvh;
-  padding: 0.5rem;
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: space-between;
-`;
-const Container = styled.div`
-  flex: 0 0 100%;
-  display: grid;
-  grid-template-rows: 12.5rem 1fr;
-  align-items: stretch;
-`;
 function Game() {
+  const [searchParams] = useSearchParams();
+  const gameId = searchParams.get('gameId');
+  const seasonId = searchParams.get('season');
+
+  // Call the useGameData hook with the gameId prop
+  const { isLoading, error, playerGame, playerSeason, ...gameDetails } =
+    useGameData(gameId, seasonId);
+  const playerDetails = { playerGame, playerSeason };
+  // Handle loading state (e.g., show a loading spinner or message)
+
+  if (isLoading) {
+    return <Spinner />;
+  }
+
+  // Handle error state (e.g., show an error message)
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
-    <GameContextProvider>
-      <PlayerContextProvider>
-        <MainContainer>
-          <Container>
-            <GameHeader />
-            <GameProgress />
-          </Container>
-        </MainContainer>
+    <GameContextProvider gameDetails={gameDetails}>
+      <PlayerContextProvider
+        playerDetails={playerDetails}
+        gameDetails={gameDetails}
+      >
+        <GameContainer />
       </PlayerContextProvider>
     </GameContextProvider>
   );

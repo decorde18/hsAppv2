@@ -33,11 +33,10 @@ const categories = [
   { description: 'Header', type: 'headed', team: 'own' },
 ];
 function ActionGoal({ team, players, goalScoredData }) {
-  const [onFieldPlayers, setOnFieldPlayers] = useState(
-    players
-      .filter((player) => player.subStatus === 1)
-      .sort((a, b) => a.number - b.number)
-  );
+  const onFieldPlayers = players
+    .filter((player) => player.subStatus === 1)
+    .sort((a, b) => a.number - b.number);
+
   const [goalTypes, setGoalTypes] = useState({ type: '', headed: false });
   const { goalScored, setGoalScored } = goalScoredData;
 
@@ -46,35 +45,34 @@ function ActionGoal({ team, players, goalScoredData }) {
       (cat) => cat.description === e.target.name
     ).type;
     const target = type === goalTypes.type ? null : type;
-    setGoalTypes({ ...goalTypes, type: target });
+    setGoalTypes((prev) => ({ ...prev, type: target }));
+    setGoalScored((prev) => ({
+      ...prev,
+      [target]: true,
+    }));
   }
   function handleButtonClick() {
-    setGoalTypes({ ...goalTypes, headed: !goalTypes.headed });
+    setGoalTypes((prev) => ({ ...prev, headed: !prev?.headed }));
+    setGoalScored((prev) => ({
+      ...prev,
+      headed: !prev?.headed || true,
+    }));
   }
   function handleSelectChange(e) {
     const name = e.target.name;
     const value = e.target.value;
-    const goal = team === 'Independence High' ? 'gf' : 'ga';
-    console.log(players);
-    setOnFieldPlayers(
-      players
-        .filter((player) => player.subStatus === 1)
-        .sort((a, b) => a.number - b.number)
-        .filter((player) => +value !== player.playerId)
-    );
+    const goal = team === 'for' ? 'gf' : 'ga';
+
     setGoalScored((prev) => ({
       ...prev,
       goal,
       [name]: +value,
-      goalTypes,
     }));
   }
-  //todo on select player, add game
-  //todo goal against
 
   return (
     team &&
-    (team === 'Independence High' ? (
+    (team === 'for' ? (
       <Column>
         <div>
           <h2>Who Scored?</h2>
@@ -84,11 +82,14 @@ function ActionGoal({ team, players, goalScoredData }) {
               name="scorer"
               options={[
                 { value: 0, label: 'Select Goal Scorer' },
-                ...onFieldPlayers.map((player) => ({
-                  value: player.playerId,
-                  label: `${player.number} ${player.fullname}`,
-                })),
+                ...onFieldPlayers
+                  .filter((player) => player.playerId !== goalScored?.assister)
+                  .map((player) => ({
+                    value: player.playerId,
+                    label: `${player.number} ${player.fullname}`,
+                  })),
               ]}
+              value={goalScored?.scorer}
               onChange={handleSelectChange}
             />
             <Select
@@ -96,12 +97,15 @@ function ActionGoal({ team, players, goalScoredData }) {
               name="assister"
               options={[
                 { value: 0, label: 'Select If there is an Assist' },
-                ...onFieldPlayers.map((player) => ({
-                  value: player.playerId,
-                  label: `${player.number} ${player.fullname}`,
-                })),
+                ...onFieldPlayers
+                  .filter((player) => player.playerId !== goalScored?.scorer)
+                  .map((player) => ({
+                    value: player.playerId,
+                    label: `${player.number} ${player.fullname}`,
+                  })),
               ]}
               onChange={handleSelectChange}
+              value={goalScored?.assister}
             />
           </FlexDiv>
         </div>

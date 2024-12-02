@@ -61,6 +61,7 @@ function GameRow({ game, teams }) {
       deleteData({ table: 'games', id, calendarEvent: { calendar, calId } });
 
     //todo how do we show canceled games in the app
+    //TODO delete game doesn't updte UI - i bet the view needs to be mutated on delete, currently the table games is mutated
   }
   function handleSelectChange(e) {
     const value = +e.target.value;

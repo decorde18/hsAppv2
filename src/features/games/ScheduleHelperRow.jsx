@@ -103,7 +103,11 @@ function ScheduleHelperRow({
         onChange={handleSelectChange}
         value={school.id}
         options={[
-          { label: 'Please Select an Opponent', value: 'default' },
+          {
+            label: 'Please Select an Opponent',
+            value: 'default',
+            default: 'default',
+          },
           ...schools.map((school) => ({
             label: school.school,
             value: school.id,

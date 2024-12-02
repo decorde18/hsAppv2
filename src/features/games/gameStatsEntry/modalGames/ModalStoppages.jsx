@@ -12,14 +12,11 @@ import ModalStoppagesNav from './ModalStoppagesNav';
 import { usePlayerContext } from '../../../../contexts/PlayerContext';
 import Substitutions from '../duringGame/Substitutions';
 import PopUpConfirm from './PopUpConfirm';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import Button from '../../../../ui/Button';
-import {
-  useCreateData,
-  useUpdateData,
-} from '../../../../services/useUniversal';
-import Input from '../../../../ui/Input';
-import ButtonChecked from '../../../../ui/ButtonChecked';
+
+import { convertSecondsToMinutesSeconds } from '../../../../utils/helpers';
+import { buttons } from '../gameStatsEntryHelperFunctions';
 
 const popUpOptions = [
   {
@@ -88,22 +85,25 @@ const StyledInput = styled.input`
   height: 5rem;
 `;
 const StyledDiv = styled.div``;
-function ModalStoppages() {
-  const { gameDetails, setGameDetails, getGameTime, buttons, currentPeriod } =
-    useGameContext();
+
+function ModalStoppages({ currentPeriodTime }) {
+  const {
+    gameData,
+
+    stoppageHandle,
+    goalHandle,
+    disciplineHandle,
+  } = useGameContext();
   const { activeGamePlayers, subsInWaiting, enterAllSubs } = usePlayerContext();
 
-  const { isUpdating, updateData } = useUpdateData();
-  const { isCreating, createData } = useCreateData();
-
-  const { stoppageStatus, game } = gameDetails;
+  const { stoppageStatus } = gameData;
   const [details, setDetails] = useState(stoppageStatus.details || '');
   const [popUpOpen, setPopUpOpen] = useState({
     subsConfirmed: false,
     gameTime: false,
   });
-  const [clockStopped, setClockStopped] = useState(true);
   const [goalScored, setGoalScored] = useState();
+  const [discipline, setDiscipline] = useState();
   const activePlayers = activeGamePlayers.current;
   const statusType = !stoppageStatus.event
     ? false
@@ -119,19 +119,15 @@ function ModalStoppages() {
   const stoppageTypes = buttons.filter(
     (button) => button.section === 'stoppage'
   );
+
+  function updateClockStopped() {
+    stoppageHandle.updateClockStopped();
+  }
   function changeStoppageType(e) {
-    //todo update db
-    setGameDetails(() => ({
-      ...gameDetails,
-      stoppageStatus: { ...stoppageStatus, event: e.target.name },
-    }));
+    stoppageHandle.updateStoppage({ event: e.target.name });
   }
   function changeTeam(e) {
-    //todo update db
-    setGameDetails(() => ({
-      ...gameDetails,
-      stoppageStatus: { ...stoppageStatus, team: e.target.name },
-    }));
+    stoppageHandle.updateStoppage({ team: e.target.name });
   }
   function handleAdditionalDiscipline() {
     //TODO
@@ -139,97 +135,35 @@ function ModalStoppages() {
   function updateDetails(e) {
     setDetails(e.target.value);
   }
-  function updateClockStopped() {
-    setClockStopped((prev) => !prev);
-    setGameDetails((prev) => ({
-      ...prev,
-      stoppageStatus: {
-        ...prev.stoppageStatus,
-        clockStopped: !prev.stoppageStatus.clockStopped,
-      },
-    }));
-  }
-  function saveStoppage() {
-    //todo fix me - on a stoppage, all details of that stoppage will be in the stoppageStatus state/ref, goal, discipline, other, injury - will include the team, start, type, scorer, details, clockstopped etc.
-    /* as the stoppage is changed, sthe stoppageStauts changes so only 1 status at a time*/
-    /* save the initial reason and start time on db so that it opens up the stoppage if the screen refreshes*/
-    /* on save, save GF/GA/discipline, end time on boh sheet as well as add to player stats*/
-    /* */
-    /* */
 
-    const { id } = gameDetails.stoppageStatus;
-    const gf =
-      stoppageStatus.event === 'goal' && stoppageStatus.team === 'IHS'
-        ? gameDetails.game.gf + 1
-        : gameDetails.game.gf;
-    const ga =
-      stoppageStatus.event === 'goal' && stoppageStatus.team !== 'IHS'
-        ? gameDetails.game.ga + 1
-        : gameDetails.game.ga;
-    const end = getGameTime();
-    const eventType = gf ? 'Goal Scored' : ga ? 'Goal Against' : statusType;
-    //create goal
-    const { headed, type } = goalScored.goalTypes;
-    const { scorer, assister } = goalScored;
-
-    if (gf)
-      createData({
-        table: 'goalsFor',
-        newData: {
-          eventId: id,
-          headed,
-          scorer,
-          assister: assister || null,
-          ...(type !== '' && { [type]: true }),
-        },
-      });
-    //todo discipline needs to be redone. we are currently doing red card or yellow card inside of event. need new table with discipline and details ?
-
-    //todo do i need to update the stoppage in gamedetails as complicated as i have made it
-    updateData({
-      table: 'stoppages',
-      newData: {
-        end,
-        event: eventType,
-        clockStopped,
-        details,
-      },
-      id,
-    });
-    setGameDetails((prev) => ({
-      ...prev,
-      game: { ...gameDetails.game, gf, ga },
-      stoppages: [
-        ...gameDetails.stoppages,
-        {
-          end,
-          ...stoppageStatus,
-        },
-      ],
-    }));
-
-    // if no subsinwaiting, closemodal after
+  function openModal() {
+    //determine if subs need to be entered
     subsInWaiting.length > 1
       ? setPopUpOpen((pop) => ({ ...pop, subsConfirmed: true }))
-      : closeModal();
-    //todo delete or save stoppage
-  }
-  function cancelStoppage() {
-    // popup with was time paused? (on Cancel)
-    setPopUpOpen((pop) => ({ ...pop, gameTime: true }));
-  }
-  function closeModal() {
-    setGameDetails((prev) => ({ ...prev, stoppageStatus: false }));
+      : saveStoppage();
   }
   function handlePopUpClose(e) {
     const [btn, type] = e.target.name.split('-');
     if ((type === 'subsConfirmed') & (btn === 'confirmBtn')) enterAllSubs();
     setPopUpOpen((pop) => ({ ...pop, [type]: false }));
     if (type === 'gameTime' && btn === 'cancelBtn') return;
-    closeModal();
+    saveStoppage();
   }
-  //todo add, clockstopped, time elapsed,
+  function cancelStoppage() {
+    stoppageHandle.cancelStoppage();
+  }
+
+  function saveStoppage() {
+    //determine if extra data needs to be created (ie goal, discipline)
+    if (stoppageStatus.event === 'goal')
+      goalHandle.createGoal(goalScored, details);
+    else if (stoppageStatus.event === 'discipline')
+      disciplineHandle.createDiscipline(discipline);
+    else stoppageHandle.saveStoppage(details);
+  }
+
   //todo add extra discipline
+
   return (
     <Container>
       {popUpOptions.map(
@@ -247,18 +181,19 @@ function ModalStoppages() {
       )}
 
       <CloseBtnContainer>
-        <CloseBtn onClick={closeModal}>X</CloseBtn>
+        <CloseBtn onClick={cancelStoppage}>X</CloseBtn>
       </CloseBtnContainer>
       <Title>
         <Heading case="upper">
-          {stoppageStatus.event} {stoppageStatus.begin}
+          {stoppageStatus.event}{' '}
+          {convertSecondsToMinutesSeconds(currentPeriodTime)}
           <Button
             name="clockStopped"
             size="large"
             variation={stoppageStatus.clockStopped ? 'primary' : 'secondary'}
             onClick={updateClockStopped}
           >
-            {gameDetails.stoppageStatus.clockStopped
+            {gameData.stoppageStatus.clockStopped
               ? 'Clock is Stopped'
               : 'Clock is Running'}
           </Button>
@@ -281,8 +216,8 @@ function ModalStoppages() {
         </StyledDiv>
       </Title>
       <Body>
-        {!gameDetails.stoppageStatus.team &&
-          gameDetails.stoppageStatus.event !== 'other' && (
+        {!gameData.stoppageStatus.team &&
+          gameData.stoppageStatus.event !== 'other' && (
             <h2>You Must Select a Team to Continue</h2>
           )}
         {statusType &&
@@ -291,7 +226,7 @@ function ModalStoppages() {
               case 'Goal':
                 return (
                   <ActionGoal
-                    team={gameDetails.stoppageStatus.team}
+                    team={gameData.stoppageStatus.team}
                     players={activePlayers}
                     goalScoredData={{ goalScored, setGoalScored }}
                   />
@@ -299,14 +234,14 @@ function ModalStoppages() {
               case 'Discipline':
                 return (
                   <ActionDiscipline
-                    team={gameDetails.stoppageStatus.team}
+                    team={gameData.stoppageStatus.team}
                     players={activePlayers}
                   />
                 );
               case 'Injury':
-                return <ActionInjury team={gameDetails.stoppageStatus.team} />;
+                return <ActionInjury team={gameData.stoppageStatus.team} />;
               default:
-                return <ActionOther team={gameDetails.stoppageStatus.team} />;
+                return <ActionOther team={gameData.stoppageStatus.team} />;
             }
           })()}
       </Body>
@@ -318,34 +253,38 @@ function ModalStoppages() {
         </h2>
       </Substitutions>
       <Footer>
-        {(gameDetails.stoppageStatus.team ||
-          gameDetails.stoppageStatus.event === 'other') && (
-          <Flex>
-            <Button
-              name="cancelModal"
-              size="xlarge"
-              variation="danger"
-              onClick={cancelStoppage}
-            >
-              Cancel Stoppage
-            </Button>
-            <Button
-              name="enterDiscipline"
-              size="xlarge"
-              onClick={handleAdditionalDiscipline}
-            >
-              Add Discipline
-            </Button>
-            <Button
-              name="saveModal"
-              size="xlarge"
-              variation="primary"
-              onClick={saveStoppage}
-            >
-              Restart Game
-            </Button>
-          </Flex>
-        )}
+        <Flex>
+          <Button
+            name="cancelModal"
+            size="xlarge"
+            variation="danger"
+            onClick={cancelStoppage}
+          >
+            Cancel Stoppage
+          </Button>
+          {(((gameData.stoppageStatus.team ||
+            gameData.stoppageStatus.event === 'other') &&
+            statusType !== 'Goal') ||
+            goalScored) && (
+            <>
+              <Button
+                name="enterDiscipline"
+                size="xlarge"
+                onClick={handleAdditionalDiscipline}
+              >
+                Add Discipline
+              </Button>
+              <Button
+                name="saveModal"
+                size="xlarge"
+                variation="primary"
+                onClick={openModal}
+              >
+                Restart Game
+              </Button>
+            </>
+          )}
+        </Flex>
       </Footer>
     </Container>
   );

@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { useGameContext } from '../../../contexts/GameContext';
 
@@ -8,8 +8,6 @@ import {
   convertSecondsToMinutesSeconds,
   formatDate,
   formatTime,
-  getCurrentTime,
-  subtractTimes,
 } from '../../../utils/helpers';
 
 import Heading from '../../../ui/Heading';
@@ -30,25 +28,11 @@ const Clock = styled.div`
 `;
 /* GAME HEADER - use on (Game Break?, game stoppage? are these modals?),
  before game , after game */
-function GameHeader() {
-  const { gameDetails, currentPeriod } = useGameContext();
-  const { game, gameStatus } = gameDetails;
-  const [currentPeriodTime, setCurrentPeriodTime] = useState(0);
+function GameHeader({ currentPeriodTime }) {
+  const { gameDataArrays, gameData } = useGameContext();
+  const { game } = gameDataArrays;
+  const { gameProgress, currentPeriod } = gameData;
   const [countDown, setCountDown] = useState(true);
-  useEffect(() => {
-    //start scoreboard clock
-    if (!currentPeriod) return;
-
-    if (gameStatus === 'periodActive') {
-      const interval = setInterval(() => {
-        setCurrentPeriodTime(
-          subtractTimes(currentPeriod.start, getCurrentTime())
-        );
-      }, 1000);
-
-      return () => clearInterval(interval);
-    }
-  }, [currentPeriod, gameStatus]);
 
   return (
     <>
@@ -58,7 +42,7 @@ function GameHeader() {
             <div>IHS</div>
             <div>{game.gf}</div>
           </Heading>
-          {gameStatus !== 'periodActive' ? (
+          {gameProgress !== 'periodActive' ? (
             <div>
               <Heading as="h4" case="upper" location="center">
                 <div>{game.short_name}</div>
@@ -98,7 +82,7 @@ function GameHeader() {
           </Heading>
         </Row>
       </StyledDiv>
-      {gameStatus !== 'periodActive' && <GameSettings expand={false} />}
+      {gameProgress !== 'periodActive' && <GameSettings expand={false} />}
     </>
   );
 }

@@ -1,3 +1,6 @@
+- upadte the IHS / Indeependence etc to use dbDefaults from Supabase
+  \*\* do it
+
 ## //TODO FIXME !!!
 
 - ihssoccergirls.net does not take you to public or app
