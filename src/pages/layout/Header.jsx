@@ -8,6 +8,7 @@ import Heading from '../../ui/Heading';
 
 const StyledHeader = styled.header`
   /* background-color: blue; */
+  flex: 0;
   padding: 0.5rem;
   display: grid;
   grid-template-columns: 18rem 1fr 18rem;
@@ -30,6 +31,7 @@ const MainDiv = styled.div`
 `;
 const AccountDiv = styled.div`
   /* background-color: yellow; */
+
   display: flex;
   flex-direction: column;
   justify-content: center;

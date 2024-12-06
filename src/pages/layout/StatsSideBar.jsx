@@ -19,7 +19,7 @@ const Div = styled.div`
   /* width: 100%; */
 `;
 
-function SideBar() {
+function StatsSideBar() {
   const { currentSeason } = useCurrentSeason();
   const { active } = useAppNavContext();
 
@@ -110,4 +110,4 @@ function SideBar() {
   );
 }
 
-export default SideBar;
+export default StatsSideBar;

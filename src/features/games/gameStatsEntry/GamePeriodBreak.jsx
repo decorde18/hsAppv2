@@ -8,6 +8,7 @@ import PopUpConfirm from './modalGames/PopUpConfirm';
 import { useState } from 'react';
 import { getCurrentTime } from '../../../utils/helpers';
 import ModalGamesEditButton from './modalGamesEdit/ModalGamesEditButton';
+
 const popUpOptions = [
   {
     title: 'Confirm Subs Entry',
@@ -20,10 +21,14 @@ const SplitSection = styled.div`
   display: flex;
   flex: 1;
   gap: 1rem;
-  overflow-y: auto;
+  overflow: hidden;
+  margin: 1rem;
 `;
 const Section = styled.div`
   width: 50%;
+  flex: 1;
+  overflow-y: auto;
+  margin: 1rem;
 `;
 
 function GamePeriodBreak() {

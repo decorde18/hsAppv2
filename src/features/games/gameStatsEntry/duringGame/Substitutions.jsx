@@ -47,6 +47,7 @@ function Substitutions({ isWorking, children }) {
     setSubsInWaiting,
     updateCurrentPlayers,
   } = usePlayerContext();
+
   function handleSubChange(e) {
     //updates a line of subs with new player out or new player in
     //it gets the type and index of the player selected
@@ -88,7 +89,6 @@ function Substitutions({ isWorking, children }) {
       handleNewSubsInWaiting(newSubs);
     }
   }
-
   function handleBtnClick(e) {
     //handles a delete or enter of a single line of subs
     const [type, index] = e.target.closest('button').name.split('-');
@@ -142,21 +142,21 @@ function Substitutions({ isWorking, children }) {
                   ? { value: 'out', label: 'SUBBING OUT' }
                   : {
                       value: currentPlayers.onField.find(
-                        (player) => +subs.subOut === player.playerId
-                      )?.playerId,
+                        (player) => +subs.subOut === player.playerid
+                      )?.playerid,
                       label: currentPlayers.onField.find(
-                        (player) => +subs.subOut === player.playerId
+                        (player) => +subs.subOut === player.playerid
                       )?.fullname,
                     }, //then only the players who are not already being subbed out
                 ...currentPlayers.onField
                   .filter(
                     (player) =>
                       !subsInWaiting.some(
-                        (sub) => sub.subOut === player.playerId
+                        (sub) => sub.subOut === player.playerid
                       )
                   )
                   .map((player) => ({
-                    value: player.playerId,
+                    value: player.playerid,
                     label: player.fullname,
                   })),
               ]}
@@ -165,8 +165,8 @@ function Substitutions({ isWorking, children }) {
               value={
                 subs.subOut
                   ? currentPlayers.onField.find(
-                      (player) => +subs.subOut === player.playerId
-                    )?.playerId
+                      (player) => +subs.subOut === player.playerid
+                    )?.playerid
                   : 'out'
               }
             />
@@ -178,21 +178,21 @@ function Substitutions({ isWorking, children }) {
                   ? { value: 'in', label: 'SUBBING IN' }
                   : {
                       value: currentPlayers.offField.find(
-                        (player) => +subs.subIn === player.playerId
-                      )?.playerId,
+                        (player) => +subs.subIn === player.playerid
+                      )?.playerid,
                       label: currentPlayers.offField.find(
-                        (player) => +subs.subIn === player.playerId
+                        (player) => +subs.subIn === player.playerid
                       )?.fullname,
                     }, //then only the players who are not already being subbed in
                 ...currentPlayers.offField
                   .filter(
                     (player) =>
                       !subsInWaiting.some(
-                        (sub) => sub.subIn === player.playerId
+                        (sub) => sub.subIn === player.playerid
                       )
                   )
                   .map((player) => ({
-                    value: player.playerId,
+                    value: player.playerid,
                     label: player.fullname,
                   })),
               ]}
@@ -201,8 +201,8 @@ function Substitutions({ isWorking, children }) {
               value={
                 subs.subIn
                   ? currentPlayers.offField.find(
-                      (player) => +subs.subIn === player.playerId
-                    )?.playerId
+                      (player) => +subs.subIn === player.playerid
+                    )?.playerid
                   : 'in'
               }
             />

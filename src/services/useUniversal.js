@@ -79,7 +79,6 @@ const tables = [
     name: 'uniformSeasonPlayers',
     view: 'uniforms_seasons_view',
   },
-  { view: 'season_stats_view' },
   { view: 'stats_by_player_game_view' },
 ];
 

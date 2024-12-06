@@ -50,7 +50,8 @@ new player form
                 name="allDay"
                 value={buttons.allDayValue}
                 variation={buttons.allDayValue ? 'primary' : 'secondary'}
-                onClick={handleButtonClick}> type = selected  fullWidth
+                onClick={handleButtonClick}> 
+                type = selected  fullWidth
       
   const [selectedBtn, setSelectedBtn] = useState('Season Uniforms');
   function handleButtonGroupChange(e) {

@@ -87,13 +87,11 @@ html {
 body {
   font-family: "Manrope", sans-serif;
   color: var(--color-grey-700);
-
   transition: color 0.3s, background-color 0.3s;
   line-height: 1.5;
   font-size: 1.6rem;
-  height: 100dvh; 
-  /* height: 100dvh; */
-  /* overflow: hidden; */
+  height: 100vh;
+
 
 }
 

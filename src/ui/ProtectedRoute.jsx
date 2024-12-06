@@ -1,11 +1,16 @@
-import { useNavigate } from "react-router-dom";
-import { useUser } from "../features/authentication/useUser";
-import Spinner from "./Spinner";
-import { styled } from "styled-components";
-import { useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
+import { useUser } from '../features/authentication/useUser';
+import Spinner from './Spinner';
+import { styled } from 'styled-components';
+import { useEffect } from 'react';
 
 const FullPage = styled.div`
-  height: 100dvh;
+  display: flex;
+  height: 100vh; /* Full viewport height */
+  overflow: hidden;
+`;
+const SpinnerStyle = styled.div`
+  flex: 1;
   background-color: var(--color-grey-50);
   display: flex;
   align-items: center;
@@ -19,7 +24,7 @@ function ProtectedRoute({ children }) {
   //if no auth user, redirect to login
   useEffect(
     function () {
-      if (!isAuthenticated && !isLoading) navigate("/login");
+      if (!isAuthenticated && !isLoading) navigate('/login');
     },
     [isLoading, navigate, isAuthenticated]
   );
@@ -27,11 +32,13 @@ function ProtectedRoute({ children }) {
   if (isLoading)
     return (
       <FullPage>
-        <Spinner />
+        <SpinnerStyle>
+          <Spinner />
+        </SpinnerStyle>
       </FullPage>
     );
   // if there is, render the app
-  if (isAuthenticated) return children;
+  if (isAuthenticated) return <>{children}</>;
 }
 
 export default ProtectedRoute;

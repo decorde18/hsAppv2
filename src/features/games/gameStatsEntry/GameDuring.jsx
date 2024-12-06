@@ -11,11 +11,11 @@ import Heading from '../../../ui/Heading';
 import ModalGamesEditButton from './modalGamesEdit/ModalGamesEditButton';
 import PlayerTable from './components/PlayerTable';
 
-//todo it was wrapped in this
 const Container = styled.div`
   display: grid;
-  grid-template-rows: auto auto minmax(auto, 1fr) auto;
+  grid-template-rows: auto auto minmax(1fr auto) minmax(11rem auto);
   overflow: hidden;
+  margin-bottom: 1rem;
 `;
 const MainHeader = styled.div`
   flex-shrink: 0;
@@ -85,7 +85,7 @@ function GameDuring() {
               { field: 'number', order: 'asc' },
               { field: 'minPlayed', order: 'dec' },
             ]}
-          />{' '}
+          />
         </Column>
       </Main>
       <Footer>

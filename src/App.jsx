@@ -50,6 +50,9 @@ import AppLayoutPublic from './pages/layout/AppLayoutPublic';
 import Uniforms from './pages/Uniforms';
 import ScheduleHelper from './pages/ScheduleHelper';
 import Game from './pages/Game';
+import Stats from './pages/Stats';
+import PlayerStats from './features/statsViewPages/PlayerStats';
+import PublicStats from './features/statsViewPages/PublicStats';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -114,6 +117,7 @@ function App() {
                   <Route path="people" element={<People />} />
                   <Route path="communication" element={<Communication />} />
                   <Route path="games" element={<Games />} />
+                  <Route path="stats" element={<Stats />} />
                   <Route path="events" element={<Events />} />
                   <Route path="newseason" element={<NewSeason />} />
                   <Route path="uniforms" element={<Uniforms />} />
@@ -134,6 +138,8 @@ function App() {
                   <Route path="scheduleTSSAA" element={<ScheduleTSSAA />} />
                   <Route path="rosterTSSAA" element={<RosterTSSAA />} />
                   <Route path="account" element={<Account />} />
+                  <Route path="playerStats" element={<PlayerStats />} />
+                  <Route path="publicStats" element={<PublicStats />} />
                   <Route path="game" element={<Game />} />
                 </Route>
               </Routes>
