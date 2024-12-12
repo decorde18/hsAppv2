@@ -1,7 +1,7 @@
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 import { useEffect, useState } from 'react';
 
-import { useData, useUpdateData } from '../../services/useUniversal';
+import { useData } from '../../services/useUniversal';
 
 import {
   filterBySeasonPhase,
@@ -126,8 +126,7 @@ const columns = [
 ];
 
 function PlayerTableSeasons({ setFilteredCount }) {
-  const { currentSeason, currentSeasonNew } = useCurrentSeason();
-  const { isUpdating, updateData } = useUpdateData();
+  const { currentSeason } = useCurrentSeason();
 
   const columnWidths = columns.reduce((acc, cur) => {
     return (acc = acc.concat(' ', cur.width));
@@ -164,7 +163,7 @@ function PlayerTableSeasons({ setFilteredCount }) {
     table: 'playerSeasons',
     filter: [
       ...currentFilters.filter((option) => option.table === 'playerSeasons'),
-      { field: 'seasonId', value: currentSeasonNew.id, table: 'playerSeasons' },
+      { field: 'seasonId', value: currentSeason.id, table: 'playerSeasons' },
     ],
     sort: sort.playerSeasons,
   });
@@ -193,13 +192,13 @@ function PlayerTableSeasons({ setFilteredCount }) {
   useEffect(() => {
     //update default status filter
 
-    const defaultFilter = filterBySeasonPhase(currentSeasonNew);
+    const defaultFilter = filterBySeasonPhase(currentSeason);
     handleFilterChange(
       [{ value: defaultFilter.label, label: defaultFilter.value }],
       { name: 'status' }
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSeasonNew]);
+  }, [currentSeason]);
   function handleFilterChange(selected, { name }) {
     const newFilter = filterChange({ selected, name, currentFilters, columns });
     setCurrentFilters(newFilter);
@@ -285,7 +284,7 @@ function PlayerTableSeasons({ setFilteredCount }) {
               <PlayerSeasonRow
                 playerSeason={player}
                 key={player.id}
-                teams={currentSeasonNew.teamLevels}
+                teams={currentSeason.teamLevels}
                 columns={columns}
               />
             )}

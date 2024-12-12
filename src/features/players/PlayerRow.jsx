@@ -2,11 +2,8 @@ import styled from 'styled-components';
 
 import CreatePlayerForm from './CreatePlayerModalForm';
 
-import { useDeletePlayer } from './useDeletePlayer';
+import { HiPencil, HiEye } from 'react-icons/hi2';
 
-import { HiPencil, HiTrash, HiEye } from 'react-icons/hi2';
-
-import ModalConfirm from '../../ui/ModalConfirm';
 import Modal from '../../ui/Modal';
 import Table from '../../ui/Table';
 import Menus from '../../ui/Menus';
@@ -21,8 +18,6 @@ const Player = styled.div`
 `;
 
 function PlayerRow({ player, seasons }) {
-  const { isDeleting, deletePlayer } = useDeletePlayer();
-
   const { id: playerId, firstName, lastName, dateOfBirth, entryYear } = player;
 
   function dataWithSeasons() {

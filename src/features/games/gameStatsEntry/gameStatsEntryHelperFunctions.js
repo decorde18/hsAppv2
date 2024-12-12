@@ -1,3 +1,5 @@
+import { converthmsToSecondsOnly } from '../../../utils/helpers';
+
 export const meCategories = {
   for: { foul: [], corner: [], offside: [], shots: [] },
   against: { foul: [], corner: [], offside: [], shots: [] },
@@ -242,4 +244,126 @@ export function getStatuses({ game, periods, stoppages }) {
     //   newPeriodNeeded,
     // };
   }
+}
+
+export function preparePlayerData(playerGame, playerSeason, subs, gameTime) {
+  //  This function should handle all the mapping, filtering, and calculations.  Consider using `reduce` for more efficient aggregations.
+  // const playerG = playerGame.map((playG) => ({
+  //   gameStatus: playG.playergamestatus,
+  //   ...playG,
+  // })); //convert status to gameStatus so it doesn't conflict with season Status
+  const allPlayers = playerGame.map((playG) => ({
+    ...playG,
+    ...playerSeason.find((playS) => playS.Id === playG.playerid),
+  }));
+  // const activeGamePlayers = allPlayers.filter((player) =>
+  //   ['dressed', 'starter', 'gkStarter'].includes(player.playergamestatus)
+  // );
+  const { activeGamePlayers, inactiveGamePlayers } = allPlayers.reduce(
+    (acc, player) => {
+      if (
+        ['dressed', 'starter', 'gkStarter'].includes(player.playergamestatus)
+      ) {
+        acc.activeGamePlayers.push(player);
+      } else {
+        acc.inactiveGamePlayers.push(player);
+      }
+      return acc;
+    },
+    { activeGamePlayers: [], inactiveGamePlayers: [] }
+  );
+
+  const activePlayersWithStats = activeGamePlayers.map((player) => {
+    const subIns = subs.filter(
+      (sub) => sub.subIn === player.playerid && sub.gameMinute
+    );
+    const subOuts = subs.filter(
+      (sub) => sub.subOut === player.playerid && sub.gameMinute
+    );
+
+    const ins = subIns.length;
+    const outs = subOuts.length;
+    const start = ['starter', 'gkStarter'].includes(player.playergamestatus);
+    const subStatus = start + ins - outs;
+
+    const inMinutes = subIns?.reduce((acc, min) => acc + min.gameMinute, 0);
+    const outMinutes = subOuts?.reduce((acc, min) => acc + min.gameMinute, 0);
+
+    const lastIn =
+      subIns?.sort((a, b) => b.gameMinute - a.gameMinute)[0]?.gameMinute || 0;
+    const lastOut =
+      subOuts?.sort((a, b) => b.gameMinute - a.gameMinute)[0]?.gameMinute || 0;
+
+    const minPlayed =
+      subStatus === 1
+        ? converthmsToSecondsOnly(gameTime) || 0 //todo //!fixme this needs to be fixed. it just blanket gives everyone who ended the game the minutes of the game regardless of whether they subbed in or started or how many times
+        : outMinutes - inMinutes;
+
+    return {
+      ...player,
+      ins,
+      outs,
+      subStatus,
+      subIns,
+      subOuts,
+      inMinutes,
+      outMinutes,
+      lastIn,
+      lastOut,
+      minPlayed,
+    };
+  });
+  return { activePlayersWithStats, inactiveGamePlayers, allPlayers };
+}
+
+export function getCurrentPlayers(players, subs) {
+  return {
+    onField: getOnFieldPlayers(players),
+    offField: getOffFieldPlayers(players),
+    subsInWaiting: getSubsInWaiting(subs),
+  };
+
+  function getOnFieldPlayers(players) {
+    return players
+      .filter((player) => player.subStatus === 1)
+      .sort((a, b) => a.number - b.number);
+  }
+
+  function getOffFieldPlayers(players) {
+    return players
+      .filter((player) => player.subStatus === 0)
+      .sort((a, b) => a.number - b.number);
+  }
+
+  function getSubsInWaiting(subs) {
+    return [
+      ...subs.filter((sub) => !sub.gameMinute),
+      { id: null, subIn: null, subOut: null },
+    ];
+  }
+}
+
+export function handleMissingPlayers(playerSeason, playerGame, gameId) {
+  // ... (Implementation for finding and preparing missing player data)
+
+  const missingPlayers = playerSeason.reduce((missing, playerS) => {
+    if (
+      !playerGame.some((playerG) => +playerG.playerid === +playerS.playerId)
+    ) {
+      missing.push({
+        player: playerS.playerId,
+        game: gameId,
+        status: playerS.teamLevel.includes('Varsity')
+          ? 'dressed'
+          : 'notDressed',
+      });
+    }
+    return missing;
+  }, []);
+  if (missingPlayers.length > 0) return missingPlayers;
+  return false;
+}
+
+export function updatePlayerStatus(currentPlayers, subIn, subOut, gameTime) {
+  // ... (Implementation for updating player statuses – less imperative)
 }

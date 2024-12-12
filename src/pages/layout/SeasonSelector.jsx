@@ -1,24 +1,18 @@
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
-import { useData } from '../../services/useUniversal';
 
 import { useNavigate } from 'react-router-dom';
 
 import Select from '../../ui/Select';
 
 function SeasonSelector() {
-  const { currentSeason, currentSeasonNew, updateCurrentSeason, seasons } =
-    useCurrentSeason();
+  const { currentSeason, updateCurrentSeason, seasons } = useCurrentSeason();
 
-  // const { isLoading, data: seasons } = useData({
-  //   table: 'seasons',
-  //   sort: [{ field: 'season', direction: false }],
-  // });
   const navigate = useNavigate();
 
   function handleSelectChange({ target }) {
     if (target.value === 'createSeason') {
       navigate(`./newseason`);
-      target.value = currentSeasonNew.id;
+      target.value = currentSeason.id;
     } else updateCurrentSeason(+target.value);
   }
 
@@ -34,7 +28,7 @@ function SeasonSelector() {
     <Select
       width={26}
       onChange={handleSelectChange}
-      defaultValue={currentSeasonNew.id}
+      defaultValue={currentSeason.id}
       options={options}
     />
   );

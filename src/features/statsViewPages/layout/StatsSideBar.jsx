@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import Button from '../../../ui/Button';
-import { useContext } from 'react';
 import { useStatsNavContext } from '../../../contexts/StatsNavContext';
 
 const Container = styled.div`
@@ -19,15 +18,15 @@ const Container = styled.div`
 
 function StatsSideBar() {
   const { active, handleToggle, allButtons } = useStatsNavContext();
-  const { sidebar: buttons } = allButtons;
-
+  const { sidebar: buttons, header } = allButtons;
+  const { primary } = active;
   return (
     <Container>
       {buttons.map((button, index) => (
         <Button
-          name={button}
-          value={active}
-          variation={button === active ? 'primary' : 'secondary'}
+          name={`${button}-${header[button][0]}`}
+          value={primary}
+          variation={button === primary ? 'primary' : 'secondary'}
           onClick={handleToggle}
           key={`aside-${index}`}
           type="fullWidth"

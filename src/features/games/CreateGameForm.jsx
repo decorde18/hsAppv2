@@ -117,7 +117,7 @@ const gameTypes = [
 function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
   const { isLoading: isLoadingSupabase } = useSessionContext();
   const session = useSession();
-  const { currentSeasonNew: season } = useCurrentSeason();
+  const { currentSeason: season } = useCurrentSeason();
   const { isCreating, createData } = useCreateData();
   const { isUpdating, updateData } = useUpdateData();
 

@@ -2,17 +2,12 @@ import styled from 'styled-components';
 import Spinner from '../../ui/Spinner';
 
 import { useEvents } from './useEvents';
-import { useContext, useEffect, useState } from 'react';
-import Button from '../../ui/Button';
 import Table from '../../ui/Table';
 import Empty from '../../ui/Empty';
 import EventRow from './EventRow';
 import AddEvent from './AddEvent';
-import { useSearchParams } from 'react-router-dom';
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 import Menus from '../../ui/Menus';
-
-import { useSeason } from '../seasons/useSeasons';
 
 const StyledDiv = styled.div`
   display: flex;

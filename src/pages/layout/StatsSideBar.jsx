@@ -13,10 +13,7 @@ const Aside = styled.aside`
 const Div = styled.div`
   display: flex;
   flex-direction: column;
-  /* justify-content: center; */
-  /* align-items: center; */
   gap: 1rem;
-  /* width: 100%; */
 `;
 
 function StatsSideBar() {
@@ -26,28 +23,28 @@ function StatsSideBar() {
   const sideBarButtons = [
     {
       name: 'printRoster',
-      link: `../roster?season=${currentSeason}`,
+      link: `../roster?season=${currentSeason.id}`,
       text: 'Print Roster',
       newWindow: true,
       appNav: 'Main',
     },
     {
       name: 'printSchedule',
-      link: `../schedule?season=${currentSeason}`,
+      link: `../schedule?season=${currentSeason.id}`,
       text: 'Print Schedule',
       newWindow: true,
       appNav: 'Main',
     },
     {
       name: 'tssaaRoster',
-      link: `../protected/rosterTSSAA?season=${currentSeason}`,
+      link: `../protected/rosterTSSAA?season=${currentSeason.id}`,
       text: 'TSSAA Roster',
       newWindow: true,
       appNav: 'Main',
     },
     {
       name: 'communication',
-      link: `./communication?season=${currentSeason}`,
+      link: `./communication?season=${currentSeason.id}`,
       text: 'Communication',
       newWindow: false,
       appNav: 'Main',

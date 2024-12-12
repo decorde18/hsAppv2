@@ -8,11 +8,11 @@ import useGameData from '../hooks/useGameData';
 function Game() {
   const [searchParams] = useSearchParams();
   const gameId = searchParams.get('gameId');
-  const seasonId = searchParams.get('season');
+  searchParams.delete('season');
 
   // Call the useGameData hook with the gameId prop
   const { isLoading, error, playerGame, playerSeason, ...gameDetails } =
-    useGameData(gameId, seasonId);
+    useGameData(gameId);
   const playerDetails = { playerGame, playerSeason };
   // Handle loading state (e.g., show a loading spinner or message)
 

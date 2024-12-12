@@ -6,7 +6,6 @@ import GamePeriodBreak from './GamePeriodBreak';
 import GameAfter from './GameAfter';
 import GameShootout from './GameShootout';
 
-import { useState } from 'react';
 import Spinner from '../../../ui/Spinner';
 
 function GameProgress() {

@@ -2,28 +2,25 @@ import Button from '../../ui/Button';
 import Form from '../../ui/Form';
 import FormRow from '../../ui/FormRow';
 import Heading from '../../ui/Heading';
-import Input from '../../ui/Input';
 import Row from '../../ui/Row';
 
 import { useForm } from 'react-hook-form';
 
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 import {
   useCreateData,
   useData,
-  useDeleteData,
   useUpdateData,
 } from '../../services/useUniversal';
-import { useSeason } from '../seasons/useSeasons';
 import Select from '../../ui/Select';
 
 function UniformSeasonCreateForm({ uniformToEdit = {}, onCloseModal }) {
   const { id: editId, ...editValues } = uniformToEdit;
-  const { currentSeason, currentSeasonNew } = useCurrentSeason();
+  const { currentSeason } = useCurrentSeason();
 
   const teamLevels = [
-    ...currentSeasonNew.teamLevels.map((level) => ({
+    ...currentSeason.teamLevels.map((level) => ({
       value: level,
       label: level,
     })),
@@ -32,10 +29,6 @@ function UniformSeasonCreateForm({ uniformToEdit = {}, onCloseModal }) {
 
   const isEditSession = Boolean(editId);
 
-  // const { isLoading: isLoadingUniformSeasons, data: uniforms } = useData({
-  //   table: 'uniformSeasons',
-
-  // });
   const { isLoading: isLoadingUniforms, data: uniforms } = useData({
     table: 'uniforms',
     filter: [{ field: 'active', value: true }],
@@ -47,7 +40,7 @@ function UniformSeasonCreateForm({ uniformToEdit = {}, onCloseModal }) {
     isCreating: isCreatingUniformSeason,
     createData: createUniformSeason,
   } = useCreateData({ table: 'uniformSeasons' });
-  const { register, handleSubmit, reset, getValues, formState } = useForm({
+  const { register, handleSubmit, reset, formState } = useForm({
     defaultValues: isEditSession ? editValues : {},
   });
   const { errors } = formState;
@@ -114,52 +107,22 @@ function UniformSeasonCreateForm({ uniformToEdit = {}, onCloseModal }) {
         <FormRow label="Team *" error={errors?.team?.message}>
           <Select
             options={teamLevels}
-            // onChange={handleSelectChange}
-            // name={each.field}
-            // disabled={isWorking}
-            // defaultValue={
-            //   selectFieldValues.find((field) => field.field === each.field)
-            //     .value
-            // }
             register={{
               ...register('field', {
                 // validate: errors?.uniform?.message,
               }),
             }}
           />
-          {/* <Input
-            type="text"
-            id="team"
-            {...register('team', {
-              required: 'We need the type of uniform',
-              })}
-              disabled={isWorking}
-              /> */}
         </FormRow>
         <FormRow label="Uniform *" error={errors?.uniform?.message}>
           <Select
             options={uniformTypes}
-            // onChange={handleSelectChange}
-            // name={each.field}
-            // disabled={isWorking}
-            // defaultValue={
-            //   selectFieldValues.find((field) => field.field === each.field)
-            //     .value
-            // }
             register={{
               ...register('id', {
                 // validate: errors?.uniform?.message,
               }),
             }}
           />
-          {/* <Input
-            type="number"
-            id="uniform"
-            {...register('uniform', {
-              required: 'We need the type of uniform',
-            })}
-            disabled={isWorking}
-          /> */}
         </FormRow>
       </Row>
 

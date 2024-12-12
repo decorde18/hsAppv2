@@ -5,15 +5,7 @@ import { convertSecondsToMinutesSeconds } from '../../../utils/helpers';
 
 import Table from '../../../ui/Table';
 
-import {
-  afterGameColumns,
-  duringGameColumns,
-  periodBreakColumns,
-} from './gameTableColumns';
-
 function PlayerTableRow({ player, status, displayTable, columns }) {
-  const { getGameTime } = useGameContext();
-
   const [lastOut, setLastOut] = useState();
   const [lastIn, setLastIn] = useState();
 

@@ -38,9 +38,9 @@ function Substitutions({ isWorking, children }) {
   const { gameData, gameDataArrays, getGameTime } = useGameContext();
   const { currentPeriod, gameStatus } = gameData;
   const { game } = gameDataArrays;
-  const { isCreating, createData } = useCreateData();
-  const { isUpdating, updateData } = useUpdateData();
-  const { isDeleting, deleteData } = useDeleteData();
+  const { createData } = useCreateData();
+  const { updateData } = useUpdateData();
+  const { deleteData } = useDeleteData();
   const {
     currentPlayers,
     subsInWaiting,

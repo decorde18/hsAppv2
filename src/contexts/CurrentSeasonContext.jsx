@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { useLocalStorageState } from '../hooks/useLocalStorageState';
@@ -10,14 +10,15 @@ import Spinner from '../ui/Spinner';
 const CurrentSeasonContext = createContext();
 
 function CurrentSeasonProvider({ children }) {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const curSeason = +searchParams.get('season');
+
   //get all seasons
   const { isLoading, data: seasons } = useData({
     table: 'seasons',
     sort: [{ field: 'season', direction: false }],
   });
 
-  const [currentSeasonNew, setCurrentSeasonNew] = useState();
-  const [recentSeasonNew, setRecentSeasonNew] = useState();
   const [currentSeason, setCurrentSeason] = useLocalStorageState(
     null,
     'currentSeason'
@@ -26,44 +27,28 @@ function CurrentSeasonProvider({ children }) {
     false,
     'recentSeason'
   );
-  const [searchParams, setSearchParams] = useSearchParams();
-  const curSeason = +searchParams.get('season');
 
   useEffect(() => {
-    if (isLoading) return;
-
-    const recent = seasons[0];
-    if (!recentSeason) updateRecentSeason(recent.id);
-
-    const updatedCurrent = curSeason === curSeason ? curSeason : currentSeason;
-    const current =
-      seasons.find((season) => season.id === +updatedCurrent) || recent;
-
-    //get recent season from API
-    setRecentSeasonNew(recent);
-    //if current season is stored locally, use it
-    setCurrentSeasonNew(
-      currentSeason
-        ? current
-        : //set the current season to the recent season if not already stored locally
-          recent
-    );
-    //set local variables
-    updateCurrentSeason(current.id);
+    if (!seasons) return;
+    //update Current Season
+    updateCurrentSeason(curSeason ? +curSeason : seasons[0].id);
+    //update Recent Season
+    updateRecentSeason(seasons[0]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSeason, isLoading, seasons, setRecentSeason]);
+  }, [seasons, curSeason]);
 
-  function updateCurrentSeason(season) {
+  function updateCurrentSeason(seasonId) {
     setSearchParams(searchParams);
-    setCurrentSeason(season);
-    searchParams.set('season', season);
+    searchParams.set('season', seasonId);
+    setCurrentSeason(
+      seasons.find((season) => season.id === +seasonId) || recentSeason
+    );
   }
   function updateRecentSeason(season) {
     setRecentSeason(season);
   }
 
   if (!currentSeason || !recentSeason || isLoading) return <Spinner />;
-
   return (
     <CurrentSeasonContext.Provider
       value={{
@@ -72,8 +57,6 @@ function CurrentSeasonProvider({ children }) {
         recentSeason,
         updateRecentSeason,
         seasons,
-        recentSeasonNew,
-        currentSeasonNew,
       }}
     >
       {children}

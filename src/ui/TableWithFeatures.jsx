@@ -39,11 +39,13 @@ const ThTd = styled.th`
 const StyledTd = styled.td`
   padding: 0.8rem;
   width: ${(props) => `${props.width}rem`};
+  text-align: right;
 `;
 const StyledEndTd = styled.td`
   border-right: 3px solid var(--color-brand-500);
   padding: 0.8rem;
   width: ${(props) => `${props.width}rem`};
+  text-align: right;
 `;
 const PrimaryHeader = styled.tr`
   position: sticky;
@@ -124,16 +126,20 @@ const StickyFirstColumnTd = styled.td`
 `;
 
 // Reusable Table Component with Sorting, Filtering, and Pagination
-const TableWithFeatures = ({ headers, data, rowsPerPage }) => {
+const TableWithFeatures = ({
+  headers,
+  data,
+  rowsPerPage,
+  defaultSort,
+  defaultFilter,
+}) => {
+  //TODO add a defaultSort and defaultFilter
+  //TODO on headers, add a default sortDirection
+
   const [currentPage, setCurrentPage] = useState(1);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   const [filters, setFilters] = useState({});
   const [tableData, setTableData] = useState(data); // Add state for table data
-
-  const totalPages = Math.ceil(tableData.length / rowsPerPage);
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const endIndex = startIndex + rowsPerPage;
-  let currentData = tableData.slice(startIndex, endIndex);
 
   const handleSort = (key) => {
     let direction = 'asc';
@@ -152,22 +158,32 @@ const TableWithFeatures = ({ headers, data, rowsPerPage }) => {
     setTableData(sortedData); // Update the table data
   };
 
+  // Filtering logic
   const handleFilterChange = (key, value) => {
     setFilters((prevFilters) => ({
       ...prevFilters,
       [key]: value,
     }));
+    setCurrentPage(1); // Reset to first page
   };
 
-  const filteredData = currentData.filter((row) => {
-    return Object.keys(filters).every((key) => {
-      if (!filters[key]) return true;
-      return row[key]
-        .toString()
-        .toLowerCase()
-        .includes(filters[key].toLowerCase());
-    });
-  });
+  const getFilteredData = () => {
+    return tableData.filter((row) =>
+      Object.keys(filters).every((key) => {
+        if (!filters[key]) return true;
+        return row[key]
+          .toString()
+          .toLowerCase()
+          .includes(filters[key].toLowerCase());
+      })
+    );
+  };
+
+  const filteredData = getFilteredData();
+  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+  const currentData = filteredData.slice(startIndex, endIndex);
 
   const renderPrimaryHeader = () => {
     return headers.map((header, index) => {
@@ -237,28 +253,13 @@ const TableWithFeatures = ({ headers, data, rowsPerPage }) => {
   };
 
   const renderTableRows = () => {
-    return filteredData.map((row, rowIndex) => (
+    return currentData.map((row, rowIndex) => (
       <TableRow key={rowIndex}>
         {headers.map((header, colIndex) => {
-          if (header.columns) {
-            return header.columns.map((col, colIndex) =>
-              colIndex === header.columns.length - 1 ? (
-                <StyledEndTd
-                  width={col.width || 5}
-                  key={`${rowIndex}-${colIndex}`}
-                >
-                  {styledData(row, col)}
-                </StyledEndTd>
-              ) : (
-                <StyledTd
-                  width={col.width || 5}
-                  key={`${rowIndex}-${colIndex}`}
-                >
-                  {styledData(row, col)}
-                </StyledTd>
-              )
-            );
-          } else {
+          //is it a column with subcolumns
+          //is it the end of the data set
+          //is is the first column
+          if (colIndex === 0) {
             // Conditionally set the background color for the sticky column based on rowIndex
             const stickyBgColor =
               rowIndex % 2 === 0
@@ -273,6 +274,33 @@ const TableWithFeatures = ({ headers, data, rowsPerPage }) => {
               >
                 {row[header.key]}
               </StickyFirstColumnTd>
+            );
+          } else if (header.columns) {
+            return header.columns.map((subCol, subColIndex) =>
+              subColIndex === header.columns.length - 1 ? (
+                <StyledEndTd
+                  width={subCol.width || 5}
+                  key={`${rowIndex}-${subColIndex}`}
+                >
+                  {styledData(row, subCol)}
+                </StyledEndTd>
+              ) : (
+                <StyledTd
+                  width={subCol.width || 5}
+                  key={`${rowIndex}-${subColIndex}`}
+                >
+                  {styledData(row, subCol)}
+                </StyledTd>
+              )
+            );
+          } else {
+            return (
+              <StyledTd
+                width={header.width || 5}
+                key={`${rowIndex}-${colIndex}`}
+              >
+                {styledData(row, header)}
+              </StyledTd>
             );
           }
         })}

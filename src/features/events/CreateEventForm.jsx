@@ -5,7 +5,6 @@ import { useForm } from 'react-hook-form';
 import Form from '../../ui/Form';
 import FormRow from '../../ui/FormRow';
 import Input from '../../ui/Input';
-import Select from '../../ui/Select';
 import Button from '../../ui/Button';
 import Textarea from '../../ui/Textarea';
 
@@ -26,15 +25,7 @@ import { convertToGoogleDateTime } from '../../utils/helpers';
 const Div = styled.div`
   height: 100%;
 `;
-const Center = styled.div`
-  width: 50%;
-  margin: auto;
-`;
-const Header = styled.header`
-  display: flex;
-  gap: 5rem;
-  justify-content: center;
-`;
+
 const StyledSelect = styled.select`
   font-size: 1.4rem;
   padding: 0.8rem 1.2rem;
@@ -116,7 +107,15 @@ function CreateEventForm({ eventToEdit = {}, onCloseModal }) {
         setValue('seasonPhase', buttons.seasonPhaseValue);
       }
     },
-    [isLoading]
+    [
+      buttons.allDayValue,
+      buttons.seasonPhaseValue,
+      isEditSession,
+      isLoading,
+      season.season,
+      setValue,
+      watch,
+    ]
   );
 
   function handleButtonClick(e) {
@@ -135,7 +134,7 @@ function CreateEventForm({ eventToEdit = {}, onCloseModal }) {
   }
 
   function onSubmit(data) {
-    const { created_at, updated_at, ...newData } = data;
+    const { ...newData } = data;
     setGoogleUpdating(true);
     newData.location === 'default' && delete newData.location;
     if (isEditSession) {
@@ -149,7 +148,7 @@ function CreateEventForm({ eventToEdit = {}, onCloseModal }) {
           id: editId,
         },
         {
-          onSuccess: (data) => {
+          onSuccess: () => {
             reset();
             onCloseModal?.();
           },

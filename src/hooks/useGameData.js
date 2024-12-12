@@ -1,11 +1,22 @@
+import { useState, useEffect } from 'react';
+
 import { useData } from '../services/useUniversal';
 
-function useGameData(gameId, seasonId) {
-  // Use `useData` for each dataset
+function useGameData(gameId) {
+  const [seasonId, setSeasonId] = useState(null);
+
+  // ... (existing code for gameResponse)
+
   const gameResponse = useData({
     table: 'games',
     filter: [{ field: 'id', value: gameId }],
   });
+  useEffect(() => {
+    if (gameResponse.data && gameResponse.data[0]) {
+      setSeasonId(gameResponse.data[0].seasonId);
+    }
+  }, [gameResponse.data]);
+  // Use `useData` for each dataset
 
   const periodsResponse = useData({
     table: 'periods',
@@ -40,8 +51,8 @@ function useGameData(gameId, seasonId) {
   const playerSeasonResponse = useData({
     table: 'playerSeasons',
     filter: [
-      { field: 'seasonId', value: seasonId },
       { field: 'status', value: 'Rostered' },
+      { field: 'seasonId', value: seasonId },
     ],
   });
 

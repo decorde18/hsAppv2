@@ -7,7 +7,7 @@ function StatsPagePicker() {
   return (
     <>
       {(() => {
-        switch (active) {
+        switch (active.primary) {
           case 'Team':
             return <TeamStats />;
           default:

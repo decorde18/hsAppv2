@@ -13,8 +13,8 @@ const tables = [
   {
     name: 'seasons',
   },
-  { view: 'season_stats_view' },
-  { view: 'seasons_view' },
+  { name: 'season_stats_view' },
+  { name: 'seasons_view' },
   {
     name: 'players',
     view: 'players_view',
@@ -79,7 +79,8 @@ const tables = [
     name: 'uniformSeasonPlayers',
     view: 'uniforms_seasons_view',
   },
-  { view: 'stats_by_player_game_view' },
+  { name: 'player_career_stats_view' },
+  { name: 'player_season_stats_view' },
 ];
 
 export function useCreateData() {

@@ -11,9 +11,7 @@
 - fix games and events with Google log in - allow Development to acces game form
 
 - People Table - convert to overall table add view edit
-- SeasonSideBar.jsx:9 The component styled.img with the id of "sc-jdEkgJ" has been created dynamically.You may see this warning because you've called styled inside another component.To resolve this only create new StyledComponents outside of any render method and function component. at SeasonSideBar (http://localhost:5173/src/features/seasons/SeasonSideBar.jsx:19:26)
 
-- useContext for current season - always access it that way versus theuseUniverasl I have started to implement
 - createPlayerModal for new players
 
 - redo communication table ---
@@ -27,8 +25,6 @@
 - ON stats, be sure to include only games that status is not completed or in progress- can't do in sql view because then the playergame will be added even though it is already included
 
 ## //TODO FIXME !!
-
--sidebar hihlighted when clicked
 
 ## //TODO FIXME !
 

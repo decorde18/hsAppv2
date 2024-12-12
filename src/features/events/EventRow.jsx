@@ -1,31 +1,25 @@
-import styled, { css } from 'styled-components';
 import Table from '../../ui/Table';
 import { formatTime, formatDate } from '../../utils/helpers';
 import Modal from '../../ui/Modal';
 import Menus from '../../ui/Menus';
-import {
-  HiPencil,
-  HiSquare2Stack,
-  HiTrash,
-  HiMiniXMark,
-} from 'react-icons/hi2';
+import { HiPencil, HiTrash } from 'react-icons/hi2';
 import { useDeleteEvent } from './useEvents';
 import ModalConfirm from '../../ui/ModalConfirm';
 import CreateEventForm from './CreateEventForm';
 import CreateGoogleSignedInError from '../Calendar/CreateGoogleSignedInError';
 import { useSession, useSessionContext } from '@supabase/auth-helpers-react';
 
-const TableRow = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  column-gap: 2.4rem;
-  align-items: center;
-  padding: 0 2rem;
+// const TableRow = styled.div`
+//   display: grid;
+//   grid-template-columns: 1fr 1fr;
+//   column-gap: 2.4rem;
+//   align-items: center;
+//   padding: 0 2rem;
 
-  &:not(:last-child) {
-    border-bottom: 1px solid var(--color-grey-100);
-  }
-`;
+//   &:not(:last-child) {
+//     border-bottom: 1px solid var(--color-grey-100);
+//   }
+// `;
 
 function EventRow({ event }) {
   const { isDeleting, deleteEvent } = useDeleteEvent();

@@ -8,7 +8,6 @@ import Heading from '../../ui/Heading';
 import TssaaTableRow from './TssaaTableRow';
 
 import { useSeason } from '../seasons/useSeasons';
-import { usePlayerSeasons } from './usePlayerSeasons';
 import { useData } from '../../services/useUniversal';
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 
@@ -36,24 +35,18 @@ const Container = styled.div`
 `;
 
 function TssaaRosterTable() {
-  const { currentSeason, currentSeasonNew } = useCurrentSeason();
+  const { currentSeason } = useCurrentSeason();
   const { isLoadingSeason, season } = useSeason();
   const playerSeasons = useData({
     table: 'playerSeasons',
     filter: [
-      { field: 'seasonId', value: currentSeasonNew.id, table: 'playerSeasons' },
+      { field: 'seasonId', value: currentSeason.id, table: 'playerSeasons' },
       { field: 'status', value: 'Rostered', table: 'playerSeasons' },
     ],
   });
 
   if (playerSeasons.isLoading || isLoadingSeason) return <Spinner />;
-  console.log(currentSeasonNew.id, playerSeasons);
-  // if (!season)
-  //   return (
-  //     <Container>
-  //       <Empty resource="Season" />
-  //     </Container>
-  //   );
+
   if (!playerSeasons.data.length)
     return (
       <Container>

@@ -1,12 +1,13 @@
 import { useEffect, useState, createContext, useContext, useRef } from 'react';
-
 import { useGameContext } from './GameContext';
-
 import { useCreateData, useUpdateData } from '../services/useUniversal';
-
 import { converthmsToSecondsOnly } from '../utils/helpers';
-
 import Spinner from '../ui/Spinner';
+import {
+  getCurrentPlayers,
+  handleMissingPlayers,
+  preparePlayerData,
+} from '../features/games/gameStatsEntry/gameStatsEntryHelperFunctions';
 
 const PlayerContext = createContext();
 
@@ -21,132 +22,30 @@ function PlayerContextProvider({ playerDetails, gameDetails, children }) {
   const { isUpdating, updateData } = useUpdateData();
 
   const allPlayers = useRef();
-  const activeGamePlayers = useRef();
-  const missingPlayers = useRef(false);
+  const activeGamePlayers = useRef([]);
+  // const missingPlayers = useRef(false);
+
+  const [players, setPlayers] = useState([]);
+  const [inactivePlayers, setInactivePlayers] = useState([]);
+  const [currentPlayers, setCurrentPlayers] = useState({
+    onField: [],
+    offField: [],
+    subsInWaiting: [],
+  });
+  const [missingPlayers, setMissingPlayers] = useState(playerGame);
 
   const [subsInWaiting, setSubsInWaiting] = useState([
     ...subs.filter((sub) => !sub.gameMinute),
     { id: null, subIn: null, subOut: null },
   ]);
-  const [currentPlayers, setCurrentPlayers] = useState();
-
-  // const playerGame = useData({
-  //   table: 'playerGames',
-  //   filter: [{ field: 'game', value: game.id, table: 'playerGames' }],
-  // });
-
-  // const playerSeason = useData({
-  //   table: 'playerSeasons',
-  //   filter: [
-  //     { field: 'seasonId', value: game.seasonId, table: 'playerSeason' },
-  //     { field: 'status', value: 'Rostered', table: 'playerSeason' },
-  //   ],
-  // });
+  // const [currentPlayers, setCurrentPlayers] = useState();
 
   useEffect(() => {
-    //update playerGames if they are missing
-    // if (playerGame.isLoading || playerSeason.isLoading) return;
-
-    const playerG = playerGame.map((playG) => ({
-      gameStatus: playG.playergamestatus,
-      ...playG,
-    })); //convert status to gameStatus so it doesn't conflict with season Status
-    allPlayers.current = playerG.map((playG) => ({
-      ...playG,
-      ...playerSeason.find((playS) => playS.Id === playG.playerid),
-    }));
-
-    activeGamePlayers.current = allPlayers.current
-      .filter(
-        (player) =>
-          player.gameStatus === 'dressed' ||
-          player.gameStatus === 'starter' ||
-          player.gameStatus === 'gkStarter'
-      )
-      .map((player) => {
-        const ins = subs.filter(
-          (sub) => sub.subIn === player.playerid && sub.gameMinute
-        ).length;
-
-        const outs = subs.filter(
-          (sub) => sub.subOut === player.playerid && sub.gameMinute
-        ).length;
-
-        const start =
-          player.gameStatus === 'starter' || player.gameStatus === 'gkStarter';
-
-        const subStatus = start + ins - outs;
-
-        const inMinutes = subs
-          .filter((sub) => sub?.subIn === player.playerid)
-          .reduce((acc, min) => acc + min.gameMinute, 0);
-
-        const outMinutes = subs
-          .filter((sub) => sub?.subOut === player.playerid)
-          .reduce((acc, min) => acc + min.gameMinute, 0);
-
-        return {
-          ...player,
-          ins,
-          outs,
-          subStatus,
-          subIns: subs.filter((sub) => sub?.subIn === player.playerid),
-          subOuts: subs.filter((sub) => sub?.subOut === player.playerid),
-          inMinutes,
-          outMinutes,
-          lastIn:
-            subs
-              .filter((sub) => sub?.subIn === player.playerid)
-              .sort((a, b) => b.gameMinute - a.gameMinute)[0]?.gameMinute || 0,
-          lastOut:
-            subs
-              .filter((sub) => sub?.subOut === player.playerid)
-              .sort((a, b) => b.gameMinute - a.gameMinute)[0]?.gameMinute || 0,
-          minPlayed:
-            status !== 'to be played'
-              ? subStatus === 1
-                ? converthmsToSecondsOnly(game.actualgametime) || 0
-                : 0 + outMinutes - inMinutes
-              : 0,
-        };
-      });
-
-    setCurrentPlayers({
-      onField: activeGamePlayers.current
-        .filter((player) => player.subStatus === 1)
-        .sort((a, b) => a.number - b.number),
-
-      offField: activeGamePlayers.current
-        .filter((player) => player.subStatus === 0)
-        .sort((a, b) => a.number - b.number),
-
-      subsInWaiting: [
-        ...subs.filter((sub) => !sub.gameMinute),
-        { id: null, subIn: null, subOut: null },
-      ],
-    });
-  }, [game.actualgametime, playerGame, playerSeason, subs]);
-
-  useEffect(() => {
-    // Wait for data to load before executing logic
-    // if (playerGame.isLoading || playerSeason.isLoading) return;
-
-    // Check for missing players
-    const missing = playerSeason
-      .filter((playerS) =>
-        playerGame.every((playerG) => playerG.playerid !== playerS.playerId)
-      )
-      .map((playerS) => ({
-        player: playerS.playerId,
-        game: game.id,
-        status: playerS.teamLevel.includes('Varsity')
-          ? 'dressed'
-          : 'notDressed',
-      }));
-
-    // If missing players exist, create them in `playerGames`
+    // Handle missing players - This function is now separated for clarity
+    const missing = handleMissingPlayers(playerSeason, playerGame, game.id);
+    setMissingPlayers(missing);
     if (missing.length > 0) {
-      missingPlayers.current = missing;
+      // console.log(missing);
       createData(
         {
           table: 'playerGames',
@@ -155,29 +54,84 @@ function PlayerContextProvider({ playerDetails, gameDetails, children }) {
           toast: false,
         },
         {
-          onSuccess: () => {
-            missingPlayers.current = false; // Reset the state after successful creation
-          },
+          onSuccess: () => setMissingPlayers(false),
         }
       );
-    } else {
-      missingPlayers.current = false;
     }
   }, [createData, game.id, playerGame, playerSeason]);
 
-  if (
-    missingPlayers.current ||
-    !activeGamePlayers.current?.length ||
-    isCreating ||
-    isUpdating
-  )
-    return <Spinner />;
+  useEffect(() => {
+    if (missingPlayers) return;
+    const preparedPlayers = preparePlayerData(
+      playerGame,
+      playerSeason,
+      subs,
+      game.actualgametime
+    );
+    setPlayers(preparedPlayers.allPlayers);
+    setInactivePlayers(preparedPlayers.inactiveGamePlayers);
+    setCurrentPlayers(
+      getCurrentPlayers(preparedPlayers.activePlayersWithStats, subs)
+    );
+  }, [
+    game.actualgametime,
+    gameStatus,
+    playerGame,
+    playerSeason,
+    subs,
+    missingPlayers,
+  ]);
 
-  const players = playerGame.map(({ playergamestatus, ...rest }) => ({
-    playergamestatus: playergamestatus, // Rename "status" to "gameStatus"
-    ...rest,
-    ...playerSeason.find((playS) => playS.playerId === rest.id), // Merge matching playerSeason data
-  }));
+  // useEffect(() => {
+  //   // Check for missing players
+  //   const missing = playerSeason
+  //     .filter((playerS) =>
+  //       playerGame.every((playerG) => playerG.playerid !== playerS.playerId)
+  //     )
+  //     .map((playerS) => ({
+  //       player: playerS.playerId,
+  //       game: game.id,
+  //       status: playerS.teamLevel.includes('Varsity')
+  //         ? 'dressed'
+  //         : 'notDressed',
+  //     }));
+
+  //   // If missing players exist, create them in `playerGames`
+  //   if (missing.length > 0) {
+  //     missingPlayers.current = missing;
+  //     createData(
+  //       {
+  //         table: 'playerGames',
+  //         newData: missing,
+  //         bulk: true,
+  //         toast: false,
+  //       },
+  //       {
+  //         onSuccess: () => {
+  //           missingPlayers.current = false; // Reset the state after successful creation
+  //         },
+  //       }
+  //     );
+  //   } else {
+  //     missingPlayers.current = false;
+  //   }
+  // }, [createData, game.id, playerGame, playerSeason]);
+
+  if (missingPlayers || isCreating || isUpdating) return <Spinner />;
+
+  // if (
+  //   missingPlayers.current ||
+  //   !activeGamePlayers.current?.length ||
+  //   isCreating ||
+  //   isUpdating
+  // )
+  //   return <Spinner />;
+
+  // const players = playerGame.map(({ playergamestatus, ...rest }) => ({
+  //   playergamestatus: playergamestatus, // Rename "status" to "gameStatus"
+  //   ...rest,
+  //   ...playerSeason.find((playS) => playS.playerId === rest.id), // Merge matching playerSeason data
+  // }));
 
   function updateCurrentPlayers({ subIn, subOut }, gameTime) {
     //create a function for entering a sub
@@ -219,6 +173,7 @@ function PlayerContextProvider({ playerDetails, gameDetails, children }) {
       ].sort((a, b) => a.number - b.number),
     }));
   }
+
   function enterAllSubs(updatedPeriod) {
     if (subsInWaiting.length <= 1) return;
     const gameTime = getGameTime.gameTime();
@@ -240,21 +195,30 @@ function PlayerContextProvider({ playerDetails, gameDetails, children }) {
   }
   return (
     <PlayerContext.Provider
-      value={{
-        players,
-        currentPlayers,
-        setCurrentPlayers,
-        activeGamePlayers,
-        subsInWaiting,
-        setSubsInWaiting,
-        enterAllSubs,
-        updateCurrentPlayers,
-      }}
+      value={{ players, currentPlayers, updateCurrentPlayers, enterAllSubs }}
     >
       {children}
     </PlayerContext.Provider>
   );
 }
+//   return (
+//     <PlayerContext.Provider
+//       value={{
+//         players,
+//         currentPlayers,
+//         setCurrentPlayers,
+//         activeGamePlayers,
+//         subsInWaiting,
+//         setSubsInWaiting,
+//         enterAllSubs,
+//         updateCurrentPlayers,
+//       }}
+//     >
+//       {children}
+//     </PlayerContext.Provider>
+//   );
+// }
+
 function usePlayerContext() {
   const context = useContext(PlayerContext);
   if (context === undefined)
@@ -263,7 +227,6 @@ function usePlayerContext() {
 }
 
 export { PlayerContextProvider, usePlayerContext };
-
 // useEffect(() => {
 //   if (playerGame.isLoading || playerSeason.isLoading) return;
 
@@ -425,3 +388,41 @@ export { PlayerContextProvider, usePlayerContext };
 //     ].sort((a, b) => a.number - b.number),
 //   }));
 // }
+
+//   function updateCurrentPlayers({ subIn, subOut }, gameTime) {
+//     const updatedPlayers = updatePlayerStatus(
+//       currentPlayers,
+//       subIn,
+//       subOut,
+//       gameTime
+//     );
+//     setCurrentPlayers(updatedPlayers);
+
+//     updateData({
+//       table: 'subs',
+//       newData: { gameMinute: gameTime, periodId: currentPlayers.periodId }, // Assuming periodId is in context
+//       id: currentPlayers.subId,
+//     });
+//   }
+
+//   function enterAllSubs(updatedPeriod) {
+//     const gameTime = getGameTime();
+//     const newSubs = currentPlayers.subsInWaiting.map((sub) => {
+//       if (sub.subIn && sub.subOut) {
+//         updateCurrentPlayers(sub, gameTime);
+//         return { ...sub, gameMinute: gameTime, periodId: updatedPeriod }; //Modify only necessary fields
+//       }
+//       return sub;
+//     });
+
+//     setCurrentPlayers((prev) => ({ ...prev, subsInWaiting: newSubs })); //Efficient update
+
+//     // Bulk update for all subs instead of individual updates
+//     updateData({
+//       table: 'subs',
+//       newData: newSubs.filter((sub) => sub.gameMinute), //only subs that were updated
+//       bulk: true,
+//     });
+//   }
+
+// //Helper Functions

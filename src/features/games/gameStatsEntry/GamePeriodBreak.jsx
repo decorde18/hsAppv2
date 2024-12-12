@@ -9,14 +9,14 @@ import { useState } from 'react';
 import { getCurrentTime } from '../../../utils/helpers';
 import ModalGamesEditButton from './modalGamesEdit/ModalGamesEditButton';
 
-const popUpOptions = [
-  {
-    title: 'Confirm Subs Entry',
-    message: 'Do you want to enter all subs from waiting subs?',
-    confirmType: 'subsConfirmed',
-    btnTypes: 'YesNo',
-  },
-];
+// const popUpOptions = [
+//   {
+//     title: 'Confirm Subs Entry',
+//     message: 'Do you want to enter all subs from waiting subs?',
+//     confirmType: 'subsConfirmed',
+//     btnTypes: 'YesNo',
+//   },
+// ];
 const SplitSection = styled.div`
   display: flex;
   flex: 1;
@@ -34,7 +34,7 @@ const Section = styled.div`
 function GamePeriodBreak() {
   const { subsInWaiting, enterAllSubs } = usePlayerContext();
   const [popUpOpen, setPopUpOpen] = useState(false);
-  const { updateGame, periodHandle } = useGameContext();
+  const { periodHandle } = useGameContext();
 
   let start;
   //todo- thi popUpOptions ia already in ModalStoppages

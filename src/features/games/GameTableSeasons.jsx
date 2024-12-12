@@ -111,7 +111,7 @@ const columns = [
 ];
 
 function GameTableSeasons({ setFilteredCount }) {
-  const { currentSeasonNew } = useCurrentSeason();
+  const { currentSeason } = useCurrentSeason();
   //UPDATE FOR APPROPRIATE TABLE
   const columnWidths = columns.reduce((acc, cur) => {
     return (acc = acc.concat(' ', cur.width));
@@ -147,7 +147,7 @@ function GameTableSeasons({ setFilteredCount }) {
     table: 'games',
     filter: [
       ...currentFilters.filter((option) => option.table === 'games'),
-      { field: 'seasonId', value: currentSeasonNew.id, table: 'games' },
+      { field: 'seasonId', value: currentSeason.id, table: 'games' },
     ],
     sort: sort.games,
     // isSeason: true,

@@ -9,9 +9,8 @@ import {
 import PlayerTableRow from '../PlayerTableRow';
 
 function PlayerTable({ status, displayTable = 'all', sortArr }) {
-  const { activeGamePlayers, currentPlayers } = usePlayerContext();
-  const activePlayers =
-    currentPlayers[displayTable] || activeGamePlayers.current;
+  const { players: activeGamePlayers, currentPlayers } = usePlayerContext();
+  const activePlayers = currentPlayers[displayTable] || activeGamePlayers;
 
   const columnsMap = {
     after: afterGameColumns,

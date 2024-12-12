@@ -1,40 +1,63 @@
 import styled from 'styled-components';
-import { useState } from 'react';
 import Select from '../../ui/Select';
 import { useData, useUpdateData } from '../../services/useUniversal';
 import Spinner from '../../ui/Spinner';
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
-import Heading from '../../ui/Heading';
-import PlayerSidebar from '../players/playerIndividualPages/PlayerSidebar';
-import SeasonSideBar from './SeasonSideBar';
 import Button from '../../ui/Button';
-import Row from '../../ui/Row';
+import { supabaseUrl } from '../../services/supabase';
 
 const Container = styled.div`
-  height: 75dvh;
-  width: 75vw;
-  padding: 2rem 2rem 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
+const PictureSection = styled.div`
+  display: grid;
+  grid-template-columns: 54rem 1fr;
+  gap: 1rem;
+  align-items: start;
+  justify-content: center;
+
+  @media (max-width: 76.8rem) {
+    grid-template-columns: 1fr;
+  }
+`;
+const ImageContainer = styled.div`
+  width: 100%;
+  max-width: 54rem;
+  max-height: 36rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
-  /* gap: 1rem; */
+  background-color: #f0f0f0;
 `;
-const Header = styled.header``;
-const Picture = styled.div`
-  grid-column: 1/2;
-  grid-row: 1 / 4;
-  margin: auto;
-`;
-const Main = styled.section`
-  margin: auto;
+const Image = styled.img`
   width: 100%;
   height: 100%;
-  display: grid;
-  grid-template-columns: repeat(2, auto);
-  grid-template-rows: repeat(5, auto);
+  max-width: 540rem;
+  max-height: 36rem;
+  object-fit: contain;
+`;
+const Controls = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+const SmallRow = styled.div`
+  width: 100%;
+  background-color: var(--color-brand-50);
+  padding: 0.5rem;
+  border: 1px solid var(--color-grey-100);
+  border-radius: 5px;
+  text-align: center;
+`;
 
-  padding: 1rem;
-  overflow: auto;
-  border-radius: 1rem;
-  outline: 2px solid var(--color-grey-100);
+const BelowRows = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 `;
 const Title = styled.div`
   margin: 2rem auto;
@@ -58,42 +81,50 @@ const options = [
   { label: 'active', value: 2 },
   { label: 'completed', value: 3 },
 ];
+
 function SeasonOverview() {
-  const { currentSeason, currentSeasonNew } = useCurrentSeason();
+  const { currentSeason } = useCurrentSeason();
+
   const { isUpdating, updateData } = useUpdateData();
   const { isLoading, data } = useData({
-    view: 'season_stats_view',
-    filter: [{ field: 'seasonId', value: currentSeasonNew.id }],
+    table: 'season_stats_view',
+    filter: [{ field: 'seasonid', value: currentSeason.id }],
   });
+
+  const picture = `${supabaseUrl}/storage/v1/object/public/teampics/independence${currentSeason.season}.jpg`;
+  const noImage = `${supabaseUrl}/storage/v1/object/public/teampics/unavailableSquare.jpg`;
+
   function seasonChange(e) {
     const value = e.target.options[e.target.selectedIndex].text;
     const field = 'seasonPhase';
     updateData({
       table: 'seasons',
-      newData: [{ [field]: value, id: currentSeasonNew.id }],
-      id: currentSeasonNew.id,
+      newData: [{ [field]: value, id: currentSeason.id }],
+      id: currentSeason.id,
     });
   }
 
   const defaultSeasonPhase = options.find(
-    (option) => option.label === currentSeasonNew.seasonPhase
+    (option) => option.label === currentSeason.seasonPhase
   ).value;
   if (isLoading) return <Spinner />;
 
   const [seasonStats] = data;
 
   return (
-    <>
-      <Header>
-        <Heading as="h1" case="upper" location="center">
-          {currentSeasonNew.teamMascot} {currentSeasonNew.season} season
-        </Heading>
-      </Header>
-      <Container>
-        <Main>
-          <Picture>
-            <SeasonSideBar season={currentSeasonNew} />
-          </Picture>
+    <Container>
+      <PictureSection>
+        <ImageContainer>
+          <Image
+            src={picture}
+            alt={`${currentSeason.season} Team`}
+            onError={({ currentTarget }) => {
+              currentTarget.onerror = null; // prevents looping
+              currentTarget.src = noImage;
+            }}
+          />
+        </ImageContainer>
+        <Controls>
           <Columns>
             <div>
               <p>
@@ -110,165 +141,160 @@ function SeasonOverview() {
               SETTINGS
             </Button>
           </Columns>
-          <Columns>
-            <div>
-              <strong>School Year</strong>
-              <div>{currentSeasonNew.schoolYear}</div>
-            </div>
-            <div>
-              <strong>Classification</strong>
-              <div>{currentSeasonNew.classification}</div>
-            </div>
-            <div>
-              <strong>Region</strong>
-              <div>{currentSeasonNew.region}</div>
-            </div>
-            <div>
-              <strong>District</strong>
-              <div>{currentSeasonNew.district}</div>
-            </div>
-          </Columns>
-          {seasonStats ? (
+          <SmallRow>
             <Columns>
-              <Title>
-                <strong>OVERALL</strong>
-                <Columns>
-                  <div>
-                    <strong>Record</strong>
-                    <div>
-                      {seasonStats.wins}-{seasonStats.losses}-{seasonStats.ties}
-                    </div>
-                  </div>
-                  <div>
-                    <strong>Win %</strong>
-                    <div>
-                      {(
-                        (seasonStats.wins + 0.5 * seasonStats.ties) /
-                        (seasonStats.wins +
-                          seasonStats.losses +
-                          seasonStats.ties)
-                      ).toFixed(3)}
-                    </div>
-                  </div>
-                  <div>
-                    <strong>Goals</strong>
-                    <div>
-                      {seasonStats.gf}-{seasonStats.ga}
-                    </div>
-                  </div>
-                </Columns>
-              </Title>
-              <Title>
-                <strong>DISTRICT</strong>
-                <Columns>
-                  <div>
-                    <strong>Record</strong>
-                    <div>
-                      {seasonStats.distwins}-{seasonStats.distlosses}-
-                      {seasonStats.distties}
-                    </div>
-                  </div>
-                  <div>
-                    <strong>Win %</strong>
-                    <div>
-                      {(
-                        (seasonStats.distwins + 0.5 * seasonStats.distties) /
-                        (seasonStats.distwins +
-                          seasonStats.distlosses +
-                          seasonStats.distties)
-                      ).toFixed(3)}
-                    </div>
-                  </div>
-                </Columns>
-              </Title>
-              <Title>
-                <strong>POST-SEASON</strong>
-                <Columns>
-                  <div>
-                    <strong>Record</strong>
-                    <div>
-                      {seasonStats.postwins}-{seasonStats.postlosses}
-                    </div>
-                  </div>
-                  <div>
-                    <strong>Win</strong>%
-                    <div>
-                      {(
-                        (seasonStats.postwins + 0.5 * seasonStats.postties) /
-                        (seasonStats.postwins +
-                          seasonStats.postlosses +
-                          seasonStats.postties)
-                      ).toFixed(3)}
-                    </div>
-                  </div>
-                </Columns>
-              </Title>
+              <div>
+                <strong>School Year</strong>
+                <div>{currentSeason.schoolYear}</div>
+              </div>
+              <div>
+                <strong>Classification</strong>
+                <div>{currentSeason.classification}</div>
+              </div>
+              <div>
+                <strong>Region</strong>
+                <div>{currentSeason.region}</div>
+              </div>
+              <div>
+                <strong>District</strong>
+                <div>{currentSeason.district}</div>
+              </div>
             </Columns>
-          ) : (
-            <Title>NO GAMES PLAYED</Title>
-          )}
-          <Staff>
+            {seasonStats ? (
+              <Columns>
+                <Title>
+                  <strong>OVERALL</strong>
+                  <Columns>
+                    <div>
+                      <strong>Record</strong>
+                      <div>
+                        {seasonStats.wins}-{seasonStats.losses}-
+                        {seasonStats.ties}
+                      </div>
+                    </div>
+                    <div>
+                      <strong>Win %</strong>
+                      <div>
+                        {(
+                          (seasonStats.wins + 0.5 * seasonStats.ties) /
+                          (seasonStats.wins +
+                            seasonStats.losses +
+                            seasonStats.ties)
+                        ).toFixed(3)}
+                      </div>
+                    </div>
+                    <div>
+                      <strong>Goals</strong>
+                      <div>
+                        {seasonStats.gf}-{seasonStats.ga}
+                      </div>
+                    </div>
+                  </Columns>
+                </Title>
+                <Title>
+                  <strong>DISTRICT</strong>
+                  <Columns>
+                    <div>
+                      <strong>Record</strong>
+                      <div>
+                        {seasonStats.distwins}-{seasonStats.distlosses}-
+                        {seasonStats.distties}
+                      </div>
+                    </div>
+                    <div>
+                      <strong>Win %</strong>
+                      <div>
+                        {(
+                          (seasonStats.distwins + 0.5 * seasonStats.distties) /
+                          (seasonStats.distwins +
+                            seasonStats.distlosses +
+                            seasonStats.distties)
+                        ).toFixed(3)}
+                      </div>
+                    </div>
+                  </Columns>
+                </Title>
+                <Title>
+                  <strong>POST-SEASON</strong>
+                  <Columns>
+                    <div>
+                      <strong>Record</strong>
+                      <div>
+                        {seasonStats.postwins}-{seasonStats.postlosses}
+                      </div>
+                    </div>
+                    <div>
+                      <strong>Win</strong>%
+                      <div>
+                        {(
+                          (seasonStats.postwins + 0.5 * seasonStats.postties) /
+                          (seasonStats.postwins +
+                            seasonStats.postlosses +
+                            seasonStats.postties)
+                        ).toFixed(3)}
+                      </div>
+                    </div>
+                  </Columns>
+                </Title>
+              </Columns>
+            ) : (
+              <Title>NO GAMES PLAYED</Title>
+            )}
+          </SmallRow>
+        </Controls>
+      </PictureSection>
+
+      <Staff>
+        <Columns>
+          <Title>
+            <strong>COACHING STAFF</strong>
             <Columns>
-              <Title>
-                <strong>COACHING STAFF</strong>
-                <Columns>
-                  <div>
-                    <strong>Head Coach</strong>
-                    <div>{currentSeasonNew.coach}</div>
-                  </div>
-                  <div>
-                    <strong>Assistant Coaches</strong>
-                    <div>{currentSeasonNew.assistant_coaches}</div>
-                  </div>
-                </Columns>
-              </Title>
-              <Title>
-                <strong>SUPPORT STAFF</strong>
-                <Columns>
-                  <div>
-                    <strong>Manager</strong>
-                    <div>{currentSeasonNew.manager}</div>
-                  </div>
-                  <div>
-                    <strong>Trainer</strong>
-                    <div>{currentSeasonNew.trainer}</div>
-                  </div>
-                </Columns>
-              </Title>
+              <div>
+                <strong>Head Coach</strong>
+                <div>{currentSeason.coach}</div>
+              </div>
+              <div>
+                <strong>Assistant Coaches</strong>
+                <div>{currentSeason.assistant_coaches}</div>
+              </div>
             </Columns>
+          </Title>
+          <Title>
+            <strong>SUPPORT STAFF</strong>
             <Columns>
-              <Title>
-                <strong>ADMINISTRATION</strong>
-                <Columns>
-                  <div>
-                    <strong>Athletic Director</strong>
-                    <div>{currentSeasonNew.athleticDirector}</div>
-                  </div>
-                  <div>
-                    <strong>Principal</strong>
-                    <div>{currentSeasonNew.principal}</div>
-                  </div>
-                  <div>
-                    <strong>Assistant Principals</strong>
-                    <div>{currentSeasonNew.assistantPrincipals}</div>
-                  </div>
-                </Columns>
-              </Title>
+              <div>
+                <strong>Manager</strong>
+                <div>{currentSeason.manager}</div>
+              </div>
+              <div>
+                <strong>Trainer</strong>
+                <div>{currentSeason.trainer}</div>
+              </div>
             </Columns>
-          </Staff>
-        </Main>
-      </Container>
-    </>
+          </Title>
+        </Columns>
+        <Columns>
+          <Title>
+            <strong>ADMINISTRATION</strong>
+            <Columns>
+              <div>
+                <strong>Athletic Director</strong>
+                <div>{currentSeason.athleticDirector}</div>
+              </div>
+              <div>
+                <strong>Principal</strong>
+                <div>{currentSeason.principal}</div>
+              </div>
+              <div>
+                <strong>Assistant Principals</strong>
+                <div>{currentSeason.assistantPrincipals}</div>
+              </div>
+            </Columns>
+          </Title>
+        </Columns>
+      </Staff>
+    </Container>
   );
 }
 
 export default SeasonOverview;
-
-// coach: null
-// : null
-// trainer: null
-// principal: null
-// manager: null
-
-// assistantPrincipals: null
-// athleticDirector: null

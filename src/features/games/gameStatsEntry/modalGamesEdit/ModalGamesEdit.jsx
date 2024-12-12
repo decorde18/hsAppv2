@@ -130,14 +130,7 @@ const editableCategories = [
 
 function GameStatsEdit() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const {
-    gameDataArrays,
-    periodHandle,
-    minorEventHandle,
-    stoppageHandle,
-    goalHandle,
-    disciplineHandle,
-  } = useGameContext();
+  const { gameDataArrays } = useGameContext();
 
   const [selectedValue, setSelectedValue] = useState(0);
   const [currentCategory, setCurrentCategory] = useState(false);
@@ -155,8 +148,8 @@ function GameStatsEdit() {
     setSelectedValue(() => +e.target.value);
     setCurrentCategory(category);
   }
-  function handleUpdate() {}
-  function handleDelete() {}
+  // function handleUpdate() {}
+  // function handleDelete() {}
   const data = currentCategory
     ? currentCategory.value === 'other'
       ? gameDataArrays.stoppages.filter((each) => !each.event.includes('Goal'))

@@ -7,7 +7,6 @@ import { useGameContext } from '../../../contexts/GameContext';
 import Menus from '../../../ui/Menus';
 import Select from '../../../ui/Select';
 import Button from '../../../ui/Button';
-import Spinner from '../../../ui/Spinner';
 
 import { useUpdateData } from '../../../services/useUniversal';
 
@@ -199,7 +198,7 @@ function GameBefore() {
   //TODO
   // fix menus so they close when clicked somewhere else
 
-  if (!playerGameStatus) return <Spinner />;
+  // if (!playerGameStatus) return <Spinner />;
   const gkSelectArray = [
     { label: 'PLEASE SELECT A GK', value: 0 },
     ...playerGameStatus

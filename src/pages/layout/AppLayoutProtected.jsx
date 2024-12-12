@@ -1,7 +1,7 @@
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 
 import { styled } from 'styled-components';
-import { createContext, useState } from 'react';
+import { createContext } from 'react';
 import { Outlet } from 'react-router-dom';
 import Spinner from '../../ui/Spinner';
 

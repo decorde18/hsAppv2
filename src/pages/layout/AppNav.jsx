@@ -9,18 +9,23 @@ import SeasonSelector from './SeasonSelector';
 import Button from '../../ui/Button';
 import { useAppNavContext } from '../../contexts/AppNavContext';
 
-const Ul = styled.ul`
-  width: 80%;
-  margin: 0 auto;
-  padding: 1rem;
-  display: flex;
-  gap: 10rem;
-  background-color: var(--color-grey-50);
-  border-radius: var(--border-radius-md);
+const Section = styled.div`
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: auto 1fr;
 `;
-const Flex = styled.div`
+const Select = styled.div`
+  padding: 0.5rem;
+  cursor: pointer;
+`;
+const Nav = styled.nav`
   display: flex;
-  justify-content: center;
+  gap: 1rem;
+  overflow-x: auto; /* Allows horizontal scrolling for buttons */
+  scrollbar-width: thin; /* Styling for modern browsers */
+  padding: 0.5rem 0;
+  flex-grow: 1;
+  white-space: nowrap; /* Prevent buttons from wrapping */
 `;
 
 function AppNav() {
@@ -28,33 +33,31 @@ function AppNav() {
   const { active, handleToggle, menuButtons } = useAppNavContext();
 
   return (
-    <>
-      <Ul>
+    <Section>
+      <Select>
         <SeasonSelector />
-        <Flex>
-          {menuButtons.map((button) => {
-            return (
-              <NavLink
-                to={`${button.link}?season=${currentSeason}`}
+      </Select>
+      <Nav>
+        {menuButtons.map((button) => {
+          return (
+            <NavLink
+              to={`${button.link}?season=${currentSeason.id}`}
+              name={button.name}
+              key={`${button.name}btn`}
+            >
+              <Button
                 name={button.name}
-                key={`${button.name}btn`}
+                size="large"
+                variation={active === button.name ? 'primary' : 'secondary'}
+                onClick={handleToggle}
               >
-                <li>
-                  <Button
-                    name={button.name}
-                    size="large"
-                    variation={active === button.name ? 'primary' : 'secondary'}
-                    onClick={handleToggle}
-                  >
-                    {button.name}
-                  </Button>
-                </li>
-              </NavLink>
-            );
-          })}
-        </Flex>
-      </Ul>
-    </>
+                {button.name}
+              </Button>
+            </NavLink>
+          );
+        })}
+      </Nav>
+    </Section>
   );
 }
 export default AppNav;

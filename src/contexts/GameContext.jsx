@@ -22,9 +22,9 @@ function GameContextProvider({ gameDetails, children }) {
 
   const gameId = game.id;
 
-  const { isCreating, createData } = useCreateData();
-  const { isUpdating, updateData } = useUpdateData();
-  const { isDeleting, deleteData } = useDeleteData();
+  const { createData } = useCreateData();
+  const { updateData } = useUpdateData();
+  const { deleteData } = useDeleteData();
 
   const [gameDataArrays, setGameDataArrays] = useState({
     game: {},
@@ -42,37 +42,6 @@ function GameContextProvider({ gameDetails, children }) {
     periodStatus: 'regulation',
     stoppageStatus: false,
   });
-  // const game = useData({
-  //   table: 'games',
-  //   filter: [{ field: 'id', value: gameId, table: 'games' }],
-  // });
-  // const periods = useData({
-  //   table: 'periods',
-  //   filter: [{ field: 'game', value: gameId }],
-  // });
-  // const minorEvents = useData({
-  //   table: 'minorEvents',
-  //   filter: [{ field: 'game', value: gameId }],
-  // });
-  // const stoppages = useData({
-  //   table: 'stoppages',
-  //   filter: [{ field: 'game', value: gameId }],
-  // });
-  // const subTotals = useData({
-  //   table: 'subs',
-  //   filter: [{ field: 'game', value: gameId }],
-  // });
-  // const subs = useData({
-  //   table: 'sub',
-  //   filter: [{ field: 'game', value: gameId }],
-  // });
-
-  // const isWorking =
-  //   subs.isLoading ||
-  //   subTotals.isLoading ||
-  //   stoppages.isLoading ||
-  //   minorEvents.isLoading ||
-  //   periods.isLoading;
 
   useEffect(() => {
     //sets the arrays on load
@@ -113,7 +82,8 @@ function GameContextProvider({ gameDetails, children }) {
         currentPeriod: statusUpdates.currentPeriod,
         stoppageStatus: statusUpdates.stoppageStatus,
       });
-      if (statusUpdates.gameStatus !== gameDataArrays.game.gameStatus)
+
+      if (statusUpdates.gameStatus !== gameDataArrays.game.status)
         updateData({
           table: 'games',
           newData: { status: statusUpdates.gameStatus },

@@ -18,7 +18,6 @@ import ModalNew from '../../ui/ModalNew';
 import ModalConfirm from '../../ui/ModalConfirm';
 
 import SummerCampRegistrationConfirmation from './SummerCampRegistrationConfirmation';
-import Spinner from '../../ui/Spinner';
 
 const Background = styled.div`
   background-color: var(--color-brand--1);
@@ -142,8 +141,6 @@ const fields = [
     fieldType: 'select',
     section: 'authorization',
   },
-
-  // {field:, label:, type:, size:, message:, required: },
 ];
 const selectFields = [
   {
@@ -189,7 +186,7 @@ const sections = [
 ];
 
 function SummerCampRegistrations() {
-  const { currentSeasonNew } = useCurrentSeason();
+  const { currentSeason } = useCurrentSeason();
 
   const { register, handleSubmit, reset, setValue, getValues, formState } =
     useForm();
@@ -228,7 +225,7 @@ function SummerCampRegistrations() {
     data = {
       ...data,
       sheet: googleSheet,
-      year: currentSeasonNew.season,
+      year: currentSeason.season,
     };
     const getFormData = (object) =>
       Object.keys(object).reduce((formData, key) => {
@@ -240,7 +237,7 @@ function SummerCampRegistrations() {
       method: 'POST',
       body: getFormData(data),
     })
-      .then((response) => (isWorking = true))
+      .then(() => (isWorking = true))
 
       .catch((error) => console.error('Error!', error.message));
   }
@@ -377,7 +374,6 @@ function SummerCampRegistrations() {
             onClose={onClose}
           />
         </ModalNew>
-        {/* <ModalNew show={true}> */}
         <ModalNew show={completed && !isWorking}>
           <SummerCampRegistrationConfirmation campers={campers} />
         </ModalNew>
