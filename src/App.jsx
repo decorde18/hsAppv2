@@ -94,6 +94,7 @@ function App() {
                   }
                 >
                   {/* THESE ARE OUR PUBLIC PAGES */}
+                  <Route path="/" element={<Login />} />
                   <Route path="login" element={<Login />} />
                   <Route path="schedule" element={<Schedule />} />
                   <Route path="roster" element={<Roster />} />
