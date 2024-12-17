@@ -53,6 +53,7 @@ import Game from './pages/Game';
 import Stats from './pages/Stats';
 import PlayerStats from './features/statsViewPages/PlayerStats';
 import PublicStats from './features/statsViewPages/PublicStats';
+import SeasonMain from './features/seasons/SeasonMain';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -82,19 +83,20 @@ function App() {
             <CurrentSeasonProvider>
               <GlobalStyles />
               <Routes>
-                <Route index element={<Navigate replace to="public" />} />
-                <Route path="public" element={<HomePage />} />
+                {/* <Route index element={<Navigate replace to="/" />} /> */}
+                <Route path="/" element={<HomePage />} />
 
                 <Route
-                  path="/"
+                  path="public"
                   element={
                     <PublicRoute>
                       <AppLayoutPublic />
                     </PublicRoute>
                   }
                 >
+                  <Route index element={<HomePage />} />
+
                   {/* THESE ARE OUR PUBLIC PAGES */}
-                  <Route path="/" element={<Login />} />
                   <Route path="login" element={<Login />} />
                   <Route path="schedule" element={<Schedule />} />
                   <Route path="roster" element={<Roster />} />
@@ -112,6 +114,7 @@ function App() {
                     </ProtectedRoute>
                   }
                 >
+                  <Route index element={<SeasonMain />} />
                   <Route path="test" element={<Test />} />
                   <Route path="seasonMain" element={<Season />} />
                   <Route path="players" element={<Players />} />
