@@ -1,9 +1,7 @@
 import { useEffect, useState, createContext, useContext } from 'react';
-import { useSearchParams } from 'react-router-dom';
 
 import {
   useCreateData,
-  useData,
   useDeleteData,
   useUpdateData,
 } from '../services/useUniversal';

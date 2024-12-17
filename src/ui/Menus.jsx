@@ -5,9 +5,9 @@ import styled from 'styled-components';
 import { useOutsideClick } from '../hooks/useOutsideClick';
 
 const Menu = styled.div`
-  /* display: flex;
+  display: flex;
   align-items: center;
-  justify-content: flex-end; */
+  justify-content: flex-end;
 `;
 
 const StyledToggle = styled.button`

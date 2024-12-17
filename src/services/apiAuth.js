@@ -5,6 +5,14 @@ export async function login({ email, password }) {
     email,
     password,
   });
+  if (data?.session) {
+    // Preserve search parameters
+    const params = new URLSearchParams(window.location.search);
+    const redirectUrl = `/app/seasonMain?${params.toString()}`;
+    window.location.href = redirectUrl;
+  } else {
+    console.error('Login failed:', error.message);
+  }
   if (error) throw new Error(error.message);
   else return data;
 }
@@ -57,7 +65,7 @@ export async function googleSignIn() {
         'https://www.googleapis.com/auth/calendar',
         'https://www.googleapis.com/auth/spreadsheets',
       ],
-      // redirectTo: 'http://localhost:5173/app',
+      redirectTo: 'http://ihssoccergirls.net/app/games',
     },
   });
   if (error) {

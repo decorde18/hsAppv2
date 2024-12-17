@@ -107,7 +107,7 @@ function ModalStoppages() {
   });
   const [goalScored, setGoalScored] = useState();
   const [discipline, setDiscipline] = useState();
-  const activePlayers = [...currentPlayers.onField, ...currentPlayers.offField];
+
   const statusType = !stoppageStatus.event
     ? false
     : stoppageStatus.event.toLowerCase().includes('goal')
@@ -133,6 +133,7 @@ function ModalStoppages() {
     stoppageHandle.updateStoppage({ team: e.target.name });
   }
   function handleAdditionalDiscipline() {
+    setDiscipline();
     //TODO
   }
   function updateDetails(e) {

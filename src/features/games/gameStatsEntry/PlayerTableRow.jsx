@@ -1,12 +1,9 @@
-import { useEffect, useState } from 'react';
-import { useGameContext } from '../../../contexts/GameContext';
-
 import { convertSecondsToMinutesSeconds } from '../../../utils/helpers';
 
 import Table from '../../../ui/Table';
 import { useClockContext } from '../../../contexts/ClockContext';
 
-function PlayerTableRow({ player, status, displayTable, columns }) {
+function PlayerTableRow({ player, displayTable, columns }) {
   const { currentPeriodTime } = useClockContext();
 
   //TODO on half change, last in/out need to reflect previous in/out from previous half
