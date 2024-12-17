@@ -24,7 +24,7 @@ function HomePage() {
       <Header type="nonApp" />
 
       <Row type="horizontal" justify="center">
-        <NavLink to="../public/schedule">
+        <NavLink to="/public/schedule">
           <Button size="medium" variation="primary">
             SCHEDULE
           </Button>
@@ -34,7 +34,7 @@ function HomePage() {
         <h1>
           <span>New Players, please </span>
           <StyledNav>
-            <NavLink to="../public/newplayer">SIGN UP</NavLink>
+            <NavLink to="/public/newplayer">SIGN UP</NavLink>
           </StyledNav>
           <span> to get on our email list</span>
         </h1>

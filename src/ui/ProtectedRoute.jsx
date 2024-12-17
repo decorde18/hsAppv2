@@ -17,18 +17,20 @@ const SpinnerStyle = styled.div`
   justify-content: center;
 `;
 
+import { useLocation } from 'react-router-dom';
+
 function ProtectedRoute({ children }) {
   const navigate = useNavigate();
-  // load authenticated user
   const { isLoading, isAuthenticated } = useUser();
-  //if no auth user, redirect to login
-  useEffect(
-    function () {
-      if (!isAuthenticated && !isLoading) navigate('../public/login');
-    },
-    [isLoading, navigate, isAuthenticated]
-  );
-  //while loading show spinner
+  const location = useLocation();
+
+  useEffect(() => {
+    if (!isAuthenticated && !isLoading) {
+      const redirectPath = `/public/login?redirect=${location.pathname}`;
+      navigate(redirectPath); // Redirect to login with a "redirect" query parameter
+    }
+  }, [isLoading, navigate, isAuthenticated, location]);
+
   if (isLoading)
     return (
       <FullPage>
@@ -37,7 +39,7 @@ function ProtectedRoute({ children }) {
         </SpinnerStyle>
       </FullPage>
     );
-  // if there is, render the app
+
   if (isAuthenticated) return <>{children}</>;
 }
 

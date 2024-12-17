@@ -114,6 +114,10 @@ function App() {
                     </ProtectedRoute>
                   }
                 >
+                  {/* Redirect /app to /app/seasonMain */}
+                  <Route index element={<Navigate to="seasonMain" replace />} />
+
+                  {/* Other app routes */}
                   <Route index element={<SeasonMain />} />
                   <Route path="test" element={<Test />} />
                   <Route path="seasonMain" element={<Season />} />
