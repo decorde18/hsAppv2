@@ -1,7 +1,20 @@
 import { createContext, useContext } from 'react';
 import styled from 'styled-components';
 
+const TableContainer = styled.div`
+  width: 100%;
+  max-height: 53.5rem;
+  overflow-x: auto; /* Allow horizontal scrolling */
+  margin: 2rem 0;
+  background-color: var(--color-grey-0);
+  border-radius: var(--border-radius-md);
+`;
+// const Table = styled.table``;
+
 const StyledTable = styled.div`
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 60rem; /* To trigger horizontal scrolling when needed */
   /* border: 1px solid var(--color-grey-200); */
   padding: 1rem;
   font-size: 1.25rem;

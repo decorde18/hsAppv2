@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import Button from '../../../../ui/Button';
+import PropTypes from 'prop-types';
 
 const Background = styled.div`
   width: 100dvw;
@@ -12,49 +13,160 @@ const Background = styled.div`
   align-items: center;
   z-index: 1000;
 `;
+
 const MessageDiv = styled.div`
   width: 40rem;
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
   background-color: var(--color-grey-100);
-  margin-bottom: 1.2rem;
   padding: 2rem;
   border-radius: 1rem;
   align-items: center;
+  text-align: center;
 `;
+
 const ButtonDiv = styled.div`
   display: flex;
-  gap: 5rem;
-  /* justify-content: space-between; */
-  padding: 2rem;
+  gap: 2rem;
+  padding: 1.5rem 0;
 `;
-//todo turn ModalGames into a component that is called by each of the mdals needed, it will provide the background --- or use Max dialoguw box modal leson 139
-function PopUpConfirm({ title, message, confirmType, onClose, btnTypes }) {
+// EXAMPLE FOR CALLING CODE
+//   function handleModalAction(id, actionType) {
+//     // Handle actions based on modal id and button action
+//     console.log(`Modal ${id} triggered action ${actionType}`);
+//     if (id === 'subsConfirm' && actionType === 'confirmBtn') {
+//       console.log('Substitutions confirmed!');
+//     } else if (id === 'deletePlayer' && actionType === 'confirmBtn') {
+//       console.log('Player deleted!');
+//     }
+//     handleCloseModal();
+//   }
+//   function handleCloseModal() {
+//     setOpenModal(null); // Close any open modal
+//   }
+
+// <PopUpConfirm
+//   id="deletePlayer"
+//   title="Delete Player"
+//   message="Are you sure you want to delete this player?"
+//   buttonType="CancelOk"   //--buttonPresets  see below in code for types or create custom buttons --see below code
+//   onClose={handleCloseModal}
+//   onAction={handleModalAction}
+// />;
+function PopUpConfirm({
+  id, // Unique identifier for the modal
+  title,
+  message,
+  buttonType = 'YesNo',
+  customButtons = [],
+  onClose,
+  onAction, // Callback for specific actions
+  className,
+  children,
+}) {
+  // Button presets
+  const buttonPresets = {
+    YesNo: [
+      { label: 'No', variation: 'danger', name: 'cancelBtn' },
+      { label: 'Yes', variation: 'primary', name: 'confirmBtn' },
+    ],
+    CancelOk: [
+      { label: 'Cancel', variation: 'danger', name: 'cancelBtn' },
+      { label: 'OK', variation: 'primary', name: 'confirmBtn' },
+    ],
+    CloseOnly: [{ label: 'Close', variation: 'primary', name: 'closeBtn' }],
+  };
+
+  // Resolve buttons
+  const buttons = customButtons.length
+    ? customButtons
+    : buttonPresets[buttonType] || [];
+
   return (
-    <Background>
-      <MessageDiv>
-        <h3>{title}</h3>
-        <p>{message}</p>
+    <Background
+      role="dialog"
+      aria-labelledby="modal-title"
+      aria-describedby="modal-message"
+    >
+      <MessageDiv className={className}>
+        {title && <h3 id="modal-title">{title}</h3>}
+        {message && <p id="modal-message">{message}</p>}
+        {children /* Custom content */}
         <ButtonDiv>
-          <Button
-            name={`cancelBtn-${confirmType}`}
-            variation="danger"
-            onClick={onClose}
-          >
-            {btnTypes === 'YesNo' ? 'No' : 'Cancel'}
-          </Button>
-          <Button
-            name={`confirmBtn-${confirmType}`}
-            variation="primary"
-            onClick={onClose}
-          >
-            {btnTypes === 'YesNo' ? 'Yes' : 'OK'}
-          </Button>
+          {buttons.map(({ label, variation, onClick, name }, index) => (
+            <Button
+              key={index}
+              name={name}
+              variation={variation}
+              onClick={() => {
+                onClick?.(id); // Pass the id to the button's onClick
+                onAction?.(id, name); // Notify parent component of action
+                onClose?.();
+              }}
+            >
+              {label}
+            </Button>
+          ))}
         </ButtonDiv>
       </MessageDiv>
     </Background>
   );
 }
 
+PopUpConfirm.propTypes = {
+  id: PropTypes.string.isRequired,
+  title: PropTypes.string,
+  message: PropTypes.string,
+  buttonType: PropTypes.oneOf(['YesNo', 'CancelOk', 'CloseOnly']),
+  customButtons: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      variation: PropTypes.string, // E.g., 'primary', 'danger'
+      onClick: PropTypes.func,
+      name: PropTypes.string,
+    })
+  ),
+  onClose: PropTypes.func,
+  onAction: PropTypes.func, // Callback for specific modal actions
+  className: PropTypes.string,
+  children: PropTypes.node,
+};
 export default PopUpConfirm;
+
+// EXAMPLE CUSTOM BUTTONS
+{
+  /* <PopUpConfirm
+  title="Custom Buttons"
+  message="Choose an action:"
+  customButtons={[
+    {
+      label: 'Dismiss',
+      variation: 'danger',
+      name: 'dismissBtn',
+      onClick: handleDismiss,
+    },
+    {
+      label: 'Retry',
+      variation: 'primary',
+      name: 'retryBtn',
+      onClick: handleRetry,
+    },
+  ]}
+  onClose={handleClose}
+/>; */
+}
+
+// EXAMPLE CUSTOM BUTTONS WITH CONTENT
+// <PopUpConfirm
+//   title="Player Info"
+//   message="Modify player details below:"
+//   buttonType="CancelOk"
+//   onClose={handleClose}
+// >
+//   <form onSubmit={handleSubmit}>
+//     <label>
+//       Name: <input type="text" value={playerName} onChange={handleChange} />
+//     </label>
+//   </form>
+// </PopUpConfirm>;

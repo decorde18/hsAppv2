@@ -1,10 +1,6 @@
 import GameTable from '../features/games/GameTable';
 
 function Games() {
-  return (
-    <div>
-      <GameTable />
-    </div>
-  );
+  return <GameTable />;
 }
 export default Games;

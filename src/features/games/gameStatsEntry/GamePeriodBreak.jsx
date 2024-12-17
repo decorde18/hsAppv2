@@ -1,30 +1,30 @@
+// External libraries
+import { useState } from 'react';
 import styled from 'styled-components';
+
+// Utility functions
+import { getCurrentTime } from '../../../utils/helpers';
+
+// Contexts
+import { useGameContext } from '../../../contexts/GameContext';
+import { usePlayerContext } from '../../../contexts/PlayerContext';
+
+// Components
 import Button from '../../../ui/Button';
 import Substitutions from './duringGame/Substitutions';
 import PlayerTable from './components/PlayerTable';
-import { useGameContext } from '../../../contexts/GameContext';
-import { usePlayerContext } from '../../../contexts/PlayerContext';
 import PopUpConfirm from './modalGames/PopUpConfirm';
-import { useState } from 'react';
-import { getCurrentTime } from '../../../utils/helpers';
 import ModalGamesEditButton from './modalGamesEdit/ModalGamesEditButton';
+import { useSubstitutionHandling } from '../../../hooks/useSubstitutionHandling';
 
-// const popUpOptions = [
-//   {
-//     title: 'Confirm Subs Entry',
-//     message: 'Do you want to enter all subs from waiting subs?',
-//     confirmType: 'subsConfirmed',
-//     btnTypes: 'YesNo',
-//   },
-// ];
-const SplitSection = styled.div`
+const Container = styled.div`
   display: flex;
   flex: 1;
   gap: 1rem;
   overflow: hidden;
   margin: 1rem;
 `;
-const Section = styled.div`
+const Column = styled.div`
   width: 50%;
   flex: 1;
   overflow-y: auto;
@@ -32,44 +32,63 @@ const Section = styled.div`
 `;
 
 function GamePeriodBreak() {
-  const { subsInWaiting, enterAllSubs } = usePlayerContext();
-  const [popUpOpen, setPopUpOpen] = useState(false);
-  const { periodHandle } = useGameContext();
+  const { subsInWaiting, setSubsInWaiting, gameSubs, setGameSubs } =
+    usePlayerContext(); // Access player context states
 
-  let start;
-  //todo- thi popUpOptions ia already in ModalStoppages
-  start = getCurrentTime();
+  const { periodHandle, gameData, getGameTime } = useGameContext(); // Access currentPeriod and gameMinute
+
+  const [openModal, setOpenModal] = useState(null); // Tracks the active modal
+  const [startTime, setStartTime] = useState(null); // Tracks the active modal
+  const { currentPeriod } = gameData; // Access currentPeriod and gameMinute
+  const gameMinute = getGameTime.gameTime();
+
+  const { enterAllSubs } = useSubstitutionHandling({
+    subsInWaiting,
+    setSubsInWaiting,
+    gameSubs,
+    setGameSubs,
+  });
+
   function handleClick() {
-    periodHandle.startPeriod({ start });
-    // subs in waiting - enter prompt
-    if (subsInWaiting.length > 1) setPopUpOpen(true);
+    const start = getCurrentTime();
+
+    setStartTime(() => start);
+    if (subsInWaiting.length > 1) setOpenModal(true);
+    else startPeriod(start);
   }
-  function closePopUp(e) {
-    //todo fixme enter sub takes old period, not new
-    const btn = e.target.name.split('-')[0];
-    setPopUpOpen((val) => !val);
-    //todo use start for enterAllSubs
-    if (btn === 'confirmBtn') enterAllSubs();
+  function handleModalAction(id, actionType) {
+    // Handle actions based on modal id and button action
+    handleCloseModal();
+    if (id === 'subsConfirm' && actionType === 'confirmBtn')
+      enterAllSubs({ periodId: currentPeriod.id, gameMinute }); // Pass currentPeriod ID and gameMinute
+    startPeriod();
   }
-  //todo player times should not keep trying to update from PlayerTableRow during a break (and probably a stoppage that is stopped as well)
+  function handleCloseModal() {
+    setOpenModal(null); // Close any open modal
+  }
+  function startPeriod(start) {
+    periodHandle.startPeriod({ start: startTime || start });
+  }
+
   return (
     <>
-      {popUpOpen && (
+      {openModal && (
         <PopUpConfirm
-          title="Enter Subs"
+          id="subsConfirm"
+          title="Confirm Substitutions"
           message="Do you want to enter subs on Period Start?"
-          confirmType="enterSubs"
-          onClose={closePopUp}
-          btnTypes="YesNo"
+          buttonType="YesNo"
+          onClose={handleCloseModal}
+          onAction={handleModalAction}
         />
       )}
       <ModalGamesEditButton />
       <Button onClick={handleClick}>START Next Period</Button>
-      <SplitSection>
-        <Section>
+      <Container>
+        <Column>
           <Substitutions />
-        </Section>
-        <Section>
+        </Column>
+        <Column>
           <PlayerTable
             status={'break'}
             sortArr={[
@@ -77,8 +96,8 @@ function GamePeriodBreak() {
               { field: 'minPlayed', order: 'dec' },
             ]}
           />
-        </Section>
-      </SplitSection>
+        </Column>
+      </Container>
     </>
   );
 }

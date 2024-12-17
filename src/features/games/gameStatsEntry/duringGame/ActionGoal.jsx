@@ -33,10 +33,6 @@ const categories = [
   { description: 'Header', type: 'headed', team: 'own' },
 ];
 function ActionGoal({ team, players, goalScoredData }) {
-  const onFieldPlayers = players
-    .filter((player) => player.subStatus === 1)
-    .sort((a, b) => a.number - b.number);
-
   const [goalTypes, setGoalTypes] = useState({ type: '', headed: false });
   const { goalScored, setGoalScored } = goalScoredData;
 
@@ -82,10 +78,10 @@ function ActionGoal({ team, players, goalScoredData }) {
               name="scorer"
               options={[
                 { value: 0, label: 'Select Goal Scorer' },
-                ...onFieldPlayers
-                  .filter((player) => player.playerId !== goalScored?.assister)
+                ...players
+                  .filter((player) => player.playerid !== goalScored?.assister)
                   .map((player) => ({
-                    value: player.playerId,
+                    value: player.playerid,
                     label: `${player.number} ${player.fullname}`,
                   })),
               ]}
@@ -97,10 +93,10 @@ function ActionGoal({ team, players, goalScoredData }) {
               name="assister"
               options={[
                 { value: 0, label: 'Select If there is an Assist' },
-                ...onFieldPlayers
-                  .filter((player) => player.playerId !== goalScored?.scorer)
+                ...players
+                  .filter((player) => player.playerid !== goalScored?.scorer)
                   .map((player) => ({
-                    value: player.playerId,
+                    value: player.playerid,
                     label: `${player.number} ${player.fullname}`,
                   })),
               ]}

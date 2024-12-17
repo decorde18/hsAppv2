@@ -7,9 +7,8 @@ import Empty from '../../ui/Empty';
 
 import ScheduleRow from './ScheduleRow';
 
-import { useSeason } from '../seasons/useSeasons';
-import { useGamesSeason } from './useGames';
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
+import { useData } from '../../services/useUniversal';
 
 const PrintStyle = styled.div`
   @media screen {
@@ -34,20 +33,21 @@ const Right = styled.div`
 
 function ScheduleTable() {
   const { currentSeason } = useCurrentSeason();
-  const { isLoadingSeason, season } = useSeason();
-  const { isLoadingGamesSeason, gamesSeason } = useGamesSeason(currentSeason);
+  const { isLoading: isLoadingGamesSeason, data: gamesSeason } = useData({
+    table: 'games',
+    filter: [{ field: 'seasonId', value: currentSeason.id }],
+  });
 
-  if (isLoadingGamesSeason || isLoadingSeason) return <Spinner />;
-  // console.log(currentSeason, season, gamesSeason);
-  if (!season || !gamesSeason.length) return <Empty resource="Games" />;
+  if (isLoadingGamesSeason) return <Spinner />;
+  if (!gamesSeason.length) return <Empty resource="Games" />;
 
   return (
     <PrintStyle>
       <Heading as="h2" location="center">
         Independence High School Girls&#39; <br></br>
-        {`Soccer Season ${season.season}`}
+        {`Soccer Season ${currentSeason.season}`}
       </Heading>
-      {season.teamLevels.map((team) => (
+      {currentSeason.teamLevels.map((team) => (
         <div key={team}>
           <Heading as="h3">{`${team} Schedule`}</Heading>
           <Table columns="2px 49px 50px 180px 150px 1fr 2px">

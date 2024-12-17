@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import ModalGamesEdit from './modalGamesEdit/ModalGamesEdit';
 import ModalGames from './modalGames/ModalGames';
 import { useSearchParams } from 'react-router-dom';
+import { ClockProvider } from '../../../contexts/ClockContext';
 
 const Container = styled.div`
   display: grid;
@@ -27,15 +28,13 @@ const Main = styled.main`
   margin: 1rem;
 `;
 
-function GsmeContainer() {
+function GameContainer() {
   const [searchParams] = useSearchParams();
   const editGame = searchParams.get('edit');
 
   const { gameData, getGameTime } = useGameContext();
   const { currentPeriod, gameProgress } = gameData;
   const { stoppageStatus } = gameData;
-
-  const [currentPeriodTime, setCurrentPeriodTime] = useState(0);
 
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -45,34 +44,25 @@ function GsmeContainer() {
     else setModalOpen(false);
   }, [stoppageStatus]);
 
-  useEffect(() => {
-    //start scoreboard clock
-    if (!currentPeriod) return;
-
-    if (gameProgress === 'periodActive') {
-      const interval = setInterval(() => {
-        setCurrentPeriodTime(getGameTime.periodTime());
-      }, 1000);
-
-      return () => clearInterval(interval);
-    }
-  }, [currentPeriod, gameProgress, getGameTime]);
-
   return (
-    <>
+    <ClockProvider
+      getGameTime={getGameTime}
+      gameProgress={gameProgress}
+      currentPeriod={currentPeriod}
+    >
       {editGame && <ModalGamesEdit />}
-      {modalOpen && <ModalGames currentPeriodTime={currentPeriodTime} />}
+      {modalOpen && <ModalGames />}
 
       <Container>
         <Header>
-          <GameHeader currentPeriodTime={currentPeriodTime} />
+          <GameHeader />
         </Header>
         <Main>
           <GameProgress />
         </Main>
       </Container>
-    </>
+    </ClockProvider>
   );
 }
 
-export default GsmeContainer;
+export default GameContainer;

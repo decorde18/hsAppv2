@@ -9,20 +9,32 @@ import {
 import PlayerTableRow from '../PlayerTableRow';
 
 function PlayerTable({ status, displayTable = 'all', sortArr }) {
-  const { players: activeGamePlayers, currentPlayers } = usePlayerContext();
-  const activePlayers = currentPlayers[displayTable] || activeGamePlayers;
+  const { currentPlayers } = usePlayerContext();
+  const availablePlayers = {
+    onField: currentPlayers.onField,
+    offField: currentPlayers.offField,
+    all: [...currentPlayers.onField, ...currentPlayers.offField],
+    DNP: filterPlayers(
+      [...currentPlayers.onField, ...currentPlayers.offField],
+      'DNP'
+    ),
+    played: filterPlayers(
+      [...currentPlayers.onField, ...currentPlayers.offField],
+      'played'
+    ),
+  };
+  const activePlayers = availablePlayers[displayTable];
 
   const columnsMap = {
     after: afterGameColumns,
     break: periodBreakColumns,
     default: duringGameColumns,
   };
-
-  const columns = columnsMap[status] || columnsMap.default;
+  const columns = (columnsMap[status] || columnsMap.default).filter((column) =>
+    column.displayTable.includes(displayTable)
+  );
 
   const columnWidths = columns.map((column) => column.width).join(' ');
-
-  // Function to filter players based on the displayTable criteria
 
   // Filter and sort the players
   const filteredPlayers = filterPlayers(activePlayers, displayTable);
@@ -60,7 +72,6 @@ function PlayerTable({ status, displayTable = 'all', sortArr }) {
       sortArray
     );
   }
-
   return (
     <Table columns={columnWidths}>
       <Table.Header>

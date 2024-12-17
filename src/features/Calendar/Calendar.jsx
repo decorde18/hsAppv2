@@ -1,141 +1,128 @@
-import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useGamesSeason } from '../games/useGames';
-import { useEvents } from '../events/useEvents';
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 import Spinner from '../../ui/Spinner';
+import { useData } from '../../services/useUniversal';
 
+// Styled Components
 const CalendarDiv = styled.div`
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   overflow-y: auto;
-  width: 55%;
-  padding: 0.6rem;
+  width: 100%;
+  max-width: 80rem;
+  padding: 1rem;
+  gap: 0.5rem;
+
+  @media (max-width: 60rem) {
+    grid-template-columns: repeat(3, 1fr);
+    font-size: 0.8rem;
+  }
 `;
-const Div = styled.div`
-  display: block;
-  width: 100px;
-  height: 100px;
-  padding: 5px;
-  border: 1px solid blue;
+
+const DayCell = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  border: 1px solid var(--color-grey-50);
+  padding: 0.5rem;
+  background-color: ${(props) =>
+    props.isCurrentDay ? 'var(--color-brand-50: ' : 'white'};
 `;
-const DivDesc = styled.div`
-  font-size: 1rem;
+const PlaceholderCell = styled.div`
+  visibility: hidden;
 `;
+const Event = styled.div`
+  font-size: 0.9rem;
+  margin-top: 0.3rem;
+  color: ${(props) =>
+    props.type === 'game'
+      ? 'var(--color-brand-500)'
+      : 'var(--color-green-700)'};
+`;
+
+// Helper Functions
+const buildDateArray = (start, end) => {
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+  const days = Math.round((endDate - startDate) / (1000 * 3600 * 24)) + 1;
+
+  return Array.from({ length: days }, (_, i) => {
+    const date = new Date(startDate);
+    date.setDate(startDate.getDate() + i);
+    return {
+      date: date.setHours(0, 0, 0, 0),
+      day: date.getDate(),
+      weekDay: date.getDay(),
+    };
+  });
+};
+
+const processEvents = (data, type) =>
+  data.map((item) => ({
+    ...item,
+    date: new Date(item.date).setHours(0, 0, 0, 0),
+    type,
+  }));
+
+const groupEventsByDate = (dates, events, games) =>
+  dates.map((day) => ({
+    ...day,
+    events: events.filter((event) => event.date === day.date),
+    games: games.filter((game) => game.date === day.date),
+  }));
+
+// Calendar Component
 function Calendar({ startDate, endDate }) {
   const { currentSeason } = useCurrentSeason();
+  const { isLoading: isLoadingGames, data: gamesSeason } = useData({
+    table: 'games',
+    filter: [{ field: 'seasonId', value: currentSeason.id }],
+  });
+  const { isLoading: isLoadingEvents, data: events } = useData({
+    table: 'calendarEvents',
+    filter: [{ field: 'season', value: currentSeason.id }],
+  });
 
-  const { isLoadingGamesSeason, gamesSeason } = useGamesSeason(currentSeason);
-  const { isLoadingEvents, events } = useEvents(currentSeason);
-  const isLoading = isLoadingEvents || isLoadingGamesSeason;
-  function calendar(start, end) {
-    //calendar builder
-    start = new Date(start);
-    end = new Date(end);
-    const numberOfDays = Math.round((end - start) / (1000 * 3600 * 24)) + 1; //count days needed
-    const dateArray = Array(numberOfDays) //create array with the dates needed
-      .fill()
-      .map((_, i) => new Date(new Date(start).setDate(start.getDate() + i)));
+  if (isLoadingGames || isLoadingEvents) return <Spinner />;
 
-    const allDates = dateArray.map((date) => {
-      //make the date arry into object of months, days, day
-      return {
-        date: date.setHours(0, 0, 0, 0),
-        weekDay: date.getDay(),
-        shortDate: new Intl.DateTimeFormat(['en-US', 'id']).format(
-          date.setDate(date.getDate())
-        ),
-        day: date.getDate(),
-      };
-    });
-    if (isLoading) return <Spinner />;
+  const dates = buildDateArray(startDate, endDate);
+  const games = processEvents(gamesSeason, 'game');
+  const calendarEvents = processEvents(events, 'event');
+  const groupedDates = groupEventsByDate(dates, calendarEvents, games);
 
-    const games = gamesSeason.map((calEvent) => {
-      //get games
-      const date = new Date(
-        new Date(calEvent.date).getTime() +
-          new Date(calEvent.date).getTimezoneOffset() * 60000
-      );
-      return {
-        ...calEvent,
-        date: date.setHours(0, 0, 0, 0),
-      };
-    });
-    const calEvents = events.map((calEvent) => {
-      //get events
-      const startDate = new Date(calEvent.startDateTime);
-      const endDate = new Date(calEvent.endDateTime);
-      return {
-        ...calEvent,
-        startDate: startDate.setHours(0, 0, 0, 0),
-        endDate: endDate.setHours(0, 0, 0, 0),
-      };
-    });
-
-    const dates = allDates.map((day) => {
-      //
-      return {
-        ...day,
-        eventsStart: calEvents.filter((event) => day.date === event.startDate),
-        eventsEnd: calEvents.filter((event) => day.date === event.endDate),
-        games: games.filter((game) => day.date === game.date),
-      };
-    });
-
-    const empty = Array(dates[0].weekDay)
-      .fill()
-      .map((_, i) => {
-        return <Div key={`empty${i}`}></Div>;
-      });
-    const cal = dates.map((date) => {
-      return (
-        <Div key={`date${date.date}`}>
-          <div>{date.day}</div>
-          {date.eventsStart.length > 0 &&
-            date.eventsStart.map((event) => {
-              return (
-                <DivDesc key={`${event.id}event`}>{`${
-                  event.startDate && event.summary
-                } begins`}</DivDesc>
-              );
-            })}
-          {date.eventsEnd.length > 0 &&
-            date.eventsEnd.map((event) => {
-              return (
-                <DivDesc key={`${event.id}event`}>{`${
-                  event.endDate && event.summary
-                } ends`}</DivDesc>
-              );
-            })}
-          {date.games.length > 0 &&
-            date.games.map((type) => {
-              return (
-                <DivDesc key={`${type.id}game`}>
-                  {type.teamType} - {type.schools.short_name}
-                </DivDesc>
-              );
-            })}
-        </Div>
-      );
-    });
-    return (
-      <>
-        {empty}
-        {cal}
-      </>
-    );
-  }
+  // Add placeholders for the first week to align days correctly
+  const firstDayOfWeek = groupedDates[0]?.weekDay || 0;
+  const placeholderDays = Array.from({ length: firstDayOfWeek }, (_, i) => (
+    <PlaceholderCell key={`placeholder-${i}`} />
+  ));
 
   return (
     <CalendarDiv>
-      <div>Sun</div>
-      <div>Mon</div>
-      <div>Tue</div>
-      <div>Wed</div>
-      <div>Thur</div>
-      <div>Fri</div>
-      <div>Sat</div>
-      {calendar(startDate, endDate)}
+      {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+        <div key={day} style={{ textAlign: 'center', fontWeight: 'bold' }}>
+          {day}
+        </div>
+      ))}
+      {placeholderDays}
+      {groupedDates.map((date) => (
+        <DayCell
+          key={date.date}
+          isCurrentDay={date.date === new Date().setHours(0, 0, 0, 0)}
+        >
+          <div>{date.day}</div>
+          {date.events.map((event) => (
+            <Event key={event.id} type="event">
+              {event.summary} (Start)
+            </Event>
+          ))}
+          {date.games.map((game) => (
+            <Event key={game.id} type="game">
+              {game.teamType} - {game.short_name}
+            </Event>
+          ))}
+        </DayCell>
+      ))}
     </CalendarDiv>
   );
 }

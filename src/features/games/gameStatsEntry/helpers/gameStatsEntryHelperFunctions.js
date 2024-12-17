@@ -1,4 +1,4 @@
-import { converthmsToSecondsOnly } from '../../../utils/helpers';
+import { converthmsToSecondsOnly } from '../../../../utils/helpers';
 
 export const meCategories = {
   for: { foul: [], corner: [], offside: [], shots: [] },
@@ -246,20 +246,9 @@ export function getStatuses({ game, periods, stoppages }) {
   }
 }
 
-export function preparePlayerData(playerGame, playerSeason, subs, gameTime) {
+export function preparePlayerData({ playerGame, subs, gameTime }) {
   //  This function should handle all the mapping, filtering, and calculations.  Consider using `reduce` for more efficient aggregations.
-  // const playerG = playerGame.map((playG) => ({
-  //   gameStatus: playG.playergamestatus,
-  //   ...playG,
-  // })); //convert status to gameStatus so it doesn't conflict with season Status
-  const allPlayers = playerGame.map((playG) => ({
-    ...playG,
-    ...playerSeason.find((playS) => playS.Id === playG.playerid),
-  }));
-  // const activeGamePlayers = allPlayers.filter((player) =>
-  //   ['dressed', 'starter', 'gkStarter'].includes(player.playergamestatus)
-  // );
-  const { activeGamePlayers, inactiveGamePlayers } = allPlayers.reduce(
+  const { activeGamePlayers, inactiveGamePlayers } = playerGame.reduce(
     (acc, player) => {
       if (
         ['dressed', 'starter', 'gkStarter'].includes(player.playergamestatus)
@@ -313,14 +302,15 @@ export function preparePlayerData(playerGame, playerSeason, subs, gameTime) {
       minPlayed,
     };
   });
-  return { activePlayersWithStats, inactiveGamePlayers, allPlayers };
+
+  return { activePlayersWithStats };
 }
 
 export function getCurrentPlayers(players, subs) {
   return {
     onField: getOnFieldPlayers(players),
     offField: getOffFieldPlayers(players),
-    subsInWaiting: getSubsInWaiting(subs),
+    // subsInWaiting: getSubsInWaiting(subs),
   };
 
   function getOnFieldPlayers(players) {
@@ -341,27 +331,6 @@ export function getCurrentPlayers(players, subs) {
       { id: null, subIn: null, subOut: null },
     ];
   }
-}
-
-export function handleMissingPlayers(playerSeason, playerGame, gameId) {
-  // ... (Implementation for finding and preparing missing player data)
-
-  const missingPlayers = playerSeason.reduce((missing, playerS) => {
-    if (
-      !playerGame.some((playerG) => +playerG.playerid === +playerS.playerId)
-    ) {
-      missing.push({
-        player: playerS.playerId,
-        game: gameId,
-        status: playerS.teamLevel.includes('Varsity')
-          ? 'dressed'
-          : 'notDressed',
-      });
-    }
-    return missing;
-  }, []);
-  if (missingPlayers.length > 0) return missingPlayers;
-  return false;
 }
 
 export function updatePlayerStatus(currentPlayers, subIn, subOut, gameTime) {

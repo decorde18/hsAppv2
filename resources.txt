@@ -21,6 +21,14 @@ useCreateData({ newData, table, view })
           },)
 useData({ table, filter, sort })
   isLoading, data
+  const playerSeasons = useData({
+    table: 'playerSeasons',
+    filter: [
+      { field: 'seasonId', value: currentSeason.id, table: 'playerSeasons' },
+      { field: 'status', value: 'Rostered', table: 'playerSeasons' },
+    ],
+  });
+
 
 upDat
 useUpdateData({ table, newData, id, view })

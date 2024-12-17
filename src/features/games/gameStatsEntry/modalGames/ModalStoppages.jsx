@@ -16,7 +16,8 @@ import { useState } from 'react';
 import Button from '../../../../ui/Button';
 
 import { convertSecondsToMinutesSeconds } from '../../../../utils/helpers';
-import { buttons } from '../gameStatsEntryHelperFunctions';
+import { buttons } from '../helpers/gameStatsEntryHelperFunctions';
+import { useClockContext } from '../../../../contexts/ClockContext';
 
 const popUpOptions = [
   {
@@ -86,7 +87,7 @@ const StyledInput = styled.input`
 `;
 const StyledDiv = styled.div``;
 
-function ModalStoppages({ currentPeriodTime }) {
+function ModalStoppages() {
   const {
     gameData,
 
@@ -94,7 +95,9 @@ function ModalStoppages({ currentPeriodTime }) {
     goalHandle,
     disciplineHandle,
   } = useGameContext();
-  const { activeGamePlayers, subsInWaiting, enterAllSubs } = usePlayerContext();
+  const { players, currentPlayers, subsInWaiting, enterAllSubs } =
+    usePlayerContext();
+  const { currentPeriodTime } = useClockContext();
 
   const { stoppageStatus } = gameData;
   const [details, setDetails] = useState(stoppageStatus.details || '');
@@ -104,7 +107,7 @@ function ModalStoppages({ currentPeriodTime }) {
   });
   const [goalScored, setGoalScored] = useState();
   const [discipline, setDiscipline] = useState();
-  const activePlayers = activeGamePlayers.current;
+  const activePlayers = [...currentPlayers.onField, ...currentPlayers.offField];
   const statusType = !stoppageStatus.event
     ? false
     : stoppageStatus.event.toLowerCase().includes('goal')
@@ -115,7 +118,7 @@ function ModalStoppages({ currentPeriodTime }) {
     : stoppageStatus.event.toLowerCase().includes('injury')
     ? 'Injury'
     : 'Other';
-
+  console.log(currentPlayers);
   const stoppageTypes = buttons.filter(
     (button) => button.section === 'stoppage'
   );
@@ -227,7 +230,7 @@ function ModalStoppages({ currentPeriodTime }) {
                 return (
                   <ActionGoal
                     team={gameData.stoppageStatus.team}
-                    players={activePlayers}
+                    players={currentPlayers.onField}
                     goalScoredData={{ goalScored, setGoalScored }}
                   />
                 );
@@ -235,7 +238,7 @@ function ModalStoppages({ currentPeriodTime }) {
                 return (
                   <ActionDiscipline
                     team={gameData.stoppageStatus.team}
-                    players={activePlayers}
+                    players={players}
                   />
                 );
               case 'Injury':

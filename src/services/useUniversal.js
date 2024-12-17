@@ -6,7 +6,6 @@ import {
   deleteDataApi,
 } from './apiUniversal';
 import toast from 'react-hot-toast';
-import { useCurrentSeason } from '../contexts/CurrentSeasonContext';
 
 const tables = [
   { name: 'people' },
@@ -26,7 +25,6 @@ const tables = [
   {
     name: 'playerGames',
     view: 'player_game_view',
-    // view: 'stats_by_player_game_view',
   },
   { name: 'parents', view: 'parents_view' },
   {
@@ -36,6 +34,9 @@ const tables = [
   {
     name: 'games',
     view: 'games_view',
+  },
+  {
+    name: 'calendarEvents',
   },
   {
     name: 'periods',
@@ -77,6 +78,10 @@ const tables = [
   },
   {
     name: 'uniformSeasonPlayers',
+    view: 'players_seasons_view',
+  },
+  {
+    name: 'uniformSeasons',
     view: 'uniforms_seasons_view',
   },
   { name: 'player_career_stats_view' },
@@ -99,7 +104,7 @@ export function useCreateData() {
 export function useData({ table, filter, sort, search }) {
   table =
     tables.find((tab) => tab.name === table)?.view ||
-    tables.find((tab) => tab.name === table).name;
+    tables.find((tab) => tab.name === table)?.name;
 
   const { isLoading, data, error } = useQuery({
     queryKey: [table, filter, sort],

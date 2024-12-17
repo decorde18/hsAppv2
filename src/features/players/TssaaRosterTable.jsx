@@ -7,7 +7,6 @@ import Heading from '../../ui/Heading';
 
 import TssaaTableRow from './TssaaTableRow';
 
-import { useSeason } from '../seasons/useSeasons';
 import { useData } from '../../services/useUniversal';
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 
@@ -36,7 +35,7 @@ const Container = styled.div`
 
 function TssaaRosterTable() {
   const { currentSeason } = useCurrentSeason();
-  const { isLoadingSeason, season } = useSeason();
+
   const playerSeasons = useData({
     table: 'playerSeasons',
     filter: [
@@ -45,8 +44,7 @@ function TssaaRosterTable() {
     ],
   });
 
-  if (playerSeasons.isLoading || isLoadingSeason) return <Spinner />;
-
+  if (playerSeasons.isLoading) return <Spinner />;
   if (!playerSeasons.data.length)
     return (
       <Container>
@@ -83,7 +81,7 @@ function TssaaRosterTable() {
     <Container>
       <Heading as="h2" location="center">
         Independence High School Girls&#39; <br></br>Soccer Season{' '}
-        {season.season}
+        {currentSeason.season}
       </Heading>
       <Heading as="h3" location="center">
         TSSAA Roster
@@ -101,7 +99,7 @@ function TssaaRosterTable() {
         </Table.PrintHeaderBorder>
         <Table.Body
           data={tssaaRoster.filter(
-            (player) => player.entryYear !== season.season
+            (player) => player.entryYear !== currentSeason.season
           )}
           render={(player) => <TssaaTableRow player={player} key={player.id} />}
         />
@@ -119,7 +117,7 @@ function TssaaRosterTable() {
         </Table.PrintHeaderBorder>
         <Table.Body
           data={tssaaRoster.filter(
-            (player) => player.entryYear === season.season
+            (player) => player.entryYear === currentSeason.season
           )}
           render={(player) => <TssaaTableRow player={player} key={player.id} />}
         />

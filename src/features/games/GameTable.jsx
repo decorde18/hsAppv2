@@ -27,7 +27,7 @@ function GameTable() {
     setTableData(e.target.name);
   }
 
-    return (
+  return (
     <>
       <StyledDiv>
         <ButtonGroup

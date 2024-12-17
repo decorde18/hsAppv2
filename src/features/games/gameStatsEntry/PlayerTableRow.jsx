@@ -4,31 +4,21 @@ import { useGameContext } from '../../../contexts/GameContext';
 import { convertSecondsToMinutesSeconds } from '../../../utils/helpers';
 
 import Table from '../../../ui/Table';
+import { useClockContext } from '../../../contexts/ClockContext';
 
 function PlayerTableRow({ player, status, displayTable, columns }) {
-  const [lastOut, setLastOut] = useState();
-  const [lastIn, setLastIn] = useState();
+  const { currentPeriodTime } = useClockContext();
 
-  const [gameTime, setGameTime] = useState();
-  // useEffect(() => {
-  //   setInterval(() => {
-  //     const gt = getGameTime;
-  //     // const gt = getGameTime();
-  //     // const gt = getGameTime().officialGameTime;
-  //     setGameTime(() => gt);
-  //     if (player.lastIn) setLastIn(gt - player.lastIn);
-  //     if (player.lastOut) setLastOut(gt - player.lastOut);
-  //   }, 1000);
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [player]);
   //TODO on half change, last in/out need to reflect previous in/out from previous half
   //TODO at end of game, final minutes needs to be calculated differently a starter will not have the full time they were in and a sub will have more time. see game 7
 
   function getField(column) {
     let field = player[column.field];
     //do we need to get the value of the field
-    if (column.field === 'lastOut') field = lastOut;
-    if (column.field === 'lastIn') field = lastIn;
+    if (column.field === 'lastOut')
+      field = player.outs > 0 ? currentPeriodTime - player.lastOut : null;
+    if (column.field === 'lastIn')
+      field = player.ins > 0 ? currentPeriodTime - player.lastIn : null;
     //is the field min played and player on field
     if (
       (displayTable === 'onField' || displayTable === 'played') &&
@@ -39,7 +29,7 @@ function PlayerTableRow({ player, status, displayTable, columns }) {
         player.outMinutes -
         player.inMinutes +
         (player.subStatus === 1
-          ? player.lastIn + (gameTime - player.lastIn)
+          ? player.lastIn + (currentPeriodTime - player.lastIn)
           : 0);
 
     // do we need to get the time for the field

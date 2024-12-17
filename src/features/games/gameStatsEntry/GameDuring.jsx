@@ -10,6 +10,7 @@ import Button from '../../../ui/Button';
 import Heading from '../../../ui/Heading';
 import ModalGamesEditButton from './modalGamesEdit/ModalGamesEditButton';
 import PlayerTable from './components/PlayerTable';
+import { useSubstitutionHandling } from '../../../hooks/useSubstitutionHandling';
 
 const Container = styled.div`
   display: grid;
@@ -42,9 +43,25 @@ const Footer = styled.div`
 `;
 
 function GameDuring() {
-  const { periodHandle } = useGameContext();
+  const { periodHandle, gameData, getGameTime } = useGameContext(); // Access currentPeriod and gameMinute
+  const { subsInWaiting, setSubsInWaiting, gameSubs, setGameSubs } =
+    usePlayerContext(); // Access player context states
 
-  const { enterAllSubs } = usePlayerContext();
+  const { currentPeriod } = gameData; // Access currentPeriod and gameMinute
+  // Initialize the substitution handling hook
+  const { enterAllSubs } = useSubstitutionHandling({
+    subsInWaiting,
+    setSubsInWaiting,
+    gameSubs,
+    setGameSubs,
+  });
+
+  // Event handler for "Enter all Subs" button
+  const handleEnterAllSubs = () => {
+    const gameMinute = getGameTime.gameTime();
+    enterAllSubs({ periodId: currentPeriod.id, gameMinute }); // Pass currentPeriod ID and gameMinute
+  };
+
   return (
     <Container>
       <div>
@@ -83,14 +100,14 @@ function GameDuring() {
             displayTable={'offField'}
             sortArr={[
               { field: 'number', order: 'asc' },
-              { field: 'minPlayed', order: 'dec' },
+              // { field: 'minPlayed', order: 'dec' },
             ]}
           />
         </Column>
       </Main>
       <Footer>
         <Substitutions>
-          <Button onClick={enterAllSubs}>Enter all Subs</Button>
+          <Button onClick={handleEnterAllSubs}>Enter all Subs</Button>
         </Substitutions>
       </Footer>
     </Container>

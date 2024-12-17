@@ -3,7 +3,7 @@ import Button from '../../../../ui/Button';
 import Heading from '../../../../ui/Heading';
 
 import { useGameContext } from '../../../../contexts/GameContext';
-import { buttons } from '../gameStatsEntryHelperFunctions';
+import { buttons } from '../helpers/gameStatsEntryHelperFunctions';
 
 const Div = styled.div`
   display: flex;

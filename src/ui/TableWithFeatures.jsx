@@ -2,21 +2,20 @@ import { useState } from 'react';
 import styled from 'styled-components';
 
 // Styled components with updated colors and design
+
 const TableContainer = styled.div`
   width: 100%;
-  max-height: 53.5rem; /* Set a specific height for vertical scrolling */
-  overflow-y: auto; /* Enable scrolling only for the data rows */
+  max-height: 53.5rem;
+  overflow-x: auto; /* Allow horizontal scrolling */
   margin: 2rem 0;
   background-color: var(--color-grey-0);
   border-radius: var(--border-radius-md);
 `;
-
 const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
   min-width: 60rem; /* To trigger horizontal scrolling when needed */
 `;
-
 const ThTd = styled.th`
   padding: 0.8rem;
   text-align: center;
@@ -35,7 +34,6 @@ const ThTd = styled.th`
     background-color: var(--color-brand-200);
   }
 `;
-
 const StyledTd = styled.td`
   padding: 0.8rem;
   width: ${(props) => `${props.width}rem`};
@@ -49,14 +47,11 @@ const StyledEndTd = styled.td`
 `;
 const PrimaryHeader = styled.tr`
   position: sticky;
-  top: -0.05rem;
-  z-index: 2; /* Ensure primary header stays on top of the table */
-  color: var(--color-grey-900);
-  & > th:last-child {
-    border-right: 2px solid var(--color-grey-200); /* Adds a border to the right of the last th */
-  }
+  top: 0;
+  z-index: 2;
+  background-color: var(--color-grey-200);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Shadow for layering effect */
 `;
-
 const SecondaryHeader = styled.tr`
   background-color: var(--color-grey-50);
   position: sticky;
@@ -69,41 +64,45 @@ const Column = styled.div`
   align-items: center;
 `;
 const TableRow = styled.tr`
+  height: 4rem; /* Adjust the height as needed */
   text-align: right;
   &:nth-child(even) {
-    background-color: var(--color-grey-50);
+    background-color: var(
+      --color-grey-100
+    ); /* Slightly darker for better differentiation */
   }
   &:nth-child(odd) {
-    background-color: var(--color-grey-0);
+    background-color: var(--color-grey-50);
+  }
+  &:hover {
+    background-color: var(--color-brand-100); /* Highlight on hover */
+    color: var(--color-grey-900); /* Optional: enhance text contrast on hover */
   }
 `;
-
 const Pagination = styled.div`
   display: flex;
   justify-content: center;
-  margin-top: 1rem;
+  align-items: center;
+  margin-top: 2rem;
+  gap: 1rem; /* Add spacing between elements */
 `;
-
 const PageButton = styled.button`
-  padding: 0.5rem 1rem;
-  margin: 0 0.5rem;
-  cursor: pointer;
+  padding: 0.7rem 1.5rem; /* Increased padding for larger touch targets */
+  border-radius: 0.5rem;
+  font-size: 1rem; /* Slightly larger font for readability */
   background-color: var(--color-brand-500);
-  border: 1px solid var(--color-grey-200);
-  color: var(--color-grey-100);
-  font-weight: 600;
-
-  &:disabled {
-    background-color: var(--color-brand-200);
-    cursor: not-allowed;
-  }
+  border: none;
+  color: white;
 
   &:hover {
-    background-color: var(--color-brand-100);
-    color: var(--color-grey-600);
+    background-color: var(--color-brand-400);
+  }
+  &:disabled {
+    background-color: var(--color-grey-200);
+    color: var(--color-grey-500);
+    cursor: not-allowed;
   }
 `;
-
 const FilterInput = styled.input`
   padding: 0.5rem;
   margin-left: 1rem;
@@ -113,19 +112,19 @@ const FilterInput = styled.input`
   background-color: var(--color-grey-0);
   width: ${(props) => `${props.width * 0.8}rem`};
 `;
-
 const StickyFirstColumnTd = styled.td`
+  height: 4rem; /* Adjust the height as needed */
   position: sticky;
   left: 0;
   background-color: var(--color-grey-0);
-  z-index: 3; /* Ensure it stays above other rows */
+  z-index: 1; /* Ensure it stays above other rows */
   font-weight: 600;
   text-align: left;
   border-right: 3px solid var(--color-brand-500);
   width: ${(props) => `${props.width}rem`};
+  padding-left: 1rem;
 `;
 
-// Reusable Table Component with Sorting, Filtering, and Pagination
 const TableWithFeatures = ({
   headers,
   data,
@@ -203,11 +202,9 @@ const TableWithFeatures = ({
           >
             <Column>
               {header.label}
-              {sortConfig.key === header.key
-                ? sortConfig.direction === 'asc'
-                  ? ' ↑'
-                  : ' ↓'
-                : null}
+              {sortConfig.key === header.key ? (
+                <span>{sortConfig.direction === 'asc' ? '🔼' : '🔽'}</span>
+              ) : null}
               <FilterInput
                 type="text"
                 placeholder={`Filter ${header.label}`}
@@ -233,11 +230,9 @@ const TableWithFeatures = ({
           >
             <Column>
               {col.label}
-              {sortConfig.key === col.key
-                ? sortConfig.direction === 'asc'
-                  ? ' ↑'
-                  : ' ↓'
-                : null}
+              {sortConfig.key === col.key ? (
+                <span>{sortConfig.direction === 'asc' ? '🔼' : '🔽'}</span>
+              ) : null}
               <FilterInput
                 type="text"
                 placeholder={`Filter ${col.label}`}
@@ -267,13 +262,14 @@ const TableWithFeatures = ({
                 : 'var(--color-grey-50)'; // Odd rows background color
 
             return (
-              <StickyFirstColumnTd
-                width={header.width || 5}
-                key={colIndex}
-                style={{ backgroundColor: stickyBgColor }}
-              >
-                {row[header.key]}
-              </StickyFirstColumnTd>
+              <tr key={colIndex}>
+                <StickyFirstColumnTd
+                  width={header.width || 5}
+                  style={{ backgroundColor: stickyBgColor }}
+                >
+                  {row[header.key]}
+                </StickyFirstColumnTd>
+              </tr>
             );
           } else if (header.columns) {
             return header.columns.map((subCol, subColIndex) =>

@@ -1,13 +1,13 @@
 import styled from 'styled-components';
 import Spinner from '../../ui/Spinner';
 
-import { useEvents } from './useEvents';
 import Table from '../../ui/Table';
 import Empty from '../../ui/Empty';
 import EventRow from './EventRow';
 import AddEvent from './AddEvent';
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 import Menus from '../../ui/Menus';
+import { useData } from '../../services/useUniversal';
 
 const StyledDiv = styled.div`
   display: flex;
@@ -17,7 +17,10 @@ const StyledDiv = styled.div`
 
 function EventTable() {
   const { currentSeason } = useCurrentSeason();
-  const { isLoadingEvents, events } = useEvents();
+  const { isLoading: isLoadingEvents, data: events } = useData({
+    table: 'calendarEvents',
+    filter: [{ field: 'season', value: currentSeason.id }],
+  });
 
   if (isLoadingEvents) return <Spinner />;
   if (!events.length || currentSeason === 'createSeason')

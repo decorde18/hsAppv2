@@ -28,9 +28,9 @@ function ScheduleRow({ game }) {
               <strong>*-</strong>
             </span>
           )}
-          {game.schools.school}
+          {game.school}
         </div>
-        <div>{game.locations.name}</div>
+        <div>{game.locationName}</div>
         <Comment>{game.comment}</Comment>
         <div></div>
       </Table.PrintRow>

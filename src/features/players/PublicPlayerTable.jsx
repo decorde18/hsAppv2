@@ -57,22 +57,18 @@ const Container = styled.div`
 
 function PublicPlayerTable() {
   const { currentSeason } = useCurrentSeason();
-  const { isLoadingSeason, season } = useSeason();
+  // const { isLoadingSeason, season } = useSeason();
 
   const playerSeasons = useData({
     table: 'playerSeasons',
     filter: [
-      { field: 'seasonId', value: currentSeason, table: 'playerSeasons' },
+      { field: 'seasonId', value: currentSeason.id, table: 'playerSeasons' },
       { field: 'status', value: 'Rostered', table: 'playerSeasons' },
     ],
   });
-  const playerUniforms = useData({
-    table: 'uniformSeasonPlayers',
-    filter: [{ field: 'season', value: currentSeason }],
-  });
 
-  if (isLoadingSeason || playerSeasons.isLoading || playerUniforms.isLoading)
-    return <Spinner />;
+  if (playerSeasons.isLoading) return <Spinner />;
+
   if (!playerSeasons.data.length)
     return (
       <Container>
@@ -83,21 +79,15 @@ function PublicPlayerTable() {
   const orderedRoster = playerSeasons.data.sort((a, b) => a.number - b.number);
   const teams = ['Varsity', 'JV'];
 
-  const gkJerseys = playerUniforms.data
-    .filter((uniform) => uniform.type === 'GK Jersey')
-    .map((uniform) => ({
-      gkUniform: uniform.number,
-      ...playerSeasons.data.find(
-        (player) => player.id === uniform.seasonPlayer
-      ),
-    }))
+  const gkJerseys = playerSeasons.data
+    .filter((uniform) => uniform.gknumber)
     .sort((a, b) => a.gkUniform - b.gkUniform);
 
   return (
     <Container>
       <Heading as="h2" location="center">
         Independence High School Girls&#39; <br></br>
-        {`Soccer Season ${season.season}`}
+        {`Soccer Season ${currentSeason.season}`}
       </Heading>
       <Section>
         {teams.map((team) => (
@@ -154,40 +144,39 @@ function PublicPlayerTable() {
           <People>
             <strong>Head Coach:</strong>
             <span>
-              {' '}
-              {`${season.people?.firstName} ${season.people?.lastName}`}
+              {`${currentSeason.people?.firstName} ${currentSeason.people?.lastName}`}
             </span>
           </People>
           <People>
             <strong>Assistant Coaches:</strong>
-            <span> {season?.assistant_coaches}</span>
+            <span> {currentSeason?.assistant_coaches}</span>
           </People>
-          {season?.manager ? (
+          {currentSeason?.manager ? (
             <People>
               <strong>Managers:</strong>
-              <span> {season?.manager}</span>
+              <span> {currentSeason?.manager}</span>
             </People>
           ) : (
             <div></div>
           )}
           <People>
             <strong>Trainer:</strong>
-            <span> {season?.trainer}</span>
+            <span> {currentSeason?.trainer}</span>
           </People>
         </Vertical>
         <Vertical>
           <Heading as="h3">Administration</Heading>
           <People>
             <strong>Principal:</strong>
-            <span> {season?.principal}</span>
+            <span> {currentSeason?.principal}</span>
           </People>
           <People>
             <strong>Assistant Principals:</strong>
-            <span> {season?.assistantPrincipals}</span>
+            <span> {currentSeason?.assistantPrincipals}</span>
           </People>
           <People>
             <strong>Athletic Director:</strong>
-            <span> {season?.athleticDirector}</span>
+            <span> {currentSeason?.athleticDirector}</span>
           </People>
         </Vertical>
       </Sec>

@@ -16,6 +16,7 @@ import Row from '../../../ui/Row';
 import GameSettings from './GameSettings';
 
 import { FaArrowDown, FaArrowUp } from 'react-icons/fa';
+import { useClockContext } from '../../../contexts/ClockContext';
 
 const StyledDiv = styled.div`
   padding: 1rem;
@@ -28,10 +29,11 @@ const Clock = styled.div`
 `;
 /* GAME HEADER - use on (Game Break?, game stoppage? are these modals?),
  before game , after game */
-function GameHeader({ currentPeriodTime }) {
+function GameHeader() {
   const { gameDataArrays, gameData } = useGameContext();
   const { game } = gameDataArrays;
   const { gameProgress, currentPeriod } = gameData;
+  const { currentPeriodTime } = useClockContext();
   const [countDown, setCountDown] = useState(true);
 
   return (

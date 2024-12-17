@@ -14,10 +14,10 @@ const Background = styled.div`
   z-index: 1000;
 `;
 
-function ModalGames({ currentPeriodTime }) {
+function ModalGames() {
   return (
     <Background>
-      <ModalStoppages currentPeriodTime={currentPeriodTime} />
+      <ModalStoppages />
     </Background>
   );
 }

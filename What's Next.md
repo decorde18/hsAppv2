@@ -3,6 +3,13 @@
 
 ## //TODO FIXME !!!
 
+- useGoals has an updateStoppage. probably need to move that to createGoal in goal handle so it gets done in stoppages as well as it does not need a onSuccess
+- can't delete useEvents because the logic to create, update, and delete events is complicated as it calls on googleCal as well
+  -similar with useGames
+
+  - also in useGames: useScheduleHelper,
+    useCreateScheduleHelper,
+
 - ihssoccergirls.net does not take you to public or app
 - uniforms - take the number away from the size when it is being used. when primary uniform is selected, update secondary as well.
 - all things uniforms, add uniform fixed, add jerseys fixed, ability to add gk fixed, roster with GK jersey not just player listed as GK fixed, GK needs gk in roster positions even though they have a gk jersey, roster needs to be based on jersey types
@@ -74,6 +81,10 @@
 - create helper functions for all Date events (send to google calendar, with time, without time, etc)
 - create file upload page for team pics, player pics, etc - see https://www.youtube.com/watch?v=HvOvdD2nX1k
 - useMutation in create playerForm does not run on create parents because of iterations. If you can understand the useMutation hook later on as a developer, fix it
+
+# 12/16/2024
+
+- Players on main screen scrrolls past the page and creates a scroll on main page, see stats on how to fix
 
 # 7/24/2024
 

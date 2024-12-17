@@ -21,7 +21,7 @@ import { useSession, useSessionContext } from '@supabase/auth-helpers-react';
 import { useSeason } from '../seasons/useSeasons';
 import { useLocations } from '../locations/useLocations';
 import { useSchools } from '../schools/useSchools';
-// import { useCreateGame, useEditGame } from './useGames';
+
 import { createEditGoogleCalendarGame } from '../../services/apiGoogle';
 import ButtonGroup from '../../ui/ButtonGroup';
 import {
@@ -31,9 +31,39 @@ import {
 } from '../../services/useUniversal';
 import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
 
-const Div = styled.div`
-  height: 100%;
+const Container = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 90vw; /* Ensures it spans 90% of the visual width */
+  padding: 1rem; /* Adds space inside the container for a cleaner look */
+  box-sizing: border-box; /* Ensures padding is included in the width/height calculations */
+  height: auto; /* Adjust height dynamically based on content */
 `;
+
+const MainContent = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Adds space between child elements */
+  background-color: var(
+    --color-grey-0
+  ); /* Optional: Apply a background color */
+  border-radius: var(--border-radius-lg); /* Optional: Rounds the corners */
+  box-shadow: var(--shadow-md); /* Optional: Adds a subtle shadow for depth */
+  padding: 2rem; /* Provides space around the content */
+`;
+
+const FlexWrapper = styled.div`
+  display: flex;
+  flex-wrap: wrap; /* Ensures content wraps to the next line if necessary */
+  gap: 2rem; /* Adds space between child elements */
+  justify-content: space-between; /* Distributes items evenly with space between */
+  align-items: flex-start; /* Aligns items at the top */
+  max-height: 90dvh; /* Limits the height to 90% of the viewport height */
+  overflow-y: auto; /* Adds a scrollbar if content overflows */
+`;
+
 const Center = styled.div`
   width: 50%;
   margin: auto;
@@ -407,301 +437,302 @@ function CreateGameForm({ gameToEdit = {}, onCloseModal }) {
   function onError(errors) {
     console.log(errors);
   }
-
   if (isLoading || isWorking) return <Spinner />;
   if (!session?.provider_token && process.env.NODE_ENV !== 'development')
     return <CreateGoogleSignedInError />;
   return (
-    <Div>
-      <Flex>
-        <Calendar startDate={startDate} endDate={endDate} />
-        <MainForm>
-          <Form
-            onSubmit={handleSubmit(onSubmit, onError)}
-            type={closeModal ? 'Modal' : 'regular'}
-          >
-            <Center>
-              {isEditSession ? (
-                <Heading as={'h4'}>EDIT GAME</Heading>
-              ) : (
-                <Heading as={'h4'}>CREATE GAME</Heading>
-              )}
-            </Center>
-            {/* Team Type */}
-            <Center>
-              {/* <ButtonGroup> */}
-              {season.teamLevels.map((team) => {
-                return (
+    <Container>
+      <MainContent>
+        <FlexWrapper>
+          <Calendar startDate={startDate} endDate={endDate} />
+          <MainForm>
+            <Form
+              onSubmit={handleSubmit(onSubmit, onError)}
+              type={closeModal ? 'Modal' : 'regular'}
+            >
+              <Center>
+                {isEditSession ? (
+                  <Heading as={'h4'}>EDIT GAME</Heading>
+                ) : (
+                  <Heading as={'h4'}>CREATE GAME</Heading>
+                )}
+              </Center>
+              {/* Team Type */}
+              <Center>
+                {/* <ButtonGroup> */}
+                {season.teamLevels.map((team) => {
+                  return (
+                    <Button
+                      key={`${team}Button`}
+                      value={team}
+                      name="gameScheduleType"
+                      variation={
+                        gameScheduleType === team ? 'primary' : 'secondary'
+                      }
+                      onClick={handleTeamButtonChange}
+                    >
+                      {team}
+                    </Button>
+                  );
+                })}
+                {!isEditSession && (
                   <Button
-                    key={`${team}Button`}
-                    value={team}
+                    value="both"
                     name="gameScheduleType"
                     variation={
-                      gameScheduleType === team ? 'primary' : 'secondary'
+                      gameScheduleType === 'both' ? 'primary' : 'secondary'
                     }
                     onClick={handleTeamButtonChange}
                   >
-                    {team}
+                    BOTH
                   </Button>
-                );
-              })}
-              {!isEditSession && (
-                <Button
-                  value="both"
-                  name="gameScheduleType"
-                  variation={
-                    gameScheduleType === 'both' ? 'primary' : 'secondary'
-                  }
-                  onClick={handleTeamButtonChange}
-                >
-                  BOTH
-                </Button>
-              )}
-              {/* </ButtonGroup> */}
-            </Center>
-            {/* date and time */}
-            <FormRow label="Date *" error={errors?.date?.message}>
-              <Input
-                type="date"
-                id="date"
-                disabled={isWorking}
-                register={{
-                  ...register('date', { required: 'Please Provide a date' }),
-                }}
-              />
-            </FormRow>
-            <Row type="horizontal">
-              {season.teamLevels.map((team) => {
-                if (team === gameScheduleType || gameScheduleType === 'both')
-                  return (
-                    <Row type="vertical" key={`${team}Column`}>
-                      <Heading as={'h2'}>{team}</Heading>
-                      <Row>
-                        <Flex>
-                          <FormRow label="Time" error={errors?.time?.message}>
-                            <Input
-                              type="time"
-                              id={
-                                gameScheduleType !== 'both'
-                                  ? 'time'
-                                  : `time${team}`
-                              }
-                              disabled={isWorking}
-                              register={{
-                                ...register(
+                )}
+                {/* </ButtonGroup> */}
+              </Center>
+              {/* date and time */}
+              <FormRow label="Date *" error={errors?.date?.message}>
+                <Input
+                  type="date"
+                  id="date"
+                  disabled={isWorking}
+                  register={{
+                    ...register('date', { required: 'Please Provide a date' }),
+                  }}
+                />
+              </FormRow>
+              <Row type="horizontal">
+                {season.teamLevels.map((team) => {
+                  if (team === gameScheduleType || gameScheduleType === 'both')
+                    return (
+                      <Row type="vertical" key={`${team}Column`}>
+                        <Heading as={'h2'}>{team}</Heading>
+                        <Row>
+                          <Flex>
+                            <FormRow label="Time" error={errors?.time?.message}>
+                              <Input
+                                type="time"
+                                id={
                                   gameScheduleType !== 'both'
                                     ? 'time'
                                     : `time${team}`
-                                ),
-                              }}
-                            />
-                          </FormRow>
-                          {watch('time') && (
-                            <div>
-                              INCLUDE UPDATED TIME IF NOT
-                              {moment(
-                                new Date(
-                                  '1970-01-01T' + watch('time').split('-')[0]
-                                )
-                              ).format('LT')}
-                            </div>
-                          )}
-                        </Flex>
-                      </Row>
-                      <FormRow
-                        label="Game Type *"
-                        error={errors?.gameType?.message}
-                      >
-                        <StyledSelect
-                          type="white"
-                          id={
-                            gameScheduleType !== 'both'
-                              ? 'gameType'
-                              : `gameType${team}`
-                          }
-                          {...register(
-                            gameScheduleType !== 'both'
-                              ? 'gameType'
-                              : `gameType${team}`,
-                            {
-                              validate: (value) =>
-                                value !== 'default' ||
-                                'Please select a game type',
-                            }
-                          )}
-                          value={
-                            (gameScheduleType !== 'both'
-                              ? watch('gameType')
-                              : watch(`gameType${team}`)) || 'default'
-                          }
-                          onChange={handleSelectChange}
+                                }
+                                disabled={isWorking}
+                                register={{
+                                  ...register(
+                                    gameScheduleType !== 'both'
+                                      ? 'time'
+                                      : `time${team}`
+                                  ),
+                                }}
+                              />
+                            </FormRow>
+                            {watch('time') && (
+                              <div>
+                                INCLUDE UPDATED TIME IF NOT
+                                {moment(
+                                  new Date(
+                                    '1970-01-01T' + watch('time').split('-')[0]
+                                  )
+                                ).format('LT')}
+                              </div>
+                            )}
+                          </Flex>
+                        </Row>
+                        <FormRow
+                          label="Game Type *"
+                          error={errors?.gameType?.message}
                         >
-                          <option value="default" disabled>
-                            Please Select Game Type
-                          </option>
-                          {seasonTimes.map((type) => {
-                            if (!type.team || type.team === team)
-                              return (
-                                <optgroup
-                                  id={`${type.value}${team}`}
-                                  key={`${type.label}${team}`}
-                                  label={type.label}
-                                >
-                                  {gameTypes.map(
-                                    (typ) =>
-                                      typ.seasonTime === type.value && (
-                                        <option
-                                          value={typ.value}
-                                          key={`${typ.value}${team}`}
-                                        >
-                                          {typ.label}
-                                        </option>
-                                      )
-                                  )}
-                                </optgroup>
-                              );
-                          })}
-                        </StyledSelect>
-                      </FormRow>
-                    </Row>
-                  );
-              })}
-            </Row>
-            {/* Opponent and opponent details (Class District) */}
-            <Heading as={'h3'}>OPPONENT</Heading>
-            <FormRow label="Opponent *" error={errors?.opponent?.message}>
-              <StyledSelect
-                type="white"
-                id={'schoolid'}
-                {...register('schoolid', {
-                  validate: (value) =>
-                    value !== 'default' || 'Please select an Opponent',
+                          <StyledSelect
+                            type="white"
+                            id={
+                              gameScheduleType !== 'both'
+                                ? 'gameType'
+                                : `gameType${team}`
+                            }
+                            {...register(
+                              gameScheduleType !== 'both'
+                                ? 'gameType'
+                                : `gameType${team}`,
+                              {
+                                validate: (value) =>
+                                  value !== 'default' ||
+                                  'Please select a game type',
+                              }
+                            )}
+                            value={
+                              (gameScheduleType !== 'both'
+                                ? watch('gameType')
+                                : watch(`gameType${team}`)) || 'default'
+                            }
+                            onChange={handleSelectChange}
+                          >
+                            <option value="default" disabled>
+                              Please Select Game Type
+                            </option>
+                            {seasonTimes.map((type) => {
+                              if (!type.team || type.team === team)
+                                return (
+                                  <optgroup
+                                    id={`${type.value}${team}`}
+                                    key={`${type.label}${team}`}
+                                    label={type.label}
+                                  >
+                                    {gameTypes.map(
+                                      (typ) =>
+                                        typ.seasonTime === type.value && (
+                                          <option
+                                            value={typ.value}
+                                            key={`${typ.value}${team}`}
+                                          >
+                                            {typ.label}
+                                          </option>
+                                        )
+                                    )}
+                                  </optgroup>
+                                );
+                            })}
+                          </StyledSelect>
+                        </FormRow>
+                      </Row>
+                    );
                 })}
-                onChange={handleSelectChange}
-                defaultValue={isEditSession ? 'schoolid' : 'default'}
-              >
-                <option value="default" disabled>
-                  Please Select an Opponent
-                </option>
-                {schools.map((school) => (
-                  <option key={school.id} value={school.id}>
-                    {school.school}
-                  </option>
-                ))}
-              </StyledSelect>
-            </FormRow>
-            {/* Game details */}
-            <Row type="horizontal">
-              <FormRow error={errors?.district?.message}>
-                <Button
-                  size="small"
-                  name="district"
-                  value={watch('district')}
-                  variation={watch('district') ? 'primary' : 'secondary'}
-                  onClick={handleButtonClick}
-                >
-                  {watch('district') ? 'District' : 'Non-District'}
-                </Button>
-                <input
-                  type="hidden"
-                  disabled={isWorking}
-                  {...register('district')}
-                />
-              </FormRow>
-              <FormRow />
-              <FormRow
-                label="Classification"
-                error={errors?.classification?.message}
-              >
+              </Row>
+              {/* Opponent and opponent details (Class District) */}
+              <Heading as={'h3'}>OPPONENT</Heading>
+              <FormRow label="Opponent *" error={errors?.opponent?.message}>
                 <StyledSelect
                   type="white"
-                  id="classification"
-                  {...register('classification', {
+                  id={'schoolid'}
+                  {...register('schoolid', {
                     validate: (value) =>
-                      value !== 'default' ||
-                      "Please select the opponent's class",
+                      value !== 'default' || 'Please select an Opponent',
                   })}
                   onChange={handleSelectChange}
-                  defaultValue={'default'}
-                >
-                  <option value="default">
-                    Please Select the Opponents&apos; Classification
-                  </option>
-                  <option value="I AAA">I AAA</option>
-                  <option value="I AA">I AA</option>
-                  <option value="I A">I A</option>
-                  <option value="II AA">II AA</option>
-                  <option value="II A">II A</option>
-                  <option value="NA">N/A</option>
-                </StyledSelect>
-              </FormRow>
-            </Row>
-            {/* location  &  Home/Away */}
-            <Row type="horizontal">
-              <FormRow>
-                <Button
-                  name="home"
-                  variation={watch('home') ? 'primary' : 'secondary'}
-                  onClick={handleButtonClick}
-                >
-                  {watch('home') ? 'Home' : 'Away'}
-                </Button>
-                <input
-                  defaultValue={watch('home')}
-                  type="hidden"
-                  disabled={isWorking}
-                  {...register('home')}
-                />
-              </FormRow>
-              <FormRow />
-              {/* todo fix I am here location does not default - updating does not work */}
-              <FormRow label="Location *" error={errors?.location?.message}>
-                <StyledSelect
-                  type="white"
-                  id="locationid"
-                  {...register('locationid', {
-                    validate: (value) =>
-                      value !== 'default' || 'Please select a location',
-                  })}
-                  onChange={handleSelectChange}
-                  defaultValue={'default'}
+                  defaultValue={isEditSession ? 'schoolid' : 'default'}
                 >
                   <option value="default" disabled>
-                    Please Select Location
+                    Please Select an Opponent
                   </option>
-                  {locations.map((loc) => (
-                    <option key={loc.locationid} value={loc.locationid}>
-                      {loc.name}
+                  {schools.map((school) => (
+                    <option key={school.id} value={school.id}>
+                      {school.school}
                     </option>
                   ))}
                 </StyledSelect>
               </FormRow>
-            </Row>
-            {/* comment */}
-            <FormRow label="Comment" error={errors?.comment?.message}>
-              <Textarea
-                id="comment"
-                disabled={isWorking}
-                {...register('comment')}
-              />
-            </FormRow>
-            {/* submit buttons */}
-            <FormRow>
-              <Button
-                variation="secondary"
-                type="reset"
-                onClick={() => closeModal?.()}
-              >
-                Cancel
-              </Button>
-              <Button disabled={isWorking}>
-                {isEditSession ? 'Edit Game' : 'Create New Game'}
-              </Button>
-            </FormRow>
-          </Form>
-        </MainForm>
-      </Flex>
-    </Div>
+              {/* Game details */}
+              <Row type="horizontal">
+                <FormRow error={errors?.district?.message}>
+                  <Button
+                    size="small"
+                    name="district"
+                    value={watch('district')}
+                    variation={watch('district') ? 'primary' : 'secondary'}
+                    onClick={handleButtonClick}
+                  >
+                    {watch('district') ? 'District' : 'Non-District'}
+                  </Button>
+                  <input
+                    type="hidden"
+                    disabled={isWorking}
+                    {...register('district')}
+                  />
+                </FormRow>
+                <FormRow />
+                <FormRow
+                  label="Classification"
+                  error={errors?.classification?.message}
+                >
+                  <StyledSelect
+                    type="white"
+                    id="classification"
+                    {...register('classification', {
+                      validate: (value) =>
+                        value !== 'default' ||
+                        "Please select the opponent's class",
+                    })}
+                    onChange={handleSelectChange}
+                    defaultValue={'default'}
+                  >
+                    <option value="default">
+                      Please Select the Opponents&apos; Classification
+                    </option>
+                    <option value="I AAA">I AAA</option>
+                    <option value="I AA">I AA</option>
+                    <option value="I A">I A</option>
+                    <option value="II AA">II AA</option>
+                    <option value="II A">II A</option>
+                    <option value="NA">N/A</option>
+                  </StyledSelect>
+                </FormRow>
+              </Row>
+              {/* location  &  Home/Away */}
+              <Row type="horizontal">
+                <FormRow>
+                  <Button
+                    name="home"
+                    variation={watch('home') ? 'primary' : 'secondary'}
+                    onClick={handleButtonClick}
+                  >
+                    {watch('home') ? 'Home' : 'Away'}
+                  </Button>
+                  <input
+                    defaultValue={watch('home')}
+                    type="hidden"
+                    disabled={isWorking}
+                    {...register('home')}
+                  />
+                </FormRow>
+                <FormRow />
+                {/* todo fix I am here location does not default - updating does not work */}
+                <FormRow label="Location *" error={errors?.location?.message}>
+                  <StyledSelect
+                    type="white"
+                    id="locationid"
+                    {...register('locationid', {
+                      validate: (value) =>
+                        value !== 'default' || 'Please select a location',
+                    })}
+                    onChange={handleSelectChange}
+                    defaultValue={'default'}
+                  >
+                    <option value="default" disabled>
+                      Please Select Location
+                    </option>
+                    {locations.map((loc) => (
+                      <option key={loc.locationid} value={loc.locationid}>
+                        {loc.name}
+                      </option>
+                    ))}
+                  </StyledSelect>
+                </FormRow>
+              </Row>
+              {/* comment */}
+              <FormRow label="Comment" error={errors?.comment?.message}>
+                <Textarea
+                  id="comment"
+                  disabled={isWorking}
+                  {...register('comment')}
+                />
+              </FormRow>
+              {/* submit buttons */}
+              <FormRow>
+                <Button
+                  variation="secondary"
+                  type="reset"
+                  onClick={() => closeModal?.()}
+                >
+                  Cancel
+                </Button>
+                <Button disabled={isWorking}>
+                  {isEditSession ? 'Edit Game' : 'Create New Game'}
+                </Button>
+              </FormRow>
+            </Form>
+          </MainForm>
+        </FlexWrapper>
+      </MainContent>
+    </Container>
   );
 }
 export default CreateGameForm;
