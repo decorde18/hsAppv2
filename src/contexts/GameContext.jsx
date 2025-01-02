@@ -100,6 +100,16 @@ function GameContextProvider({ gameDetails, children }) {
   }, [gameDataArrays.game, gameDataArrays.periods, gameDataArrays.stoppages]);
 
   const getGameTime = {
+    fullGameTime: () =>
+      gameDataArrays.periods.reduce(
+        (acc, period) => (acc = acc + subtractTime(period.start, period.end)),
+        0
+      ) -
+      stoppages.reduce(
+        (acc, stoppage) =>
+          (acc = acc + (stoppage.end - stoppage.begin) * stoppage.clockStopped),
+        0
+      ),
     gameTime: () =>
       //current time  - used for subs, stoppages, (in Seconds)
       //get previous period times
@@ -142,15 +152,24 @@ function GameContextProvider({ gameDetails, children }) {
   function updateGame({ field, value }) {
     setGameData((prev) => ({ ...prev, [field]: value }));
   }
-  function updateGameArrays({ field, value }) {
-    setGameDataArrays((prev) => {
-      const updatedArray = [
-        ...prev[field].filter((item) => item.id !== value.id),
-        value,
-      ];
+  function updateGameArrays({ field, value, deleteItem }) {
+    if (deleteItem)
+      setGameDataArrays((prev) => {
+        const updatedArray = [
+          ...prev[field].filter((item) => item.id !== value.id),
+        ];
 
-      return { ...prev, [field]: updatedArray };
-    });
+        return { ...prev, [field]: updatedArray };
+      });
+    else
+      setGameDataArrays((prev) => {
+        const updatedArray = [
+          ...prev[field].filter((item) => item.id !== value.id),
+          value,
+        ];
+
+        return { ...prev, [field]: updatedArray };
+      });
   }
 
   const { periodHandle } = usePeriods({
@@ -162,6 +181,7 @@ function GameContextProvider({ gameDetails, children }) {
     updateGameArrays,
     currentPeriod: gameData.currentPeriod,
     getCurrentTime,
+    getGameTime,
   });
   const { stoppageHandle } = useStoppages({
     createData,
@@ -180,15 +200,15 @@ function GameContextProvider({ gameDetails, children }) {
     updateGameArrays,
     currentPeriod: gameData.currentPeriod,
     setGameDataArrays,
+    getGameTime,
   });
   const { goalHandle } = useGoals({
-    gameId,
     createData,
     updateData,
     deleteData,
-    updateGameArrays,
-    currentPeriod: gameData.currentPeriod,
-    setGameDataArrays,
+    gameData,
+    getGameTime,
+    stoppageHandle,
   });
   const { disciplineHandle } = useDiscipline({
     gameId,
@@ -198,6 +218,7 @@ function GameContextProvider({ gameDetails, children }) {
     updateGameArrays,
     currentPeriod: gameData.currentPeriod,
     setGameDataArrays,
+    getGameTime,
   });
 
   if (!gameDataArrays.game.id || !gameData.gameStatus) return;
@@ -213,6 +234,7 @@ function GameContextProvider({ gameDetails, children }) {
         goalHandle,
         disciplineHandle,
         getGameTime,
+        updateGameArrays,
       }}
     >
       {children}

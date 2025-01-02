@@ -1,3 +1,5 @@
+import { useCallback } from 'react';
+
 import {
   useCreateData,
   useDeleteData,
@@ -17,6 +19,7 @@ export function useSubstitutionHandling({
   subsInWaiting,
   setSubsInWaiting,
   setGameSubs,
+  updateGameArrays,
 }) {
   const { createData } = useCreateData();
   const { updateData } = useUpdateData();
@@ -94,7 +97,7 @@ export function useSubstitutionHandling({
    * Delete a substitution from subsInWaiting.
    * @param {number} index - Index of the substitution to delete.
    */
-  const deleteSub = (index) => {
+  const cancelSub = (index) => {
     try {
       const sub = subsInWaiting[index];
       const updatedSubList = subsInWaiting.filter((_, i) => i !== index);
@@ -119,6 +122,33 @@ export function useSubstitutionHandling({
     }
   };
 
+  const deleteSub = useCallback(
+    (id) => {
+      setGameSubs((prev) => prev.filter((gameSub) => gameSub.id !== id));
+      try {
+        deleteData(
+          { table: 'subs', id, toast: false },
+          {
+            onSuccess: () => {
+              updateGameArrays({
+                field: 'subs',
+                value: { id },
+                deleteItem: true,
+              });
+            },
+          },
+          {
+            onError: (error) => {
+              console.error('Error deleting substitution:', error);
+            },
+          }
+        );
+      } catch (error) {
+        console.error('Unexpected error while deleting substitution:', error);
+      }
+    },
+    [deleteData, setGameSubs, updateGameArrays]
+  );
   /**
    * Execute a substitution and move it from subsInWaiting to gameSubs.
    * @param {number} index - Index of the substitution in subsInWaiting.
@@ -140,13 +170,8 @@ export function useSubstitutionHandling({
           },
         }
       );
-
       // Update the gameSubs state
-      setGameSubs((prev) =>
-        prev.map((sub) =>
-          sub.id === clickedSub.id ? { ...clickedSub, gameMinute } : sub
-        )
-      );
+      setGameSubs((prev) => [...prev, { ...clickedSub, gameMinute }]);
 
       // Remove the substitution from subsInWaiting
       const updatedSubList = subsInWaiting.filter((_, i) => i !== index);
@@ -162,7 +187,6 @@ export function useSubstitutionHandling({
    * @param {number} gameMinute - Minute of the game when the substitutions occur.
    */
   const enterAllSubs = ({ periodId, gameMinute }) => {
-    console.log();
     try {
       subsInWaiting.forEach((sub, index) => {
         if (sub.subIn && sub.subOut) {
@@ -195,12 +219,15 @@ export function useSubstitutionHandling({
       );
     }
   };
-
-  return {
+  const subHandle = {
     createSub,
     updateSub,
+    cancelSub,
     deleteSub,
-    enterAllSubs,
     enterSub,
+    enterAllSubs,
+  };
+  return {
+    subHandle,
   };
 }

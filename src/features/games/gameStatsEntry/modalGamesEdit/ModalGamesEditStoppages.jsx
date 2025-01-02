@@ -11,9 +11,6 @@ import Table from '../../../../ui/Table';
 
 import ModalGamesEditTableRow from './ModalGamesEditTableRow';
 import { usePlayerContext } from '../../../../contexts/PlayerContext';
-import ModalGamesEditTableRowPeriods from './ModalGamesEditTableRowPeriods';
-import ModalGamesEditTableRowGoals from './ModalGamesEditTableRowGoals';
-import ModalGamesEditTableRowSubs from './ModalGamesEditTableRowSubs';
 
 const Background = styled.div`
   width: 100dvw;
@@ -262,55 +259,6 @@ function GameStatsEdit() {
     if (currentCategory.value === 'discipline')
       disciplineHandle.deleteDiscipline(id);
   }
-  function returnPage(row) {
-    switch (currentCategory.value) {
-      case 'goals':
-        return (
-          <ModalGamesEditTableRowGoals
-            key={row.id}
-            row={row}
-            label={currentCategory.single}
-            fields={currentCategory.categories}
-            handleEdit={(values) => handleEdit(values)}
-            handleDelete={(id) => handleDelete(id)}
-          />
-        );
-      case 'periods':
-        return (
-          <ModalGamesEditTableRowPeriods
-            key={row.id}
-            row={row}
-            label={currentCategory.single}
-            fields={currentCategory.categories}
-            handleEdit={(values) => handleEdit(values)}
-            handleDelete={(id) => handleDelete(id)}
-          />
-        );
-      case 'subs':
-        return (
-          <ModalGamesEditTableRowSubs
-            key={row.id}
-            row={row}
-            label={currentCategory.single}
-            fields={currentCategory.categories}
-            handleEdit={(values) => handleEdit(values)}
-            handleDelete={(id) => handleDelete(id)}
-          />
-        );
-      default:
-        return (
-          <ModalGamesEditTableRow
-            key={row.id}
-            row={row}
-            label={currentCategory.single}
-            fields={currentCategory.categories}
-            handleEdit={(values) => handleEdit(values)}
-            handleDelete={(id) => handleDelete(id)}
-          />
-        );
-    }
-  }
-
   return (
     <Background>
       <Header>
@@ -327,7 +275,7 @@ function GameStatsEdit() {
               disabled: cat.disabled,
             }))}
             onChange={handleSelectChange}
-            value={selectedValue || ''}
+            value={selectedValue}
             placeholder={'Please Select a Category to Update'}
           />
         </TopSection>
@@ -342,7 +290,16 @@ function GameStatsEdit() {
                 </Table.Header>
                 <Table.Body
                   data={filteredData}
-                  render={(row) => returnPage(row)}
+                  render={(row) => (
+                    <ModalGamesEditTableRow
+                      key={row.id}
+                      row={row}
+                      label={currentCategory.single}
+                      fields={currentCategory.categories}
+                      handleEdit={(values) => handleEdit(values)}
+                      handleDelete={(id) => handleDelete(id)}
+                    />
+                  )}
                 />
               </Table>
             ) : (

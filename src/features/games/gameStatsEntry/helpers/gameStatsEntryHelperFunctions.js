@@ -1,4 +1,9 @@
-import { converthmsToSecondsOnly } from '../../../../utils/helpers';
+import { pl } from 'date-fns/locale';
+import {
+  converthmsToSecondsOnly,
+  convertSecondsToMinutesSeconds,
+} from '../../../../utils/helpers';
+import { min } from 'date-fns';
 
 export const meCategories = {
   for: { foul: [], corner: [], offside: [], shots: [] },
@@ -23,6 +28,7 @@ export function getStatuses({ game, periods, stoppages }) {
   if (!game || !periods || !stoppages) {
     throw new Error('Invalid input: Missing game, periods, or stoppages.');
   }
+
   const GAME_STATUSES = {
     TO_BE_PLAYED: 'to be played',
     IN_PROGRESS: 'in progress',
@@ -153,115 +159,23 @@ export function getStatuses({ game, periods, stoppages }) {
       stoppageStatus,
       newPeriodNeeded,
     };
-
-    // let gameStatus; //to be played, completed, in progress
-    // let gameProgress; //  beforeGame, periodActive, between periods, completed
-    // let newPeriodNeeded = false;
-    // const stoppageStatus = stoppages.find((stoppage) => !stoppage.end) || false;
-
-    // // a current period will only be active if the game has started
-    // const currentPeriod =
-    //   periods.length > 0 ? periods.sort((a, b) => b.period - a.period)[0] : false;
-
-    // if (!currentPeriod) {
-    //   //game hasn't started
-    //   gameProgress = 'beforeGame';
-    //   gameStatus = 'to be played';
-    // } else if (!currentPeriod.start) {
-    //   //hasn't reached last period, so in between, but a period was created because the game isn't over
-    //   gameStatus = 'in progress';
-    //   gameProgress = 'betweenPeriods';
-    // } else if (!currentPeriod.end) {
-    //   //period hasn't ended
-    //   gameStatus = 'in progress';
-    //   gameProgress = 'periodActive';
-    // } else {
-    //   // this means we are at a break or at the end of the game
-    //   //determine if it is the final period
-    //   const period = currentPeriod.period;
-    //   // const ot = game.ot_if_tied;
-    //   // const max = game.max_ot_periods;
-    //   // const min = game.min_ot_periods;
-    //   // const reg = game.reg_periods;
-    //   const ot = true;
-    //   const max = 2;
-    //   const min = 1;
-    //   const reg = 2;
-    //   const maxPeriods = reg + (ot ? max : 0); //maxperiods this game will play
-    //   const minPeriods = reg + (ot ? min : 0); //minperiods this game will play
-    //   if (period < maxPeriods) {
-    //     // const gf = game.gf;
-    //     const gf = 1;
-    //     const ga = game.ga;
-    //     const so = true;
-    //     let periodType;
-    //     if (period < min) periodType = 'regulation';
-    //     else if (gf === ga) {
-    //       //is shootout
-    //       if (so && period === maxPeriods) periodType = 'shootout';
-    //       else if (period >= reg && period < minPeriods) periodType = 'ot1';
-    //       else if (period > reg && period < maxPeriods) periodType = 'ot2';
-    //     } else if (period > reg && period < minPeriods) periodType = 'ot1';
-    //     else {
-    //       endGame();
-    //     }
-    //     if (gf !== ga) {
-    //       endGame();
-    //     } else {
-    //       //todo this should take to end of game with endGame and completed, we got here because a period in OT ended but it was not longer tied
-
-    //       const default_time =
-    //         periodType === 'ot1'
-    //           ? game.ot_1_minutes * 60 //can't modify the default value of the table
-    //           : periodType === 'ot2'
-    //           ? game.ot_2_minutes * 60 //can't modify the default value of the table
-    //           : periodType === 'shootout'
-    //           ? null
-    //           : game.reg_periods_minutes;
-
-    //       gameStatus = 'pending';
-    //       gameProgress = 'betweenPeriods';
-    //       newPeriodNeeded =
-    //         periodType === 'shootout'
-    //           ? 'shootout'
-    //           : { default_time, period: period + 1 };
-    //     }
-    //   } else {
-    //     //if it is, end the game
-    //     endGame();
-    //   }
-    // }
-
-    // function endGame() {
-    //   gameProgress = 'endGame';
-    //   gameStatus = 'completed';
-    // }
-    // return {
-    //   gameStatus,
-    //   gameProgress,
-    //   currentPeriod,
-    //   stoppageStatus,
-    //   newPeriodNeeded,
-    // };
   }
 }
 
-export function preparePlayerData({ playerGame, subs, gameTime }) {
-  //  This function should handle all the mapping, filtering, and calculations.  Consider using `reduce` for more efficient aggregations.
+export function preparePlayerData({ playerGame, subs, gameTime, stoppages }) {
+  // Split active and inactive players
   const { activeGamePlayers, inactiveGamePlayers } = playerGame.reduce(
     (acc, player) => {
-      if (
-        ['dressed', 'starter', 'gkStarter'].includes(player.playergamestatus)
-      ) {
-        acc.activeGamePlayers.push(player);
-      } else {
-        acc.inactiveGamePlayers.push(player);
-      }
+      const isActive = ['dressed', 'starter', 'gkStarter'].includes(
+        player.playergamestatus
+      );
+      acc[isActive ? 'activeGamePlayers' : 'inactiveGamePlayers'].push(player);
       return acc;
     },
     { activeGamePlayers: [], inactiveGamePlayers: [] }
   );
 
+  // Enrich active players with stats
   const activePlayersWithStats = activeGamePlayers.map((player) => {
     const subIns = subs.filter(
       (sub) => sub.subIn === player.playerid && sub.gameMinute
@@ -270,47 +184,58 @@ export function preparePlayerData({ playerGame, subs, gameTime }) {
       (sub) => sub.subOut === player.playerid && sub.gameMinute
     );
 
-    const ins = subIns.length;
-    const outs = subOuts.length;
-    const start = ['starter', 'gkStarter'].includes(player.playergamestatus);
-    const subStatus = start + ins - outs;
-
-    const inMinutes = subIns?.reduce((acc, min) => acc + min.gameMinute, 0);
-    const outMinutes = subOuts?.reduce((acc, min) => acc + min.gameMinute, 0);
-
-    const lastIn =
-      subIns?.sort((a, b) => b.gameMinute - a.gameMinute)[0]?.gameMinute || 0;
-    const lastOut =
-      subOuts?.sort((a, b) => b.gameMinute - a.gameMinute)[0]?.gameMinute || 0;
-
-    const minPlayed =
-      subStatus === 1
-        ? converthmsToSecondsOnly(gameTime) || 0 //todo //!fixme this needs to be fixed. it just blanket gives everyone who ended the game the minutes of the game regardless of whether they subbed in or started or how many times
-        : outMinutes - inMinutes;
+    const isStarter = ['starter', 'gkStarter'].includes(
+      player.playergamestatus
+    );
+    const subStatus = isStarter + subIns.length - subOuts.length;
 
     return {
       ...player,
-      ins,
-      outs,
-      subStatus,
       subIns,
       subOuts,
-      inMinutes,
-      outMinutes,
-      lastIn,
-      lastOut,
-      minPlayed,
+      ins: subIns.length,
+      outs: subOuts.length,
+      subStatus,
+      inMinutes: subIns.reduce((sum, sub) => sum + sub.gameMinute, 0),
+      outMinutes: subOuts.reduce((sum, sub) => sum + sub.gameMinute, 0),
+      lastIn: subIns.reduce((max, sub) => Math.max(max, sub.gameMinute), 0),
+      lastOut: subOuts.reduce((max, sub) => Math.max(max, sub.gameMinute), 0),
     };
   });
 
-  return { activePlayersWithStats };
+  // Calculate players on field for each stoppage
+  const playersOnFieldStoppages = calculatePlayersOnField({
+    stoppages,
+    activePlayersWithStats,
+  });
+
+  // Finalize active players with minPlayed and plusMinus
+  const activePlayers = activePlayersWithStats.map((player) => {
+    const stoppageMinutes = calculateStoppageTimeMinutesToRemove(
+      playersOnFieldStoppages,
+      player.playerid
+    );
+    const totalGameTime = converthmsToSecondsOnly(gameTime);
+
+    const minPlayed =
+      player.subStatus === 1
+        ? totalGameTime - stoppageMinutes
+        : player.outMinutes - player.inMinutes - stoppageMinutes;
+
+    return {
+      ...player,
+      minPlayed,
+      plusMinus: calculatePlusMinus(playersOnFieldStoppages, player.playerid),
+    };
+  });
+
+  return { activePlayers, inactiveGamePlayers };
 }
 
-export function getCurrentPlayers(players, subs) {
+export function getCurrentPlayers(players) {
   return {
     onField: getOnFieldPlayers(players),
     offField: getOffFieldPlayers(players),
-    // subsInWaiting: getSubsInWaiting(subs),
   };
 
   function getOnFieldPlayers(players) {
@@ -324,15 +249,68 @@ export function getCurrentPlayers(players, subs) {
       .filter((player) => player.subStatus === 0)
       .sort((a, b) => a.number - b.number);
   }
-
-  function getSubsInWaiting(subs) {
-    return [
-      ...subs.filter((sub) => !sub.gameMinute),
-      { id: null, subIn: null, subOut: null },
-    ];
-  }
 }
 
-export function updatePlayerStatus(currentPlayers, subIn, subOut, gameTime) {
-  // ... (Implementation for updating player statuses – less imperative)
+// Calculate players on the field for each stoppage
+export function calculatePlayersOnField({ stoppages, activePlayersWithStats }) {
+  return stoppages.map((stoppage) => ({
+    ...stoppage,
+    playersOnField: activePlayersWithStats.filter((player) => {
+      const isSubbedIn = player.subIns.some(
+        (sub) => sub.gameMinute < stoppage.begin
+      );
+      const isSubbedOut = player.subOuts.some(
+        (sub) => sub.gameMinute < stoppage.begin
+      );
+      const isStarter = player.playergamestatus.includes('starter');
+      return (isSubbedIn && !isSubbedOut) || isStarter;
+    }),
+  }));
+}
+// Calculate plus-minus for a specific player
+function calculatePlusMinus(stoppages, playerId) {
+  return stoppages.reduce((total, stoppage) => {
+    if (!stoppage.playersOnField.some((player) => player.playerid === playerId))
+      return total;
+
+    if (stoppage.event.includes('Scored')) {
+      return total + 1;
+    } else if (stoppage.event.includes('Against')) {
+      return total - 1;
+    }
+
+    return total;
+  }, 0);
+}
+
+// Calculate stoppage time to remove for a specific player
+function calculateStoppageTimeMinutesToRemove(stoppages, playerId) {
+  return stoppages.reduce((total, stoppage) => {
+    if (!stoppage.playersOnField.some((player) => player.playerid === playerId))
+      return total;
+
+    return total + (stoppage.end - stoppage.begin) * stoppage.clockStopped;
+  }, 0);
+}
+
+//ModalGameEdit Helpers
+export function getPlaceholder(type) {
+  switch (type) {
+    case '24Time':
+      return '19:00:00';
+    case 'convertedSeconds':
+      return '00:00';
+    case 'yesNo':
+      return 'true/false';
+    default:
+      return '';
+  }
+}
+export function formatValue(value, inputType) {
+  switch (inputType) {
+    case 'convertedSeconds':
+      return convertSecondsToMinutesSeconds(value);
+    default:
+      return value;
+  }
 }

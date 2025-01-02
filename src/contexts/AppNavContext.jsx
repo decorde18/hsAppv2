@@ -6,7 +6,7 @@ const menuButtons = [
   { name: 'Players', link: 'players' },
   { name: 'Games', link: 'games' },
   { name: 'Statistics', link: 'stats' },
-  { name: 'Other', link: 'seasonMain' },
+  { name: 'Other', link: 'Test' },
 ];
 
 const AppNavContext = createContext();

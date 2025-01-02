@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 export const usePeriods = ({
   gameId,
@@ -10,9 +10,14 @@ export const usePeriods = ({
   currentPeriod,
   getCurrentTime,
 }) => {
+  const [periodCreationInProgress, setPeriodCreationInProgress] =
+    useState(false);
+
   const createPeriod = useCallback(
     (newData) => {
       const periodData = { game: gameId, ...newData };
+      if (periodCreationInProgress || !newData) return;
+      setPeriodCreationInProgress(true);
       createData(
         {
           table: 'periods',
@@ -23,20 +28,21 @@ export const usePeriods = ({
         {
           onSuccess: (data) => {
             updateGameArrays({ field: 'periods', value: data.data[0] });
+            setPeriodCreationInProgress(false);
           },
         }
       );
     },
-    [createData, gameId, updateGameArrays]
+    [createData, gameId, periodCreationInProgress, updateGameArrays]
   );
 
   const updatePeriod = useCallback(
-    (newData) => {
+    (newData, period) => {
       updateData(
         {
           table: 'periods',
           newData,
-          id: currentPeriod.id,
+          id: period || currentPeriod.id,
         },
         {
           onSuccess: (data) => {
@@ -50,13 +56,24 @@ export const usePeriods = ({
 
   const deletePeriod = useCallback(
     (currentPeriodId) => {
-      deleteData({
-        table: 'periods',
-        id: currentPeriodId,
-        toast: false,
-      });
+      deleteData(
+        {
+          table: 'periods',
+          id: currentPeriodId,
+          toast: false,
+        },
+        {
+          onSuccess: () => {
+            updateGameArrays({
+              field: 'periods',
+              value: { id: currentPeriodId },
+              deleteItem: true,
+            });
+          },
+        }
+      );
     },
-    [deleteData]
+    [deleteData, updateGameArrays]
   );
   const periodHandle = {
     startGame: () =>

@@ -124,7 +124,6 @@ function GameBefore() {
   const { isUpdating, updateData } = useUpdateData();
   const [beginGame, setBeginGame] = useState(false);
   const [playerGameStatus, setPlayerGameStatus] = useState([]);
-
   useEffect(() => {
     setPlayerGameStatus(players);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -198,18 +197,17 @@ function GameBefore() {
   //TODO
   // fix menus so they close when clicked somewhere else
 
-  // if (!playerGameStatus) return <Spinner />;
   const gkSelectArray = [
     { label: 'PLEASE SELECT A GK', value: 0 },
     ...playerGameStatus
       .sort((a, b) => a.number - b.number)
       .sort(
         (a, b) =>
-          (a.gkRoster === null) - (b.gkRoster === null) ||
-          +a.gkRoster - +b.gkRoster
+          (a.gknumber === null) - (b.gknumber === null) ||
+          +a.gknumber - +b.gknumber
       )
       .map((play) => ({
-        label: `${play.number}   ${play.fullname}`,
+        label: `${play.gknumber || ''}   ${play.fullname}`,
         value: play.playerid,
       })),
   ];

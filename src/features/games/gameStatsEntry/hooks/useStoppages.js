@@ -41,35 +41,15 @@ export const useStoppages = ({
   );
 
   const updateStoppage = useCallback(
-    (newData, extraDetails) => {
-      const id = gameData.stoppageStatus.id;
-      updateData(
-        {
-          table: 'stoppages',
-          newData,
-          id,
-        },
-        {
-          onSuccess: (data) => {
-            if (newData.event === 'Goal Scored')
-              createData({
-                table: 'goalsFor',
-                newData: { eventId: data.data[0].id, ...extraDetails },
-                toast: false,
-              });
-
-            if (newData.event === 'Goal Against')
-              createData({
-                table: 'goalsAgainst',
-                newData: { eventId: data.data[0].id, ...extraDetails },
-                toast: false,
-              });
-            //extraDetails runs only if there is a discpline or a goal
-          },
-        }
-      );
+    (newData, extraDetails, id) => {
+      id = id || gameData.stoppageStatus.id;
+      updateData({
+        table: 'stoppages',
+        newData,
+        id,
+      });
     },
-    [createData, gameData.stoppageStatus.id, updateData]
+    [gameData.stoppageStatus.id, updateData]
   );
 
   const deleteStoppage = useCallback(() => {

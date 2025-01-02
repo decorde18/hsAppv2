@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 @import 'https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap';
+
 /* These CSS variables are global, so they are available in all CSS modules */
 :root {
   --color-brand--1: #a89469;

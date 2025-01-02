@@ -30,7 +30,6 @@ const Aside = styled.aside`
 const Main = styled.section`
   /* background-color: green; */
   grid-template-columns: 15fr 85fr; //aside main
-
   flex: 0;
   padding: 2rem;
   height: 100%;

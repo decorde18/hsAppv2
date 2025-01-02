@@ -9,6 +9,8 @@ export function usePreparePlayerData({
   playerSeason,
   subs,
   gameTime,
+  stoppages,
+  stoppageHandle,
 }) {
   const [players, setPlayers] = useState([]);
   const [inactivePlayers, setInactivePlayers] = useState([]);
@@ -20,14 +22,18 @@ export function usePreparePlayerData({
   useEffect(() => {
     if (!playerGame.length || !playerSeason.length) return;
 
-    const preparedPlayers = preparePlayerData({ playerGame, subs, gameTime });
+    const { activePlayers, inactiveGamePlayers } = preparePlayerData({
+      playerGame,
+      subs,
+      gameTime,
+      stoppages,
+      stoppageHandle,
+    });
 
-    setPlayers(playerGame);
-    setInactivePlayers(preparedPlayers.inactiveGamePlayers);
-    setCurrentPlayers(
-      getCurrentPlayers(preparedPlayers.activePlayersWithStats, subs)
-    );
-  }, [playerGame, subs, playerSeason, gameTime]);
+    setPlayers(activePlayers);
+    setInactivePlayers(inactiveGamePlayers);
+    setCurrentPlayers(getCurrentPlayers(activePlayers));
+  }, [playerGame, playerSeason, subs, gameTime, stoppages, stoppageHandle]);
 
   return { players, inactivePlayers, currentPlayers, setCurrentPlayers };
 }

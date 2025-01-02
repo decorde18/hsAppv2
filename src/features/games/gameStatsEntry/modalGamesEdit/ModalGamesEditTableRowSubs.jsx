@@ -34,7 +34,7 @@ const StyledButton = styled.button`
     background-color: var(--color-grey-50);
   }
 `;
-function ModalGamesEditTableRow({
+function ModalGamesEditTableRowSubs({
   row,
   label,
   handleDelete,
@@ -120,4 +120,4 @@ function ModalGamesEditTableRow({
   );
 }
 
-export default ModalGamesEditTableRow;
+export default ModalGamesEditTableRowSubs;

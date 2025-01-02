@@ -7,8 +7,6 @@ import { CgEnter } from 'react-icons/cg';
 import { useGameContext } from '../../../../contexts/GameContext';
 import { usePlayerContext } from '../../../../contexts/PlayerContext';
 
-import { useSubstitutionHandling } from '../../../../hooks/useSubstitutionHandling';
-
 // Styled components for layout and styling
 const Main = styled.div`
   overflow-y: auto;
@@ -36,23 +34,7 @@ function Substitutions({ isWorking, children }) {
   const { currentPeriod, gameProgress } = gameData;
   const { game } = gameDataArrays;
 
-  const {
-    currentPlayers,
-    updateCurrentPlayers,
-    subsInWaiting,
-    setSubsInWaiting,
-    setGameSubs,
-  } = usePlayerContext();
-  const { createSub, updateSub, deleteSub, enterSub } = useSubstitutionHandling(
-    {
-      subsInWaiting,
-      setSubsInWaiting,
-      updateCurrentPlayers,
-
-      setGameSubs,
-    }
-  );
-  //TODO add rosternumber and sort by roster on select fields
+  const { currentPlayers, subsInWaiting, subHandle } = usePlayerContext();
   /**
    * Handles changes to substitution selections (player in/out).
    * Updates the state and optionally creates/updates data in the database.
@@ -63,7 +45,7 @@ function Substitutions({ isWorking, children }) {
       const storedSub = subsInWaiting[+index];
       if (!storedSub) throw new Error('Substitution data not found.');
       if (!storedSub.id)
-        createSub({
+        subHandle.createSub({
           periodId: currentPeriod.id,
           type,
           player,
@@ -71,7 +53,7 @@ function Substitutions({ isWorking, children }) {
         });
       else {
         const updatedSub = { ...storedSub, [type]: player };
-        updateSub({ updatedSub });
+        subHandle.updateSub({ updatedSub });
       }
     } catch (error) {
       console.error('Error handling substitution change:', error);
@@ -86,11 +68,11 @@ function Substitutions({ isWorking, children }) {
     try {
       const clickedSub = subsInWaiting[+index];
       if (!clickedSub) throw new Error('Substitution data not found.');
-      if (type === 'delete') deleteSub(index);
+      if (type === 'delete') subHandle.cancelSub(index);
       else if (type === 'enter') {
         if (!clickedSub.subIn || !clickedSub.subOut) return;
         const gameTime = getGameTime.gameTime();
-        enterSub(index, clickedSub, gameTime);
+        subHandle.enterSub(index, clickedSub, gameTime);
       }
     } catch (error) {
       console.error('Error handling button click:', error);
@@ -123,7 +105,7 @@ function Substitutions({ isWorking, children }) {
                   )
                   .map((player) => ({
                     value: player.playerid,
-                    label: player.fullname,
+                    label: `${player.number} ${player.fullname}`,
                   })),
               ]}
               onChange={(e) =>
@@ -157,7 +139,7 @@ function Substitutions({ isWorking, children }) {
                   )
                   .map((player) => ({
                     value: player.playerid,
-                    label: player.fullname,
+                    label: `${player.number} ${player.fullname}`,
                   })),
               ]}
               onChange={(e) =>

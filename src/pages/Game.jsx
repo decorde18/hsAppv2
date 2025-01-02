@@ -24,6 +24,7 @@ function Game() {
   if (error) {
     return <div>Error: {error}</div>;
   }
+
   return (
     <GameContextProvider gameDetails={gameDetails}>
       <PlayerContextProvider

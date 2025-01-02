@@ -30,6 +30,7 @@ function PlayerTable({ status, displayTable = 'all', sortArr }) {
     break: periodBreakColumns,
     default: duringGameColumns,
   };
+
   const columns = (columnsMap[status] || columnsMap.default).filter((column) =>
     column.displayTable.includes(displayTable)
   );
@@ -72,6 +73,7 @@ function PlayerTable({ status, displayTable = 'all', sortArr }) {
       sortArray
     );
   }
+
   return (
     <Table columns={columnWidths}>
       <Table.Header>

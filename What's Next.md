@@ -1,5 +1,14 @@
+- Make ModalGameEdit effective
+  - fix edit by creating a form for the
+  - create a blank line or addnew button
+- ActionGoal TODO
+  -probably need to remove activeStoppage from gameDataArrays stoppages (ie if no end)
 - upadte the IHS / Indeependence etc to use dbDefaults from Supabase
   \*\* do it
+
+- go through Select and add pLaceholder instead of adding a blank value ---see ActionGoal Selects
+
+- Eliminate I AM HERE
 
 ## //TODO FIXME !!!
 
@@ -81,6 +90,11 @@
 - create helper functions for all Date events (send to google calendar, with time, without time, etc)
 - create file upload page for team pics, player pics, etc - see https://www.youtube.com/watch?v=HvOvdD2nX1k
 - useMutation in create playerForm does not run on create parents because of iterations. If you can understand the useMutation hook later on as a developer, fix it
+
+# 1/2/2025
+
+- make CreateGoal effective
+  -gameStart, gameDuring, gameEnd, GameBreak, subs all working
 
 # 12/16/2024
 

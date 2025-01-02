@@ -139,7 +139,7 @@ const TableWithFeatures = ({
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   const [filters, setFilters] = useState({});
   const [tableData, setTableData] = useState(data); // Add state for table data
-
+  console.log(sortConfig);
   const handleSort = (key) => {
     let direction = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') {

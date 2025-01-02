@@ -5,13 +5,16 @@ import { useHandleMissingPlayers } from '../hooks/useHandleMissingPlayers';
 import { usePreparePlayerData } from '../hooks/usePreparePlayerData';
 
 import Spinner from '../ui/Spinner';
+import { useGameContext } from './GameContext';
+import { useSubstitutionHandling } from '../hooks/useSubstitutionHandling';
 
 const PlayerContext = createContext();
 
 function PlayerContextProvider({ playerDetails, gameDetails, children }) {
+  const { gameDataArrays, updateGameArrays } = useGameContext();
+  const { stoppages } = gameDataArrays;
   const { playerGame, playerSeason } = playerDetails;
   const { game, subs } = gameDetails;
-
   const { isCreating, createData } = useCreateData();
 
   const missingPlayers = useHandleMissingPlayers(
@@ -37,40 +40,8 @@ function PlayerContextProvider({ playerDetails, gameDetails, children }) {
     playerSeason,
     subs: gameSubs,
     gameTime: game.actualgametime,
+    stoppages,
   }); // Returns player data
-
-  // const updateCurrentPlayers = useCallback((subDetails, gameTime) => {
-  //   const { subIn, subOut } = subDetails;
-
-  //   // setCurrentPlayers((prev) => {
-  //   //   const onField = prev.onField.filter((p) => p.playerid !== subOut);
-  //   //   const offField = prev.offField.filter((p) => p.playerid !== subIn);
-
-  //   //   const updatedOnField = [
-  //   //     ...onField,
-  //   //     {
-  //   //       ...prev.offField.find((p) => p.playerid === subIn),
-  //   //       lastIn: gameTime,
-  //   //     },
-  //   //   ];
-
-  //   //   const updatedOffField = [
-  //   //     ...offField,
-  //   //     {
-  //   //       ...prev.onField.find((p) => p.playerid === subOut),
-  //   //       lastOut: gameTime,
-  //   //     },
-  //   //   ];
-
-  //   //   return {
-  //   //     onField: updatedOnField,
-  //   //     offField: updatedOffField,
-  //   //   };
-  //   // });
-  // }, []);
-  // const addSubToWaitingList = useCallback((sub) => {
-  //   setSubsInWaiting((prev) => [...prev, sub]);
-  // }, []);
 
   // Populate state when hook data is available
   useEffect(() => {
@@ -80,7 +51,16 @@ function PlayerContextProvider({ playerDetails, gameDetails, children }) {
     }
   }, [preparedPlayerData]); // Update only when `preparedPlayerData` changes
 
+  const { subHandle } = useSubstitutionHandling({
+    subsInWaiting,
+    setSubsInWaiting,
+    gameSubs,
+    setGameSubs,
+    updateGameArrays,
+  });
+
   if (missingPlayers || isCreating || !players.length) return <Spinner />;
+
   return (
     <PlayerContext.Provider
       value={{
@@ -90,7 +70,7 @@ function PlayerContextProvider({ playerDetails, gameDetails, children }) {
         setSubsInWaiting,
         gameSubs,
         setGameSubs,
-        // updateCurrentPlayers,
+        subHandle,
       }}
     >
       {children}

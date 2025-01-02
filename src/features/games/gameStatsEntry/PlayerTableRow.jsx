@@ -5,12 +5,12 @@ import { useClockContext } from '../../../contexts/ClockContext';
 
 function PlayerTableRow({ player, displayTable, columns }) {
   const { currentPeriodTime } = useClockContext();
-
   //TODO on half change, last in/out need to reflect previous in/out from previous half
   //TODO at end of game, final minutes needs to be calculated differently a starter will not have the full time they were in and a sub will have more time. see game 7
 
   function getField(column) {
     let field = player[column.field];
+
     //do we need to get the value of the field
     if (column.field === 'lastOut')
       field = player.outs > 0 ? currentPeriodTime - player.lastOut : null;
@@ -21,7 +21,6 @@ function PlayerTableRow({ player, displayTable, columns }) {
       (displayTable === 'onField' || displayTable === 'played') &&
       column.field === 'minPlayed'
     )
-      //field = player.minPlayed + (lastIn || gameTime);
       field =
         player.outMinutes -
         player.inMinutes +
@@ -42,8 +41,9 @@ function PlayerTableRow({ player, displayTable, columns }) {
           ? 'GK'
           : '';
 
-    if (!field) field = '';
-    if (field === 'subStatus') console.log(field);
+    // if (column.field === 'plusMinus') field = 'TODO';
+    if (field === null || field === undefined) field = '';
+    // if (field === 'subStatus') console.log(field);
     return field;
   }
   return (

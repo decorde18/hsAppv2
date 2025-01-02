@@ -17,6 +17,10 @@ function ClockProvider({ children, getGameTime, gameProgress, currentPeriod }) {
 
       return () => clearInterval(interval);
     }
+
+    if (gameProgress === 'endGame') {
+      setCurrentPeriodTime(getGameTime.fullGameTime());
+    }
   }, [currentPeriod, gameProgress, getGameTime]);
   return (
     <ClockContext.Provider value={{ currentPeriodTime }}>

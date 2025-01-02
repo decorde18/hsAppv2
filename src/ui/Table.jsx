@@ -41,7 +41,7 @@ const StyledHeader = styled(CommonRow)`
   font-size: 0.9rem;
   font-weight: 600;
   position: sticky;
-  top: 0;
+
   z-index: 5;
 `;
 const StyledPrintHeader = styled(CommonRow)`

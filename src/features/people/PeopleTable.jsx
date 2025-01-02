@@ -7,12 +7,13 @@ import Table from '../../ui/Table';
 import HeaderSortFilter from '../../ui/HeaderSortFilter';
 import Empty from '../../ui/Empty';
 import { filterChange, sortUpdate } from '../../utils/filterHelpers';
+import TableWithFeatures from '../../ui/TableWithFeatures';
 
 const columns = [
   {
     table: 'people',
     label: 'Title',
-    field: 'title',
+    key: 'title',
     type: 'string',
     sort: false,
     // sortPriority: 1,
@@ -23,7 +24,7 @@ const columns = [
   {
     table: 'people',
     label: 'First Name',
-    field: 'firstName',
+    key: 'firstName',
     type: 'string',
     sort: true,
     sortPriority: 2,
@@ -34,7 +35,7 @@ const columns = [
   {
     table: 'people',
     label: 'Last Name',
-    field: 'lastName',
+    key: 'lastName',
     type: 'string',
     sort: true,
     sortPriority: 1,
@@ -46,7 +47,7 @@ const columns = [
   {
     table: 'people',
     label: 'Number',
-    field: 'cellNumber',
+    key: 'cellNumber',
     type: 'number',
     sort: false,
     // sortPriority: 1,
@@ -57,7 +58,7 @@ const columns = [
   {
     table: 'people',
     label: 'Email',
-    field: 'email',
+    key: 'email',
     type: 'string',
     sort: false,
     // sortPriority: 1,
@@ -68,7 +69,7 @@ const columns = [
   {
     table: 'people',
     label: 'Created',
-    field: 'created_at',
+    key: 'created_at',
     type: 'date',
     sort: false,
     // sortPriority: 1,
@@ -76,7 +77,7 @@ const columns = [
     width: '1fr',
     isSearchable: true,
   },
-  { width: '0.2fr', field: 'options', columnType: 'string' },
+  // { width: '0.2fr', key: 'options', columnType: 'string' },
 ];
 
 function PeopleTable() {
@@ -95,7 +96,7 @@ function PeopleTable() {
     ]]: columns
       .filter((column) => column.sort)
       .map((column) => ({
-        field: column.field,
+        field: column.key,
         direction: column.defaultSortDirection,
         sortPriority: column.sortPriority,
       }))
@@ -106,6 +107,7 @@ function PeopleTable() {
   const { isLoading, data: people } = useData({
     table: 'people',
     sort: sort.people,
+    filter: currentFilters,
   });
 
   useEffect(() => {
@@ -139,12 +141,17 @@ function PeopleTable() {
     const newSort = sortUpdate({ selectedSort, sort });
     setSort(newSort);
   }
-
-  if (isLoading) return <Spinner />;
+  if (isLoading || !filteredValues) return <Spinner />;
 
   return (
     <Menus>
-      <Table columns={columnWidths}>
+      <TableWithFeatures
+        key="people"
+        headers={columns}
+        data={people}
+        rowsPerPage={20}
+      />
+      {/* <Table columns={columnWidths}>
         <Table.Header>
           {columns.map((column) => (
             <HeaderSortFilter
@@ -192,7 +199,7 @@ function PeopleTable() {
             render={(person) => <PeopleRow person={person} key={person.id} />}
           />
         )}
-      </Table>
+      </Table> */}
     </Menus>
   );
 }

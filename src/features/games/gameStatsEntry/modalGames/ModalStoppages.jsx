@@ -118,7 +118,7 @@ function ModalStoppages() {
     : stoppageStatus.event.toLowerCase().includes('injury')
     ? 'Injury'
     : 'Other';
-  console.log(currentPlayers);
+
   const stoppageTypes = buttons.filter(
     (button) => button.section === 'stoppage'
   );
@@ -159,7 +159,7 @@ function ModalStoppages() {
 
   function saveStoppage() {
     //determine if extra data needs to be created (ie goal, discipline)
-    if (stoppageStatus.event === 'goal')
+    if (stoppageStatus.event.toLowerCase().includes('goal'))
       goalHandle.createGoal(goalScored, details);
     else if (stoppageStatus.event === 'discipline')
       disciplineHandle.createDiscipline(discipline);

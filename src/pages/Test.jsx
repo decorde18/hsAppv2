@@ -1,57 +1,25 @@
-import UniversalForm from '../ui/universalForm';
-const data = {
-  fields: [
-    {
-      label: 'Field 1',
-      name: 'field1',
-      type: 'input',
-      required: true,
-      message: 'field 1 needs an answer',
-      size: 11,
-    },
-    {
-      label: 'Field 2',
-      name: 'field2',
-      type: 'input',
-      required: true,
-      message: 'field 2 needs an answer',
-      size: 11,
-    },
-  ],
-  buttons: ['submit', 'reset', 'cancel'],
-};
-// const data = {
-//   pages: [
-//     {
-//       name: 'page 1',
-//       default: true,
-//       sections: [
-//         {
-//           name: 'section 1',
-//           fields: [
-//             {
-//               label: 'Field 1',
-//               name: 'field1',
-//               type: 'input',
-//               required: true,
-//               message: 'field 1 needs an answer',
-//             },
-//             {
-//               label: 'Field 2',
-//               name: 'field2',
-//               type: 'input',
-//               required: true,
-//               message: 'field 2 needs an answer',
-//             },
-//           ],
-//         },
-//       ],
-//       buttons: ['submit', 'reset', 'cancel'],
-//     },
-//   ],
-// };
+import CalendarFull from '../ui/CalendarFull';
+
 function Test() {
-  return <UniversalForm record={{ id: 12 }} data={data} />;
+  return (
+    <CalendarFull
+      initialView="dayGridMonth"
+      weekends={true}
+      events={[
+        {
+          title: 'event 1',
+          start: '2024-12-01T12:05:00',
+          end: '2024-12-02T14:05:00',
+        },
+        { title: 'event 2', date: '2024-12-02', time: '3:45 pm' },
+      ]}
+      headerToolbar={{
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek,listWeek',
+      }}
+    />
+  );
 }
 
 export default Test;

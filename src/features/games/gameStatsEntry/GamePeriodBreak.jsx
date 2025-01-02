@@ -15,7 +15,6 @@ import Substitutions from './duringGame/Substitutions';
 import PlayerTable from './components/PlayerTable';
 import PopUpConfirm from './modalGames/PopUpConfirm';
 import ModalGamesEditButton from './modalGamesEdit/ModalGamesEditButton';
-import { useSubstitutionHandling } from '../../../hooks/useSubstitutionHandling';
 
 const Container = styled.div`
   display: flex;
@@ -32,8 +31,7 @@ const Column = styled.div`
 `;
 
 function GamePeriodBreak() {
-  const { subsInWaiting, setSubsInWaiting, gameSubs, setGameSubs } =
-    usePlayerContext(); // Access player context states
+  const { subsInWaiting, subHandle } = usePlayerContext(); // Access player context states
 
   const { periodHandle, gameData, getGameTime } = useGameContext(); // Access currentPeriod and gameMinute
 
@@ -41,13 +39,6 @@ function GamePeriodBreak() {
   const [startTime, setStartTime] = useState(null); // Tracks the active modal
   const { currentPeriod } = gameData; // Access currentPeriod and gameMinute
   const gameMinute = getGameTime.gameTime();
-
-  const { enterAllSubs } = useSubstitutionHandling({
-    subsInWaiting,
-    setSubsInWaiting,
-    gameSubs,
-    setGameSubs,
-  });
 
   function handleClick() {
     const start = getCurrentTime();
@@ -60,7 +51,7 @@ function GamePeriodBreak() {
     // Handle actions based on modal id and button action
     handleCloseModal();
     if (id === 'subsConfirm' && actionType === 'confirmBtn')
-      enterAllSubs({ periodId: currentPeriod.id, gameMinute }); // Pass currentPeriod ID and gameMinute
+      subHandle.enterAllSubs({ periodId: currentPeriod.id, gameMinute }); // Pass currentPeriod ID and gameMinute
     startPeriod();
   }
   function handleCloseModal() {

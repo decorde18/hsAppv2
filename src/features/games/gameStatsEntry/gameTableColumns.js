@@ -135,7 +135,7 @@ export const periodBreakColumns = [
     width: '.25fr',
     columnType: 'string',
     textAlign: 'right',
-    displayTable: ['DNP', 'played'],
+    displayTable: ['all'],
   },
   {
     table: 'playerSeasons',
@@ -149,7 +149,7 @@ export const periodBreakColumns = [
     width: '1.5fr',
     columnType: 'string',
     textAlign: 'left',
-    displayTable: ['DNP', 'played'],
+    displayTable: ['all'],
   },
   {
     table: 'playerSeasons',
@@ -163,7 +163,7 @@ export const periodBreakColumns = [
     width: '.5fr',
     columnType: 'string',
     textAlign: 'center',
-    displayTable: ['played'],
+    displayTable: ['all'],
   },
   {
     table: 'playerSeasons',
@@ -177,7 +177,7 @@ export const periodBreakColumns = [
     width: '.5fr',
     columnType: 'number',
     textAlign: 'center',
-    displayTable: ['played'],
+    displayTable: ['all'],
   },
   {
     table: 'playerSeasons',
@@ -191,7 +191,7 @@ export const periodBreakColumns = [
     width: '.5fr',
     columnType: 'number',
     textAlign: 'center',
-    displayTable: ['played'],
+    displayTable: ['all'],
   },
   {
     table: 'playerSeasons',
@@ -205,7 +205,7 @@ export const periodBreakColumns = [
     width: '.5fr',
     columnType: 'number',
     textAlign: 'center',
-    displayTable: ['played'],
+    displayTable: ['all'],
   },
   {
     table: 'playerSeasons',
@@ -219,7 +219,7 @@ export const periodBreakColumns = [
     width: '.5fr',
     columnType: 'number',
     textAlign: 'center',
-    displayTable: ['played'],
+    displayTable: ['all'],
   },
   {
     table: 'playerSeasons',
@@ -233,7 +233,7 @@ export const periodBreakColumns = [
     width: '.5fr',
     columnType: 'number',
     textAlign: 'right',
-    displayTable: ['played'],
+    displayTable: ['all'],
   },
   {
     table: 'playerSeasons',
@@ -247,7 +247,7 @@ export const periodBreakColumns = [
     width: '.5fr',
     columnType: 'number',
     textAlign: 'center',
-    displayTable: ['played'],
+    displayTable: ['all'],
   },
 ];
 export const afterGameColumns = [

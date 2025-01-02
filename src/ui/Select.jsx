@@ -28,35 +28,7 @@ const StyledSelect = styled.select`
     cursor: not-allowed;
   }
 `;
-// return (
-//   <div>
-//     {label && <label htmlFor={id}>{label}</label>}
-//     <StyledSelect
-//       id={id}
-//       className={props.className}
-//       style={props.style}
-//       {...register}
-//       value={value}
-//       onChange={onChange}
-//       {...props}
-//     >
-//       {placeholder && (
-//         <option value="" disabled>
-//           {placeholder}
-//         </option>
-//       )}
-//       {options.map((option) => (
-//         <option
-//           value={option.value}
-//           key={option.value}
-//           disabled={option.disabled}
-//         >
-//           {option.label}
-//         </option>
-//       ))}
-//     </StyledSelect>
-//   </div>
-// );
+
 function Select({
   label,
   options,
@@ -64,7 +36,7 @@ function Select({
   onChange,
   register,
   placeholder = 'Please select an option',
-  name,
+  // name,
   type = 'white',
   width = null,
   ...props

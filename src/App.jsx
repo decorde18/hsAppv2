@@ -99,6 +99,7 @@ function App() {
                   {/* THESE ARE OUR PUBLIC PAGES */}
                   <Route path="login" element={<Login />} />
                   <Route path="schedule" element={<Schedule />} />
+
                   <Route path="roster" element={<Roster />} />
                   <Route path="newplayer" element={<NewPlayer />} />
                   <Route path="camps" element={<SummerCampRegistrations />} />

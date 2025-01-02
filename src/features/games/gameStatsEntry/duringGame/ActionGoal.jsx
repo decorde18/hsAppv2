@@ -65,6 +65,7 @@ function ActionGoal({ team, players, goalScoredData }) {
       [name]: +value,
     }));
   }
+  //todo on the goalscored form, we need to adjsut the pk, indirect, throwin, etc to just be one value not true false and only reflected as goal_type as that is the new column i created. also, when I click on a highlighted type, it should change back to Run of Play
 
   return (
     team &&
@@ -76,32 +77,28 @@ function ActionGoal({ team, players, goalScoredData }) {
             <Select
               width={25}
               name="scorer"
-              options={[
-                { value: 0, label: 'Select Goal Scorer' },
-                ...players
-                  .filter((player) => player.playerid !== goalScored?.assister)
-                  .map((player) => ({
-                    value: player.playerid,
-                    label: `${player.number} ${player.fullname}`,
-                  })),
-              ]}
-              value={goalScored?.scorer}
+              placeholder="Select Goal Scorer"
+              options={players
+                .filter((player) => player.playerid !== goalScored?.assister)
+                .map((player) => ({
+                  value: player.playerid,
+                  label: `${player.number} ${player.fullname}`,
+                }))}
+              value={goalScored?.scorer || ''}
               onChange={handleSelectChange}
             />
             <Select
               width={25}
               name="assister"
-              options={[
-                { value: 0, label: 'Select If there is an Assist' },
-                ...players
-                  .filter((player) => player.playerid !== goalScored?.scorer)
-                  .map((player) => ({
-                    value: player.playerid,
-                    label: `${player.number} ${player.fullname}`,
-                  })),
-              ]}
+              placeholder="Select If there is an Assist"
+              options={players
+                .filter((player) => player.playerid !== goalScored?.scorer)
+                .map((player) => ({
+                  value: player.playerid,
+                  label: `${player.number} ${player.fullname}`,
+                }))}
               onChange={handleSelectChange}
-              value={goalScored?.assister}
+              value={goalScored?.assister || ''}
             />
           </FlexDiv>
         </div>

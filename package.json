@@ -11,6 +11,9 @@
     "server": "json-server --watch data/data.json --port 9001 --delay 500"
   },
   "dependencies": {
+    "@fullcalendar/core": "^6.1.15",
+    "@fullcalendar/daygrid": "^6.1.15",
+    "@fullcalendar/react": "^6.1.15",
     "@react-pdf/renderer": "^3.1.12",
     "@reduxjs/toolkit": "^1.9.5",
     "@supabase/auth-helpers-react": "^0.4.2",

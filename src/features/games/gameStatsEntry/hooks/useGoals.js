@@ -4,47 +4,49 @@ export const useGoals = ({
   createData,
   updateData,
   deleteData,
-  updateGame,
-  gameDataArrays,
   gameData,
   getGameTime,
-  setGameDataArrays,
+  stoppageHandle,
 }) => {
-  const createGoal = useCallback((data) => {}, []);
+  const createGoal = useCallback(
+    (data) => {
+      const { team, ...newData } = data;
+      const table = team === 'for' ? 'goalsFor' : 'goalsAgainst';
+      createData(
+        {
+          table,
+          newData,
+          toast: false,
+        },
+        {
+          onSuccess: (data) => {
+            console.log(data);
+          },
+        }
+      );
+    },
+    [createData]
+  );
 
-  const updateGoal = useCallback((newData, extraDetails) => {}, []);
+  const updateGoal = useCallback((newData, extraDetails) => {
+    console.log('todo - update goal');
+  }, []);
 
-  const deleteGoal = useCallback(() => {}, []);
+  const deleteGoal = useCallback(() => {
+    console.log('todo - delete goal');
+  }, []);
   const goalHandle = {
     createGoal: (goalScored, details) => {
       const end = getGameTime.gameTime();
+      const id = gameData.stoppageStatus.id;
       const team = gameData.stoppageStatus.team;
       const event = team === 'for' ? 'Goal Scored' : 'Goal Against';
       const { goal, ...extraDetails } = goalScored;
+      const goalData = { ...extraDetails, eventId: id, team };
 
-      updateGame({ field: 'stoppageStatus', value: false });
+      stoppageHandle.updateStoppage({ event, end, details, team });
 
-      if (team === 'for') {
-        //todo I AM HERE,
-        updateGame({
-          field: 'game',
-          value: {
-            ...gameDataArrays,
-            game: { ...gameDataArrays.game, gf: gameDataArrays.game.gf++ },
-          },
-        });
-        //todo send to server
-        // updateStoppage({ event, end, details }, extraDetails);
-      } else {
-        updateGame({
-          field: 'game',
-          value: {
-            ...gameDataArrays,
-            game: { ...gameDataArrays.game, ga: gameDataArrays.game.ga++ },
-          },
-        });
-        //todo send to server
-      }
+      createGoal(goalData);
     },
   };
   return {
