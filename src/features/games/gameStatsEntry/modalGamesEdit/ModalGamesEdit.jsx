@@ -1,20 +1,16 @@
 import styled from 'styled-components';
-
 import { useSearchParams } from 'react-router-dom';
 import { useMemo, useState } from 'react';
 
 import { useGameContext } from '../../../../contexts/GameContext';
+import { usePlayerContext } from '../../../../contexts/PlayerContext';
 
 import Button from '../../../../ui/Button';
 import Select from '../../../../ui/Select';
 import Table from '../../../../ui/Table';
-
 import ModalGamesEditTableRow from './ModalGamesEditTableRow';
-import { usePlayerContext } from '../../../../contexts/PlayerContext';
-import ModalGamesEditTableRowPeriods from './ModalGamesEditTableRowPeriods';
-import ModalGamesEditTableRowGoals from './ModalGamesEditTableRowGoals';
-import ModalGamesEditTableRowSubs from './ModalGamesEditTableRowSubs';
 
+// Styled components
 const Background = styled.div`
   width: 100dvw;
   height: 100dvh;
@@ -26,6 +22,7 @@ const Background = styled.div`
   grid-template-rows: auto 1fr;
   overflow: hidden;
 `;
+
 const Header = styled.div`
   display: flex;
   flex-direction: column;
@@ -34,11 +31,13 @@ const Header = styled.div`
   height: 10.9rem;
   background-color: #f8f9fa;
 `;
+
 const Container = styled.div`
   display: grid;
   grid-template-rows: auto 1fr;
   overflow: hidden;
 `;
+
 const TopSection = styled.div`
   padding: 1rem;
   display: flex;
@@ -46,11 +45,13 @@ const TopSection = styled.div`
   align-items: center;
   background-color: #f8f9fa;
 `;
+
 const MainGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr; /* Two equal-width columns */
   overflow-y: auto;
 `;
+
 const Column = styled.div`
   flex: 1;
   overflow-y: auto;
@@ -58,127 +59,13 @@ const Column = styled.div`
   border: 1px solid var(--color-grey-50);
   border-radius: 1rem;
 `;
+
 const SidePanel = styled.div`
   border: 1px solid #ccc;
   border-radius: 5px;
   padding: 1rem;
   background: #ffffff;
 `;
-
-const editableCategories = [
-  {
-    index: 1,
-    label: 'Periods',
-    single: 'Period',
-    value: 'periods',
-    categories: [
-      { width: '.5fr', label: 'Period', value: 'period', type: 'number' },
-      { width: '1fr', label: 'Start Time', value: 'start', type: '24Time' },
-      { width: '1fr', label: 'End Time', value: 'end', type: '24Time' },
-      { width: '.5fr', value: 'id' },
-    ],
-  },
-  {
-    index: 2,
-    label: 'Minor Events',
-    single: 'Minor Event',
-    value: 'minorEvents',
-    disabled: true,
-  },
-  {
-    index: 3,
-    label: 'Goals',
-    single: 'Goal',
-    value: 'goals',
-    categories: [
-      {
-        width: '1fr',
-        label: 'Start Time',
-        value: 'begin',
-        type: 'convertedSeconds',
-      },
-      {
-        width: '1fr',
-        label: 'End Time',
-        value: 'end',
-        type: 'convertedSeconds',
-      },
-      { width: '1fr', label: 'Team', value: 'team' },
-      {
-        width: '1fr',
-        label: 'Clock Stopped',
-        value: 'clockStopped',
-        type: 'yesNo',
-      },
-      { width: '.5fr', value: 'id' },
-    ],
-  },
-  {
-    index: 4,
-    label: 'Substitutions',
-    single: 'Substitution',
-    value: 'subs',
-    categories: [
-      {
-        width: '.5fr',
-        label: 'Minute',
-        value: 'gameMinute',
-        type: 'convertedSeconds',
-      },
-      {
-        width: '1fr',
-        label: 'Sub In',
-        value: 'subIn',
-        type: 'select',
-        data: 'players',
-      },
-      {
-        width: '1fr',
-        label: 'Sub Out',
-        value: 'subOut',
-        type: 'select',
-        data: 'players',
-      },
-      { width: '.5fr', value: 'id' },
-    ],
-  },
-  {
-    index: 5,
-    label: 'Discipline',
-    single: 'Discipline',
-    value: 'discipline',
-    categories: [{ width: '.5fr', value: 'id' }],
-    disabled: true,
-  },
-  {
-    index: 6,
-    label: 'Other Stoppages',
-    single: 'Stoppage',
-    value: 'other',
-    categories: [
-      {
-        width: '1fr',
-        label: 'Start Time',
-        value: 'begin',
-        type: 'convertedSeconds',
-      },
-      {
-        width: '1fr',
-        label: 'End Time',
-        value: 'end',
-        type: 'convertedSeconds',
-      },
-      { width: '1fr', label: 'Team', value: 'team' },
-      {
-        width: '1fr',
-        label: 'Clock Stopped',
-        value: 'clockStopped',
-        type: 'yesNo',
-      },
-      { width: '.5fr', value: 'id' },
-    ],
-  },
-];
 
 function GameStatsEdit() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -190,10 +77,190 @@ function GameStatsEdit() {
     goalHandle,
     disciplineHandle,
   } = useGameContext();
+  const { periods, game } = gameDataArrays;
   const { subHandle } = usePlayerContext();
 
+  const [filteredData, setFilteredData] = useState([]);
   const [selectedValue, setSelectedValue] = useState(0);
   const [currentCategory, setCurrentCategory] = useState(null);
+  // Editable categories configuration
+  const editableCategories = [
+    {
+      index: 1,
+      label: 'Periods',
+      single: 'Period',
+      value: 'periods',
+      categories: [
+        {
+          width: '.5fr',
+          label: 'Period',
+          value: 'period',
+          type: 'number',
+          allowNull: false,
+        },
+        {
+          width: '1fr',
+          label: 'Start Time',
+          value: 'start',
+          type: '24Time',
+          allowNull: true,
+        },
+        {
+          width: '1fr',
+          label: 'End Time',
+          value: 'end',
+          type: '24Time',
+          allowNull: true,
+        },
+        { width: '.5fr', value: 'id' },
+      ],
+    },
+    {
+      index: 2,
+      label: 'Minor Events',
+      single: 'Minor Event',
+      value: 'minorEvents',
+      disabled: true,
+    },
+    {
+      index: 3,
+      label: 'Goals',
+      single: 'Goal',
+      value: 'stoppages',
+      categories: [
+        {
+          width: '1fr',
+          label: 'Start Time',
+          value: 'begin',
+          type: 'convertedSeconds',
+          allowNull: false,
+        },
+        {
+          width: '1fr',
+          label: 'End Time',
+          value: 'end',
+          type: 'convertedSeconds',
+          allowNull: false,
+        },
+        {
+          width: '1fr',
+          label: 'Team',
+          value: 'team',
+          allowNull: true,
+          type: 'select',
+          data: 'team',
+          placeholder: 'Select A Team',
+        },
+        {
+          width: '1fr',
+          label: 'Clock Stopped',
+          value: 'clockStopped',
+          type: 'switch',
+          allowNull: false,
+          defaultValue: false,
+        },
+        { width: '.5fr', value: 'id' },
+      ],
+    },
+    {
+      index: 4,
+      label: 'Substitutions',
+      single: 'Substitution',
+      value: 'subs',
+      categories: [
+        {
+          width: '.5fr',
+          label: 'Period',
+          value: 'periodId',
+          type: 'select',
+          data: 'periods',
+          allowNull: false,
+          placeholder: 'Period',
+        },
+        {
+          width: '.5fr',
+          label: 'Minute',
+          value: 'gameMinute',
+          type: 'convertedSeconds',
+          allowNull: false,
+        },
+        {
+          width: '1fr',
+          label: 'Sub In',
+          value: 'subIn',
+          type: 'select',
+          data: 'players',
+          allowNull: true,
+          placeholder: 'Select Sub In Player',
+        },
+        {
+          width: '1fr',
+          label: 'Sub Out',
+          value: 'subOut',
+          type: 'select',
+          data: 'players',
+          allowNull: true,
+          placeholder: 'Select Sub Out Player',
+        },
+        {
+          width: '.5fr',
+          label: 'GK',
+          value: 'gkSub',
+          type: 'checked',
+          allowNull: false,
+          defaultValue: false,
+        },
+        { width: '.5fr', value: 'id' },
+      ],
+    },
+    {
+      index: 5,
+      label: 'Discipline',
+      single: 'Discipline',
+      value: 'discipline',
+      categories: [{ width: '.5fr', value: 'id' }],
+      disabled: true,
+    },
+    {
+      index: 6,
+      label: 'Other Stoppages',
+      single: 'Stoppage',
+      value: 'other',
+      categories: [
+        {
+          width: '1fr',
+          label: 'Start Time',
+          value: 'begin',
+          type: 'convertedSeconds',
+          allowNull: false,
+        },
+        {
+          width: '1fr',
+          label: 'End Time',
+          value: 'end',
+          type: 'convertedSeconds',
+          allowNull: false,
+        },
+        {
+          width: '1fr',
+          label: 'Team',
+          value: 'team',
+          type: 'select',
+          data: 'team',
+          placeholder: 'Select A Team',
+        },
+        {
+          width: '1fr',
+          label: 'Clock Stopped',
+          value: 'clockStopped',
+          type: 'checked',
+          allowNull: false,
+          defaultValue: false,
+        },
+        { width: '.5fr', value: 'id' },
+      ],
+    },
+  ];
 
   const removeParams = () => {
     searchParams.delete('edit');
@@ -208,108 +275,97 @@ function GameStatsEdit() {
     setCurrentCategory(category);
   };
 
-  const filteredData = useMemo(() => {
-    if (!currentCategory) return [];
+  useMemo(() => {
+    if (!currentCategory) return;
 
-    const relevantKeys = currentCategory.categories.map((cat) => cat.value);
-    const transformData = (data) =>
-      data
-        .map((item) =>
-          relevantKeys.reduce((acc, key) => {
-            if (key in item) acc[key] = item[key];
-            return acc;
-          }, {})
-        )
-        .sort((a, b) => b.period - a.period)
-        .sort((a, b) => b.gameMinute - a.gameMinute)
-        .sort((a, b) => b.begin - a.begin);
+    const transformData = (data) => {
+      const relevantKeys = currentCategory.categories.map((cat) => cat.value);
+      return data.map((item) =>
+        relevantKeys.reduce((acc, key) => {
+          if (key in item) acc[key] = item[key];
+          return acc;
+        }, {})
+      );
+    };
 
-    switch (currentCategory.value) {
-      case 'other':
-        return transformData(
-          gameDataArrays.stoppages.filter(
-            (each) => !each.event.includes('Goal')
-          )
-        );
-      case 'goals':
-        return transformData(
-          gameDataArrays.stoppages.filter((each) => each.event.includes('Goal'))
-        );
-      case 'discipline':
-        return transformData(
-          gameDataArrays.stoppages.filter((each) => each.event.includes('Card'))
-        );
-      default:
-        return transformData(gameDataArrays[currentCategory.value] || []);
-    }
+    setFilteredData(() => {
+      const categoryValue = currentCategory.value;
+      const data = gameDataArrays[categoryValue] || [];
+
+      switch (categoryValue) {
+        case 'other':
+          return transformData(
+            gameDataArrays.stoppages.filter(
+              (each) => !each.event.includes('Goal')
+            )
+          );
+        case 'goals':
+          return transformData(
+            gameDataArrays.stoppages.filter((each) =>
+              each.event.includes('Goal')
+            )
+          );
+        case 'discipline':
+          return transformData(
+            gameDataArrays.stoppages.filter((each) =>
+              each.event.includes('Card')
+            )
+          );
+        default:
+          return transformData(data);
+      }
+    });
   }, [currentCategory, gameDataArrays]);
 
   const columnWidths = useMemo(() => {
     return currentCategory?.categories?.map((col) => col.width).join(' ') || '';
   }, [currentCategory]);
-  function handleAdd() {}
-  function handleEdit({ value, id, key }) {
-    if (currentCategory.value === 'periods')
-      periodHandle.updatePeriod({ [key]: value }, id);
-  }
-  function handleDelete(id) {
-    if (currentCategory.value === 'periods') periodHandle.deletePeriod(id);
-    if (currentCategory.value === 'goals') goalHandle.deleteGoal(id);
-    if (currentCategory.value === 'subs') subHandle.deleteSub(id);
-    if (currentCategory.value === 'minorEvents')
-      minorEventHandle.deleteMinor(id);
-    if (currentCategory.value === 'other') stoppageHandle.deleteStoppage(id);
-    if (currentCategory.value === 'discipline')
-      disciplineHandle.deleteDiscipline(id);
-  }
-  function returnPage(row) {
-    switch (currentCategory.value) {
-      case 'goals':
-        return (
-          <ModalGamesEditTableRowGoals
-            key={row.id}
-            row={row}
-            label={currentCategory.single}
-            fields={currentCategory.categories}
-            handleEdit={(values) => handleEdit(values)}
-            handleDelete={(id) => handleDelete(id)}
-          />
-        );
-      case 'periods':
-        return (
-          <ModalGamesEditTableRowPeriods
-            key={row.id}
-            row={row}
-            label={currentCategory.single}
-            fields={currentCategory.categories}
-            handleEdit={(values) => handleEdit(values)}
-            handleDelete={(id) => handleDelete(id)}
-          />
-        );
-      case 'subs':
-        return (
-          <ModalGamesEditTableRowSubs
-            key={row.id}
-            row={row}
-            label={currentCategory.single}
-            fields={currentCategory.categories}
-            handleEdit={(values) => handleEdit(values)}
-            handleDelete={(id) => handleDelete(id)}
-          />
-        );
-      default:
-        return (
-          <ModalGamesEditTableRow
-            key={row.id}
-            row={row}
-            label={currentCategory.single}
-            fields={currentCategory.categories}
-            handleEdit={(values) => handleEdit(values)}
-            handleDelete={(id) => handleDelete(id)}
-          />
-        );
-    }
-  }
+
+  const handleEdit = ({ value, id, key }) => {
+    const handlers = {
+      periods: periodHandle.updatePeriod,
+      goals: goalHandle.updateGoal,
+      subs: subHandle.updateSubManual,
+      minorEvents: minorEventHandle.updateMinor,
+      stoppages: stoppageHandle.updateStoppage,
+      other: stoppageHandle.updateStoppage,
+      discipline: disciplineHandle.updateDiscipline,
+    };
+
+    handlers[currentCategory?.value]?.({ [key]: value }, id);
+  };
+
+  const handleDelete = (id) => {
+    const handlers = {
+      periods: periodHandle.deletePeriod,
+      goals: goalHandle.deleteGoal,
+      subs: subHandle.deleteSub,
+      minorEvents: minorEventHandle.deleteMinor,
+      other: stoppageHandle.deleteStoppage,
+      discipline: disciplineHandle.deleteDiscipline,
+    };
+    handlers[currentCategory?.value]?.(id);
+  };
+  const handleAddNew = (newData) => {
+    const handlers = {
+      periods: periodHandle.manualNewPeriod,
+      goals: goalHandle.newGoal,
+      subs: subHandle.createSubManual,
+      minorEvents: minorEventHandle.newMinor,
+      other: stoppageHandle.newStoppage,
+      discipline: disciplineHandle.newDiscipline,
+    };
+    if (currentCategory?.value === 'subs')
+      newData = { ...newData, game: game.id };
+    handlers[currentCategory?.value]?.(newData);
+  };
+  const addRow = () => {
+    const newRow = currentCategory.categories.reduce((acc, cat) => {
+      acc[cat.value] = cat.defaultValue ?? '';
+      return acc;
+    }, {});
+    setFilteredData((prev) => [newRow, ...prev]);
+  };
 
   return (
     <Background>
@@ -340,9 +396,24 @@ function GameStatsEdit() {
                     <div key={col.value}>{col.label}</div>
                   ))}
                 </Table.Header>
+                <div>
+                  <Button onClick={addRow}>Add New Row</Button>
+                </div>
                 <Table.Body
                   data={filteredData}
-                  render={(row) => returnPage(row)}
+                  render={(row) => (
+                    <ModalGamesEditTableRow
+                      key={row.id}
+                      row={row}
+                      label={currentCategory?.single}
+                      fields={currentCategory?.categories}
+                      handleEdit={handleEdit}
+                      handleDelete={handleDelete}
+                      handleAddNew={handleAddNew}
+                      periods={periods}
+                      game={game}
+                    />
+                  )}
                 />
               </Table>
             ) : (

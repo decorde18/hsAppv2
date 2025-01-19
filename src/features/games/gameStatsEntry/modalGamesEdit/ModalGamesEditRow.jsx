@@ -1,15 +1,24 @@
 import Checkbox from '../../../../ui/Checkbox';
 import Input from '../../../../ui/Input';
 import Select from '../../../../ui/Select';
+import Switch from '../../../../ui/Switch';
 
-function GameStatsEditRow({ field, onChange, onBlur }) {
-  switch (field.inputType) {
-    case 'checkbox':
+function GameStatsEditRow({ inputType, field, onChange, onBlur }) {
+  switch (inputType) {
+    case 'checked':
       return (
         <Checkbox
-          checked={field.value}
+          checked={field.checked || field.value === true ? true : false}
           onChange={onChange}
           size={field.size}
+          name={field.name}
+        />
+      );
+    case 'switch':
+      return (
+        <Switch
+          checked={field.checked || field.value === true ? true : false}
+          onChange={onChange}
           name={field.name}
         />
       );
@@ -17,13 +26,14 @@ function GameStatsEditRow({ field, onChange, onBlur }) {
     case 'select':
       return (
         <Select
+          key={field.key}
           options={field.options}
           onChange={onChange}
           value={field.value}
           disabled={false}
-          width={field.size}
           name={field.name}
           placeholder={field.placeholder}
+          onBlur={onBlur}
         />
       );
     default:

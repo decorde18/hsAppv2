@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useGameContext } from '../../../contexts/GameContext';
 
 import {
-  convertSecondsToMinutesSeconds,
+  convertSecondsTo_mmss,
   formatDate,
   formatTime,
 } from '../../../utils/helpers';
@@ -64,10 +64,10 @@ function GameHeader() {
               <div>
                 <Clock>
                   {countDown === true
-                    ? convertSecondsToMinutesSeconds(
+                    ? convertSecondsTo_mmss(
                         currentPeriod?.default_time - currentPeriodTime
                       )
-                    : convertSecondsToMinutesSeconds(currentPeriodTime)}
+                    : convertSecondsTo_mmss(currentPeriodTime)}
                 </Clock>
                 <div>
                   <button onClick={() => setCountDown(() => !countDown)}>

@@ -1,9 +1,8 @@
 - Make ModalGameEdit effective
-  - fix edit by creating a form for the
-  - create a blank line or addnew button
+  --stoppages and goals needs to work without stoppage popup or at very least different popup conditions
 - ActionGoal TODO
   -probably need to remove activeStoppage from gameDataArrays stoppages (ie if no end)
-- upadte the IHS / Indeependence etc to use dbDefaults from Supabase
+- upadte the IHS / Independence etc to use dbDefaults from Supabase
   \*\* do it
 
 - go through Select and add pLaceholder instead of adding a blank value ---see ActionGoal Selects
@@ -90,6 +89,13 @@
 - create helper functions for all Date events (send to google calendar, with time, without time, etc)
 - create file upload page for team pics, player pics, etc - see https://www.youtube.com/watch?v=HvOvdD2nX1k
 - useMutation in create playerForm does not run on create parents because of iterations. If you can understand the useMutation hook later on as a developer, fix it
+
+# 1/7/2025
+
+- Make ModalGameEdit effective
+- Periods is working except for adding
+- fix edit by creating a form for the
+- create a blank line or addnew button
 
 # 1/2/2025
 

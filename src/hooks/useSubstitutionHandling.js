@@ -60,13 +60,63 @@ export function useSubstitutionHandling({
       console.error('Unexpected error while creating substitution:', error);
     }
   };
+  const createSubManual = (newData) => {
+    try {
+      createData(
+        {
+          table: 'subs',
+          newData,
+          toast: false,
+        },
+        {
+          onSuccess: (data) => {
+            setSubsInWaiting((prev) => [
+              ...prev.filter((sub) => !sub.gameMinute && sub.id),
+              data.data[0],
+              { id: null, subIn: null, subOut: null },
+            ]);
+          },
+          onError: (error) => {
+            console.error('Error creating substitution:', error);
+          },
+        }
+      );
+    } catch (error) {
+      console.error('Unexpected error while creating substitution:', error);
+    }
+  };
 
   /**
    * Update an existing substitution in subsInWaiting.
    * @param {Object} param0 - Parameters for updating a substitution.
    * @param {Object} param0.updatedSub - The updated substitution data.
    */
+  const updateSubManual = (newData, id) => {
+    try {
+      // Update the local state
+      const updatedSubs = subsInWaiting.map((sub) =>
+        sub.id === id ? { id, ...newData } : sub
+      );
+      setSubsInWaiting(updatedSubs);
+
+      updateData(
+        {
+          table: 'subs',
+          newData,
+          id,
+        },
+        {
+          onError: (error) => {
+            console.error('Error updating substitution:', error);
+          },
+        }
+      );
+    } catch (error) {
+      console.error('Unexpected error while updating substitution:', error);
+    }
+  };
   const updateSub = ({ updatedSub }) => {
+    console.log(updatedSub);
     try {
       // Update the local state
       const updatedSubs = subsInWaiting.map((sub) =>
@@ -221,7 +271,9 @@ export function useSubstitutionHandling({
   };
   const subHandle = {
     createSub,
+    createSubManual,
     updateSub,
+    updateSubManual,
     cancelSub,
     deleteSub,
     enterSub,

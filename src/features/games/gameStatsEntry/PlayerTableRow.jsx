@@ -1,4 +1,4 @@
-import { convertSecondsToMinutesSeconds } from '../../../utils/helpers';
+import { convertSecondsTo_mmss } from '../../../utils/helpers';
 
 import Table from '../../../ui/Table';
 import { useClockContext } from '../../../contexts/ClockContext';
@@ -29,8 +29,7 @@ function PlayerTableRow({ player, displayTable, columns }) {
           : 0);
 
     // do we need to get the time for the field
-    if (field && column.type === 'time')
-      field = convertSecondsToMinutesSeconds(field);
+    if (field && column.type === 'time') field = convertSecondsTo_mmss(field);
     //add X if saking for start
     if (column.type === 'ex') field = field ? 'X' : '';
     if (column.field === 'playergamestatus')

@@ -87,6 +87,7 @@ export const usePeriods = ({
         period: data.period,
         default_time: data.default_time,
       }),
+    manualNewPeriod: (data) => createPeriod(data),
     endPeriod: () => updatePeriod({ end: getCurrentTime() }),
     startPeriod: (data) => updatePeriod({ start: data.start }),
     updatePeriod,

@@ -1,7 +1,8 @@
 import { pl } from 'date-fns/locale';
 import {
-  converthmsToSecondsOnly,
-  convertSecondsToMinutesSeconds,
+  convertToSeconds,
+  convertSecondsTo_mmss,
+  isValidTimeFormat,
 } from '../../../../utils/helpers';
 import { min } from 'date-fns';
 
@@ -215,7 +216,7 @@ export function preparePlayerData({ playerGame, subs, gameTime, stoppages }) {
       playersOnFieldStoppages,
       player.playerid
     );
-    const totalGameTime = converthmsToSecondsOnly(gameTime);
+    const totalGameTime = convertToSeconds(gameTime);
 
     const minPlayed =
       player.subStatus === 1
@@ -300,16 +301,40 @@ export function getPlaceholder(type) {
       return '19:00:00';
     case 'convertedSeconds':
       return '00:00';
+    case 'number':
+      return '1';
     case 'yesNo':
       return 'true/false';
+    case 'select':
+      return 'Please Select a Field';
     default:
       return '';
+  }
+}
+export function validateField({ value, fieldType }) {
+  switch (fieldType) {
+    case '24Time':
+      value === null ? (value = null) : value;
+      return isValidTimeFormat(value);
+    case 'number':
+      return Number.isInteger(+value);
+    case 'convertedSeconds':
+      return convertToSeconds(value);
+    case 'select':
+      return Number.isInteger(+value);
+    case 'switch':
+      return !!value;
+    case 'checked':
+      return !!value;
+
+    default:
+      break;
   }
 }
 export function formatValue(value, inputType) {
   switch (inputType) {
     case 'convertedSeconds':
-      return convertSecondsToMinutesSeconds(value);
+      return convertSecondsTo_mmss(value);
     default:
       return value;
   }

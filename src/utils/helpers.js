@@ -31,7 +31,7 @@ export function addDays(date, numberOfDays) {
   return newDate.format('YYYY-MM-DD');
 }
 export const subtractTime = (startTime, endTime) => {
-  return converthmsToSecondsOnly(endTime) - converthmsToSecondsOnly(startTime);
+  return convertToSeconds(endTime) - convertToSeconds(startTime);
 };
 export const getToday = function (options = {}) {
   const today = new Date();
@@ -118,32 +118,78 @@ export function convertToGoogleDateTime(date, time, timeAdded = 0) {
   // conversion
   return dateTime.format('YYYY-MM-DDTHH:mm:s');
 }
-export function convertSecondsToMinutesSeconds(time) {
-  if (time < 0) return '00:00';
-  const minutes = Math.floor(time / 60);
-  let seconds = time % 60;
-  seconds = seconds < 10 ? `0${seconds}` : seconds;
-  time = `${minutes}:${seconds}`;
-  return time;
-}
-export function convertMinutesSecondsToSeconds(time) {
-  const [minutes, seconds] = time.split(':');
-  time = +minutes * 60 + +seconds;
-  return time;
-} //TODO remove this and have all reference go to converthmsto secondsonly
-export function converthmsToSecondsOnly(str) {
-  if (!str) return;
-  var p = str.split(':'),
-    s = 0,
-    m = 1;
+export function convertSecondsTo_mmss(time) {
+  time = String(time).trim();
+  const timePattern = /^(\d+):([0-5]\d)$/;
+  const match = time.match(timePattern);
 
-  while (p.length > 0) {
-    s += m * parseInt(p.pop(), 10);
-    m *= 60;
+  if (match) {
+    // Input is already in MM:SS format
+    return time;
   }
 
-  return s;
+  // Check if input is a valid number (total seconds)
+  if (time < 0) return '00:00';
+  if (/^\d+$/.test(time)) {
+    const minutes = Math.floor(time / 60);
+    let seconds = time % 60;
+    seconds = seconds < 10 ? `0${seconds}` : seconds;
+    time = `${minutes}:${seconds}`;
+
+    return time;
+  }
+
+  // const totalSeconds = parseInt(value, 10);
+  // const minutes = Math.floor(totalSeconds / 60);
+  // const seconds = totalSeconds % 60;
+  // return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+  // Invalid input
+  return null;
 }
+export function convertToSeconds(time) {
+  // Convert input to string and trim whitespace
+  time = String(time).trim();
+
+  // Regex to match HH:MM:SS or MM:SS formats
+  const timePattern = /^(\d+):([0-5]?\d)(?::([0-5]?\d))?$/;
+  const match = time.match(timePattern);
+
+  if (match) {
+    // Extract matched groups for hours, minutes, and seconds
+    const hours = match[3] ? parseInt(match[1], 10) : 0; // If HH:MM:SS, the first group is hours
+    const minutes = parseInt(match[match[3] ? 2 : 1], 10); // Adjust for MM:SS format
+    const seconds = parseInt(match[match[3] ? 3 : 2], 10) || 0;
+
+    return hours * 3600 + minutes * 60 + seconds;
+  }
+
+  // Check if input is a valid number (total seconds)
+  if (/^\d+$/.test(time)) {
+    return parseInt(time, 10);
+  }
+
+  // Invalid input
+  return null;
+}
+// export function convertMinutesSecondsTo_ss(time) {
+//   const [minutes, seconds] = time.split(':');
+//   time = +minutes * 60 + +seconds;
+//   return time;
+// } //TODO remove this and have all reference go to converthmsto secondsonly
+// export function converthmsToSecondsOnly(str) {
+//   if (!str) return;
+//   var p = str.split(':'),
+//     s = 0,
+//     m = 1;
+
+//   while (p.length > 0) {
+//     s += m * parseInt(p.pop(), 10);
+//     m *= 60;
+//   }
+
+//   return s;
+// }
 export function getCurrentTime() {
   // Create a new Date object
   const now = new Date();

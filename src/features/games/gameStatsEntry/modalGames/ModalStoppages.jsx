@@ -15,7 +15,7 @@ import PopUpConfirm from './PopUpConfirm';
 import { useState } from 'react';
 import Button from '../../../../ui/Button';
 
-import { convertSecondsToMinutesSeconds } from '../../../../utils/helpers';
+import { convertSecondsTo_mmss } from '../../../../utils/helpers';
 import { buttons } from '../helpers/gameStatsEntryHelperFunctions';
 import { useClockContext } from '../../../../contexts/ClockContext';
 
@@ -189,8 +189,7 @@ function ModalStoppages() {
       </CloseBtnContainer>
       <Title>
         <Heading case="upper">
-          {stoppageStatus.event}{' '}
-          {convertSecondsToMinutesSeconds(currentPeriodTime)}
+          {stoppageStatus.event} {convertSecondsTo_mmss(currentPeriodTime)}
           <Button
             name="clockStopped"
             size="large"
