@@ -71,6 +71,10 @@ export async function getData({ table, filter, search, sort }) {
               type: 'websearch',
               config: 'english',
             })
+          : each.equality
+          ? query.filter(each.field, each.equality, each.value)
+          : each.array
+          ? query.in(each.field, each.value)
           : query.filter(each.field, 'in', `(${each.value})`);
       });
     }

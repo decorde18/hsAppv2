@@ -49,17 +49,13 @@ function PlayerIndividualPage({ player }) {
       { table: 'playerSeasons', field: 'playerId', value: player.playerId },
     ],
   });
-  // const seasons = useData({
-  //   table: 'seasons',
-  // });
 
-  const [season, setSeason] = useState();
+  const [season, setSeason] = useState(currentSeason);
 
   function handleSeasonChange(value) {
     setSeason(seasons.find((seas) => seas.id === +value));
   }
   if (playerSeasons.isLoading) return <Spinner />;
-  if (!season) handleSeasonChange(currentSeason);
 
   return (
     <>

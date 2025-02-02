@@ -87,12 +87,34 @@ function Toggle({ id }) {
   function handleClick(e) {
     e.stopPropagation();
     const rect = e.target.closest('button').getBoundingClientRect();
-    setPosition({
-      x: window.innerWidth - rect.width - rect.x,
-      y: rect.y + rect.height + 8,
-    });
+
+    let newX = window.innerWidth - rect.width - rect.x;
+    let newY = rect.y + rect.height + 8;
+    // Ensure popup does not go below the visible screen
+    const popupHeight = 150; // Adjust based on your popup height
+    if (newY + popupHeight > window.innerHeight) {
+      newY = window.innerHeight - popupHeight - 8; // Keep it within screen bounds
+    }
+
+    // Ensure popup width fits within the screen
+    const popupWidth = 200; // Adjust based on your popup width
+    if (newX + popupWidth > window.innerWidth) {
+      newX = window.innerWidth - popupWidth - 8; // Prevent overflow
+    }
+
+    setPosition({ x: newX, y: newY });
+
     openId === '' || openId !== id ? open(id) : close();
   }
+  // function handleClick(e) {
+  //   e.stopPropagation();
+  //   const rect = e.target.closest('button').getBoundingClientRect();
+  //   setPosition({
+  //     x: window.innerWidth - rect.width - rect.x,
+  //     y: rect.y + rect.height + 8,
+  //   });
+  //   openId === '' || openId !== id ? open(id) : close();
+  // }
   return (
     <StyledToggle onClick={handleClick}>
       <HiEllipsisVertical />

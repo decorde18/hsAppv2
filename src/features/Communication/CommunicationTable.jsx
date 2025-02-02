@@ -1,297 +1,322 @@
-import Spinner from '../../ui/Spinner';
-import CommunicationRow from './CommunicationRow';
-
-import { usePlayerSeasons } from '../players/usePlayerSeasons';
-
-import { useEffect, useState } from 'react';
-import Button from '../../ui/Button';
-import Table from '../../ui/Table';
-import Empty from '../../ui/Empty';
-import Menus from '../../ui/Menus';
-import { useGetPlayerParents } from '../parents/useParents';
+import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { useSeason } from '../seasons/useSeasons';
-import {
-  statusFilterLabel,
-  defaultVisiblePlayers,
-  visibleRosterStatus,
-  filterRosterStatus,
-  defaultRosterStatus,
-  sortUpdate,
-} from '../../utils/filterHelpers';
-// import FilterBy from '../../ui/FilterBy';
+
+import { useCurrentSeason } from '../../contexts/CurrentSeasonContext';
+import { useData } from '../../services/useUniversal';
+
+import CommunicationRow from './CommunicationRow';
 import Select from '../../ui/Select';
 import HeaderSortFilter from '../../ui/HeaderSortFilter';
-import { convertSBdateToLocalDate } from '../../utils/helpers';
+import Table from '../../ui/Table';
+import Spinner from '../../ui/Spinner';
+import Empty from '../../ui/Empty';
 
-const columns = [
-  {
-    table: 'people',
-    label: 'Title',
-    field: 'title',
-    type: 'string',
-    sort: false,
-    // sortPriority: 1,
-    // defaultSortDirection: true,
-    width: '.5fr',
-    isSearchable: false,
-  },
-];
+import { convertSBdateToLocalDate } from '../../utils/helpers';
+import {
+  defaultRosterStatus,
+  statusFilterLabel,
+} from '../../utils/filterHelpers';
+
+const ACTIONS = {
+  SET_PLAYERS: 'SET_PLAYERS',
+  FILTER_PLAYERS: 'FILTER_PLAYERS',
+};
 
 function CommunicationTable() {
   const [searchParams, setSearchParams] = useSearchParams();
-
-  const { isLoadingSeason, season } = useSeason();
-  const { isLoadingPlayerParents, playerParents } = useGetPlayerParents();
-  const { isLoadingPlayerSeasons, playerSeasons } = usePlayerSeasons();
-
-  const [allPlayersChecked, setAllPlayersChecked] = useState('none');
-  const [allParentsChecked, setAllParentsChecked] = useState('none');
+  const { currentSeason } = useCurrentSeason();
+  const season = currentSeason.id;
+  const defaultFilter = defaultRosterStatus(currentSeason);
 
   const [playerEmails, setPlayerEmails] = useState([]);
   const [parentEmails, setParentEmails] = useState([]);
-
-  const [filteredPlayers, setFilteredPlayers] = useState([]);
-  let statusFilter;
-  useEffect(
-    //on LOAD with a new object with needed fields
-    function () {
-      if (isLoadingPlayerParents || isLoadingPlayerSeasons || isLoadingSeason)
-        return;
-      //default filter
-      const defaultPlayers = defaultVisiblePlayers({
-        players: playerSeasons,
-        parents: playerParents,
-        season: season,
-      });
-      setFilteredPlayers(defaultPlayers);
+  const players = useRef([]);
+  const [statusFilter, setStatusFilter] = useState({});
+  const [sortConfig, setSortConfig] = useState([
+    {
+      field: 'grade', // Default sort field
+      direction: 'desc', // Default direction ('asc' or 'desc')
     },
-    [
-      isLoadingPlayerParents,
-      isLoadingPlayerSeasons,
-      isLoadingSeason,
-      playerParents,
-      playerSeasons,
-      season,
-    ]
-  );
-  useEffect(
-    //update emails when checked changes
-    function () {
-      if (isLoadingPlayerParents || isLoadingPlayerSeasons) return;
-      const newPlayerFilter = filteredPlayers
-        .filter((player) => player.isPlayerAdded && player.email)
-        .map((player) => player.email);
-      const newParentFilter = [
-        ...new Set(
-          filteredPlayers
-            .map((player) =>
-              player.parents.filter(
-                (parent) => parent.parentEmail && parent.isParentAdded
-              )
-            )
-            .flat(1)
-            .map((email) => email.parentEmail)
-        ),
-      ];
-      setPlayerEmails(newPlayerFilter);
-      setParentEmails(newParentFilter);
-    },
-    [filteredPlayers, isLoadingPlayerParents, isLoadingPlayerSeasons]
-  );
+    { field: 'lastName', direction: 'asc' },
+    { field: 'firstName', direction: 'asc' },
+  ]);
 
-  function handleFilterChange(e) {
-    searchParams.set(e.target.id, e.target.value);
-    setSearchParams(searchParams);
-    const visiblePlayers = visibleRosterStatus(
-      filteredPlayers,
-      statusFilterLabel.find((status) => status.value === +e.target.value)
+  const initialState = {
+    filteredPlayers: [],
+  };
+
+  const { isLoading: isLoadingPlayerSeasons, data: playerSeasons = [] } =
+    useData({
+      table: 'playerSeasons',
+      filter: [{ field: 'seasonId', value: season }],
+    });
+
+  // Extract unique playerIds only after playerSeasons loads
+  const playerIds = useMemo(() => {
+    return playerSeasons.length > 0
+      ? [...new Set(playerSeasons.map((player) => player.playerId))]
+      : [];
+  }, [playerSeasons]);
+
+  // Don't run the second query if playerIds is empty
+  const { isLoading: isLoadingPlayerParents, data: playerParents } = useData({
+    table: 'playerParents',
+    filter:
+      playerIds.length > 0
+        ? [{ field: 'player', array: true, value: playerIds }]
+        : [{ field: 'player', array: true, value: [-1] }], // Dummy filter to prevent errors
+  });
+
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  useEffect(() => {
+    if (isLoadingPlayerSeasons || isLoadingPlayerParents) return;
+    updatePlayerParents();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoadingPlayerSeasons, isLoadingPlayerParents]);
+
+  function updatePlayerParents() {
+    players.current = playerSeasons.map((player) => ({
+      ...player,
+      parents: playerParents.filter(
+        (parent) => parent.player === player.playerId
+      ),
+    }));
+    handleFilterChange();
+  }
+  function addPlayer({ email, playerId }) {
+    if (playerEmails.some((play) => play.id === playerId)) return;
+    setPlayerEmails((prev) => [...prev, { id: playerId, email }]);
+  }
+  function removePlayer({ playerId }) {
+    setPlayerEmails((prev) => prev.filter((player) => player.id !== playerId));
+  }
+  function addParent({ email, playerId, parentId }) {
+    if (
+      parentEmails.some(
+        (parent) => parent.id === parentId && parent.playerId === playerId
+      )
+    )
+      return;
+    setParentEmails((prev) => [...prev, { playerId, id: parentId, email }]);
+  }
+  function removeParent({ playerId, parentId }) {
+    setParentEmails((prev) =>
+      prev.filter(
+        (parent) => !(parent.playerId === playerId && parent.id === parentId)
+      )
     );
-    setFilteredPlayers(visiblePlayers);
+  }
+  function handlePlayerChange(data) {
+    if (data.checked) addPlayer(data);
+    else removePlayer(data);
+  }
+  function handleParentChange(data) {
+    if (data.checked) addParent(data);
+    else removeParent(data);
+  }
+  function handleRowClick(data) {
+    if (data.checked) {
+      if (data.name !== 'parents') addPlayer(data.player);
+      data.player.parents.forEach((parent) =>
+        addParent({
+          parentId: parent.id,
+          email: parent.email,
+          playerId: data.player.playerId,
+        })
+      );
+    } else {
+      if (data.name !== 'parents') removePlayer(data.player);
+      data.player.parents.map((parent) =>
+        removeParent({ playerId: data.player.playerId, parentId: parent.id })
+      );
+    }
   }
   function handleAllPlayerChecked(e) {
-    //update all checks
-    setAllPlayersChecked(e.target.checked ? 'all' : 'none');
-    const addAll = filteredPlayers.map((player) => {
-      if (player.isPlayerVisible) {
-        return { ...player, isPlayerAdded: e.target.checked };
-      } else return { ...player };
-    });
-    // if (!e.target.checked) setPlayerEmails([]);
-    setFilteredPlayers(addAll);
+    if (e.target.checked)
+      setPlayerEmails(
+        state.filteredPlayers.map((player) => ({
+          id: player.playerId,
+          email: player.email,
+        }))
+      );
+    else setPlayerEmails([]);
   }
   function handleAllParentsChecked(e) {
-    setAllParentsChecked(e.target.checked ? 'all' : 'none');
-    //change parent isParentAdded to e.target.checked
-    const addAll = filteredPlayers.map((player) => {
-      if (player.isPlayerVisible) {
-        return {
-          ...player,
-          parents: player.parents.map((parent) => {
-            return { ...parent, isParentAdded: e.target.checked };
-          }),
+    if (e.target.checked)
+      setParentEmails(
+        state.filteredPlayers
+          .map((player) =>
+            player.parents.map((parent) => ({
+              playerId: player.playerId,
+              id: parent.id,
+              email: parent.email,
+            }))
+          )
+          .flat()
+      );
+    else setParentEmails([]);
+  }
+  // function handleSort(field) {
+  //   //const dateDiff =
+  //   //   new Date(convertSBdateToLocalDate(b.created_at)) -
+  //   //   new Date(convertSBdateToLocalDate(a.created_at));
+  //   // if (dateDiff !== 0) return dateDiff;
+  //   setSortConfig((prev) => ({
+  //     field,
+  //     direction:
+  //       prev.field === field && prev.direction === 'asc' ? 'desc' : 'asc', // Toggle direction if same field
+  //   }));
+  // }
+  function handleSort(field, addToSort = false) {
+    setSortConfig((prev) => {
+      // Find existing sort rule
+      const existingSortIndex = prev.findIndex((rule) => rule.field === field);
+      let newSortConfig = [...prev];
+
+      if (existingSortIndex !== -1) {
+        // Toggle direction if already sorted
+        newSortConfig[existingSortIndex] = {
+          ...newSortConfig[existingSortIndex],
+          direction:
+            newSortConfig[existingSortIndex].direction === 'asc'
+              ? 'desc'
+              : 'asc',
         };
       } else {
-        return { ...player };
+        // Add new sort rule
+        newSortConfig = addToSort
+          ? [...prev, { field, direction: 'asc' }]
+          : [{ field, direction: 'asc' }];
       }
+
+      return addToSort ? newSortConfig : [newSortConfig.pop()];
     });
-    setFilteredPlayers(addAll);
   }
-  function handlePlayerChange({ checked, email, playerId }) {
-    if (allPlayersChecked === 'all') {
-      // if all is checked, and the checked is true, return (we don't need to do anything)
-      if (checked) return;
-      // if all is checked, and the checked is false, set allPlayersChecked to some and remove email
-      else {
-        setAllPlayersChecked('some');
-        updateEmailStatus(checked);
-      }
-    }
-    if (allPlayersChecked === 'some') {
-      //if some is checked and the chedked is true, add email , then check to see if all are chedked
-      if (checked) {
-        updateEmailStatus(checked);
-        //if some is chedked and the chcked is false, remove email
-      } else updateEmailStatus(checked);
-    }
-    if (allPlayersChecked === 'none') {
-      // if none is chedked and the checked is true, set allPlayersChecked to some and add email
-      if (checked) {
-        setAllPlayersChecked('some');
-        updateEmailStatus(checked);
-        //if none and checked is false, return (we don't need to do anything)
-      } else return;
-    }
-    function updateEmailStatus(checked) {
-      const newFilter = //change object to don't show
-        filteredPlayers.map((player) => {
-          if (player.playerId === playerId) {
-            return { ...player, isPlayerAdded: checked };
-          } else return player;
-        });
-      setFilteredPlayers(newFilter);
-      if (checked) checkForAll(newFilter);
-    }
-    function checkForAll(newFilter) {
-      ///if all players are clicked, checkall button
-      if (!newFilter.some((player) => player.isPlayerAdded === false))
-        setAllPlayersChecked('all');
+
+  function handleFilterChange(
+    filterValue = +searchParams.get('filterRosterStatus') || defaultFilter.value
+  ) {
+    setStatusFilter({ value: filterValue });
+
+    dispatch({
+      type: ACTIONS.SET_PLAYERS,
+      payload: filterPlayers(filterValue),
+    });
+
+    setSearchParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+      newParams.set('filterRosterStatus', filterValue);
+      return newParams;
+    });
+
+    function filterPlayers(filterValue) {
+      const filterLabel = statusFilterLabel.find(
+        (status) => status.value === +filterValue
+      );
+
+      return filterValue === 0
+        ? players.current
+        : players.current.filter(
+            (player) => player.status === filterLabel.label
+          );
     }
   }
-  function handleParentChange({ checked, email, playerId, parentId }) {
-    // setAllParentsChecked to true
-    //allParents Checked = 'all'
-    if (allParentsChecked === 'all') {
-      //checked = true
-      if (checked) return;
-      //checked = false
-      // setAllParentsChecked to false
-      setAllParentsChecked('some');
-      updateEmails();
-    }
-    //allParents Checked = 'some'
-    if (allParentsChecked === 'some') {
-      if (checked)
-        //checked = true
-        updateEmails(); //checked = false
-      else updateEmails();
-    }
-    //allParents Checked = 'none'
-    if (allParentsChecked === 'none') {
-      if (!checked)
-        //checked = false
-        return;
-      //checked = true
-      setAllParentsChecked('some');
-      updateEmails();
-    }
-    function updateEmails() {
-      //update object
-      const [addNew] = filteredPlayers
-        .filter((player) => player.playerId === playerId)
-        .map((player) => {
-          return {
-            ...player,
-            parents: player.parents.map((parent) => {
-              if (parent.parentId === parentId) {
-                return { ...parent, isParentAdded: checked };
-              } else return parent;
-            }),
-          };
-        });
-      const newFilter = filteredPlayers.map((player) => {
-        if (player.playerId === playerId) {
-          return addNew;
-        } else return player;
-      });
-      checkForAll(newFilter);
-      setFilteredPlayers(newFilter);
-    }
-    function checkForAll(newFilter) {
-      ///if all parents are clicked, checkall button
-      if (
-        !newFilter.some((player) =>
-          player.parents.some((parent) => parent.isParentAdded === false)
-        )
-      )
-        setAllParentsChecked('all');
-    }
-  }
-  function handleRowClick(e, row) {
-    let rowCheck = filteredPlayers.map((player) => {
-      if (player.playerId === row.player.playerId) {
+
+  function reducer(state, action) {
+    switch (action.type) {
+      case ACTIONS.SET_PLAYERS:
+        return { ...state, filteredPlayers: action.payload };
+      case ACTIONS.FILTER_PLAYERS:
         return {
-          ...player,
-          parents: player.parents.map((parent) => {
-            return { ...parent, isParentAdded: e.target.checked };
-          }),
+          ...state,
+          filteredPlayers: players.current.filter(
+            (player) => player.status === action.payload
+          ),
         };
-      } else return player;
-    });
-    if (e.target.id === 'familyCheck') {
-      rowCheck = rowCheck.map((player) => {
-        if (player.playerId === row.player.playerId) {
-          return { ...player, isPlayerAdded: e.target.checked };
-        } else return player;
-      });
+      default:
+        return state;
     }
-    if (!e.target.checked) {
-      setAllParentsChecked('some');
-      if (e.target.id === 'familyCheck') setAllPlayersChecked('some');
-    }
-
-    setFilteredPlayers(rowCheck);
   }
-  function handleSort(selectedSort) {}
+  const sortedFilteredPlayers = useMemo(() => {
+    return [...state.filteredPlayers].sort((a, b) => {
+      for (const sortRule of sortConfig) {
+        const { field, direction } = sortRule;
+        let aValue = a[field];
+        let bValue = b[field];
 
-  if (isLoadingPlayerParents || isLoadingPlayerSeasons || isLoadingSeason)
+        // Normalize case for string comparison
+        if (typeof aValue === 'string') aValue = aValue.toLowerCase();
+        if (typeof bValue === 'string') bValue = bValue.toLowerCase();
+
+        // Compare values
+        if (aValue < bValue) return direction === 'asc' ? -1 : 1;
+        if (aValue > bValue) return direction === 'asc' ? 1 : -1;
+
+        // If values are equal, move to the next sortRule in the list
+      }
+      return 0; // All values are equal, maintain order
+    });
+  }, [state.filteredPlayers, sortConfig]);
+  // Runs when filtered players or sorting config changes
+
+  if (
+    isLoadingPlayerParents ||
+    isLoadingPlayerSeasons ||
+    !players.current.length
+  )
     return <Spinner />;
   if (!playerParents.length) return <Empty resource="Player Parents" />;
 
-  //handle filter changes
-  statusFilter = searchParams.get('filterRosterStatus')
-    ? statusFilterLabel.find(
-        (status) => status.value === +searchParams.get('filterRosterStatus')
-      )
-    : defaultRosterStatus(season);
-
   return (
-    <Menus>
-      <input defaultValue={playerEmails} />
-      <input defaultValue={parentEmails} />
-      <Table columns={'1.4fr 2fr .25fr 1fr 1fr .25fr 2.5fr  .2fr;'}>
+    <>
+      <input
+        defaultValue={[
+          ...new Set(
+            playerEmails
+              .map((obj) => obj.email)
+              .filter((email) => email && email.trim() !== '')
+          ),
+        ]}
+      />
+      <input
+        defaultValue={[
+          ...new Set(
+            parentEmails
+              .map((obj) => obj.email)
+              .filter((email) => email && email.trim() !== '')
+          ),
+        ]}
+      />
+      <Table columns={'1.4fr 2fr .25fr 1.25fr .75fr .5fr .25fr 2.5fr  .2fr;'}>
         <Table.Header>
           <>
             <div>
               <input
                 type="checkbox"
-                checked={allPlayersChecked === 'all'}
+                checked={state.filteredPlayers.every((player) =>
+                  playerEmails.some((play) => play.id === player.playerId)
+                )}
                 onChange={handleAllPlayerChecked}
               />
               <p>Players</p>
             </div>
             <div>Player</div>
-            <div>Grade</div>
+            <HeaderSortFilter
+              header={{
+                label: 'Grade',
+                name: 'grade',
+                type: 'number',
+                field: 'grade',
+                table: 'playerSeasons',
+              }}
+              sort={{
+                defaultSortDirection: true,
+                handleSort: () => handleSort('grade'),
+              }}
+              filters={{}}
+            />
             <HeaderSortFilter
               header={{
                 name: 'created_at',
@@ -302,7 +327,7 @@ function CommunicationTable() {
               }}
               sort={{
                 defaultSortDirection: true,
-                handleSort: handleSort,
+                handleSort: () => handleSort('created_at'),
               }}
               filters={{}}
             />
@@ -311,16 +336,36 @@ function CommunicationTable() {
               <Select
                 options={statusFilterLabel}
                 type="white"
-                onChange={handleFilterChange}
-                id={'filterRosterStatus'}
-              ></Select>
+                onChange={(e) => handleFilterChange(+e.target.value)}
+                value={statusFilter.value}
+                width={15}
+              />
             </div>
-            <div>Team</div>
+            <HeaderSortFilter
+              header={{
+                label: 'Team',
+                field: 'teamLevel',
+                table: 'playerSeasons',
+              }}
+              sort={{
+                defaultSortDirection: true,
+                handleSort: () => handleSort('team'),
+              }}
+              filters={{}}
+            />
             <div>Returner</div>
             <div>
               <input
                 type="checkbox"
-                checked={allParentsChecked === 'all'}
+                checked={state.filteredPlayers.every((player) =>
+                  player.parents.every((parent) =>
+                    parentEmails.some(
+                      (selected) =>
+                        selected.playerId === player.playerId &&
+                        selected.id === parent.id
+                    )
+                  )
+                )}
                 onChange={handleAllParentsChecked}
               />
               <span>Parents</span>
@@ -329,49 +374,37 @@ function CommunicationTable() {
           </>
         </Table.Header>
         <Table.Body
-          data={filteredPlayers
-            .sort((a, b) => {
-              const aa = a.firstName.toLowerCase();
-              const bb = b.firstName.toLowerCase();
-              if (aa < bb) {
-                return -1;
-              }
-              if (aa > bb) {
-                return 1;
-              }
-              return 0;
-            })
-            .sort((a, b) => {
-              const aa = a.lastName.toLowerCase();
-              const bb = b.lastName.toLowerCase();
-              if (aa < bb) {
-                return -1;
-              }
-              if (aa > bb) {
-                return 1;
-              }
-              return 0;
-            })
-            .sort((a, b) => b.grade - a.grade)
-            .sort(
-              (a, b) =>
-                new Date(convertSBdateToLocalDate(b.created_at)) -
-                new Date(convertSBdateToLocalDate(a.created_at))
-            )}
-          render={(player) =>
-            player.isPlayerVisible ? (
+          data={sortedFilteredPlayers}
+          render={(player) => {
+            const playerChecked = playerEmails.some(
+              (play) => play.id === player.playerId
+            );
+            const parentsChecked = player.parents.every((parent) =>
+              parentEmails.some(
+                (selected) =>
+                  selected.playerId === player.playerId &&
+                  selected.id === parent.id
+              )
+            );
+            return (
               <CommunicationRow
                 player={{ player }}
                 key={player.id}
                 onChangePlayer={handlePlayerChange}
                 onChangeParent={handleParentChange}
                 onChangeRow={handleRowClick}
+                familyChecked={parentsChecked && playerChecked}
+                parentsChecked={parentsChecked}
+                playerChecked={playerChecked}
+                parentEmails={parentEmails.filter(
+                  (parent) => parent.playerId === player.playerId
+                )}
               />
-            ) : null
-          }
+            );
+          }}
         />
       </Table>
-    </Menus>
+    </>
   );
 }
 

@@ -8,6 +8,7 @@ import {
 import toast from 'react-hot-toast';
 
 const tables = [
+  { name: 'dbDefaults' },
   { name: 'people' },
   {
     name: 'seasons',

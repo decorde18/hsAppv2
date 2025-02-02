@@ -7,37 +7,40 @@ import Input from '../../ui/Input';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
-import { useCreateSeason, useRecentSeason } from './useSeasons';
-import { usePlayers } from '../players/usePlayers';
-import {
-  usePlayerSeasons,
-  useCreatePlayerSeason,
-} from '../players/usePlayerSeasons';
-
 import { useEffect, useState } from 'react';
-import Spinner from '../../ui/Spinner';
 import Button from '../../ui/Button';
+import { useCreateData, useData } from '../../services/useUniversal';
 
 function CreateSeasonForm() {
-  const { isLoadingRecent, recentSeason } = useRecentSeason();
+  const { recentSeason, updateCurrentSeason, updateRecentSeason } =
+    useCurrentSeason();
   const navigate = useNavigate();
 
   const { register, handleSubmit, reset, setValue, formState } = useForm();
   const { errors } = formState;
-  const { createSeason, isCreating } = useCreateSeason();
-  const isWorking = isCreating;
-  const { updateCurrentSeason, updateRecentSeason } = useCurrentSeason();
-  const { isLoadingPlayers, players } = usePlayers();
-  const { isLoadingPlayerSeasons, playerSeasons } = usePlayerSeasons('recent');
-  const { createPlayerSeason, isCreatingPlayerSeason } =
-    useCreatePlayerSeason();
+
+  const { createData, isCreating } = useCreateData();
+
+  const { isLoading: isLoadingPlayers, data: players } = useData({
+    table: 'players',
+    filter: [
+      { field: 'entryYear', value: recentSeason.season - 2, equality: 'gte' },
+    ],
+  });
+  const { isLoading: isLoadingPlayerSeasons, data: playerSeasons } = useData({
+    table: 'playerSeasons',
+    filter: [
+      { field: 'seasonId', value: recentSeason.id },
+      { field: 'grade', value: 12, equality: 'lt' },
+    ],
+  });
 
   const [newSeason, setNewSeason] = useState({});
-  const [allPlayers, setAllPlayers] = useState([]);
+
+  const isWorking = isCreating || isLoadingPlayerSeasons || isLoadingPlayers;
 
   useEffect(
     function () {
-      if (isLoadingRecent) return;
       const newSeasonFields = {
         ...recentSeason,
         season: recentSeason.season + 1,
@@ -49,15 +52,9 @@ function CreateSeasonForm() {
       delete newSeasonFields.seasonPhase;
       setNewSeason(newSeasonFields);
     },
-    [isLoadingRecent, recentSeason]
+    [recentSeason]
   );
-  useEffect(
-    function () {
-      if (isLoadingPlayers) return;
-      setAllPlayers(players);
-    },
-    [isLoadingPlayers, players]
-  );
+
   // UPDATE DEFAULT VALUES AFTER LOAD
   useEffect(() => {
     setValue('teamMascot', newSeason.teamMascot);
@@ -70,24 +67,20 @@ function CreateSeasonForm() {
   }, [newSeason, setValue]);
 
   function onSubmit(data) {
-    const filteredPlayers = allPlayers.filter(
-      (player) => +player.entryYear >= +data.season - 3
-    );
-    createSeason(
-      { ...data },
+    data = { ...newSeason, ...data };
+
+    createData(
       {
-        onSuccess: (dat) => {
-          reset();
-          // create new playerSeasons based on values from this year.
-          const filteredPlayerSeasons = playerSeasons.filter(
-            (playerS) =>
-              players.map((player) => playerS.playerId === player.id) &&
-              playerS.grade < 12
-          );
-          const newPlayerSeasonData = filteredPlayerSeasons.map((playerS) => {
+        table: 'seasons',
+        newData: { ...data },
+        toast: false,
+      },
+      {
+        onSuccess: (data) => {
+          const newPlayerSeasonData = playerSeasons.map((playerS) => {
             return {
               playerId: playerS.playerId,
-              seasonId: dat.id,
+              seasonId: data.data[0].id,
               enrolledLastYear: true,
               grade: playerS.grade + 1,
               livesWithParents: playerS.livesWithParents || true,
@@ -96,11 +89,27 @@ function CreateSeasonForm() {
                 playerS.status === 'Rostered' ? 'Interested' : 'Not Playing',
             };
           });
+          console.log(data, newPlayerSeasonData);
+          reset();
+          // create new playerSeasons based on values from this year.
+
           // create season and playerSeasons
-          newPlayerSeasonData.map((playerS) => createPlayerSeason(playerS));
+          createData(
+            {
+              table: 'playerSeasons',
+              newData: newPlayerSeasonData,
+              toast: false,
+            },
+            {
+              onSuccess: (data) => {
+                console.log(data);
+              },
+            }
+          );
+
           //UPDATE THE RECENT AND CURRENT SEASON AND NAVIGATE TO IT
-          updateCurrentSeason(dat.id);
-          updateRecentSeason(dat.id);
+          updateCurrentSeason(data.id);
+          updateRecentSeason(data.id);
           navigate('../seasonMain');
         },
       }
@@ -110,7 +119,6 @@ function CreateSeasonForm() {
   function onError(errors) {
     console.log(errors);
   }
-  if (isLoadingRecent) return <Spinner />;
   return (
     <Form onSubmit={handleSubmit(onSubmit, onError)} type={'regular'}>
       Form

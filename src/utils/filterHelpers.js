@@ -32,47 +32,7 @@ export function filterRosterStatus(playerSeasons, rosterStatus, season) {
       : playerSeasons.filter((player) => player.status === filterStatus.label);
   return { filterStatus, filteredPlayers };
 }
-export function defaultVisiblePlayers({ players, parents, season }) {
-  //TODO FIX ME, this if is for communication table and really needs to be moved there. it really should only take in players and season (or data and season)
-  if (parents)
-    return players.map((player) => {
-      return {
-        ...player,
-        isPlayerVisible: player.status === defaultRosterStatus(season).label,
-        isPlayerAdded: false,
-        parents: parents
-          .filter((parent) => parent.player === player.playerId)
-          .map((parent) => {
-            return {
-              parentId: parent.parent,
-              parentEmail: parent.parents.people.email,
-              parentfirstName: parent.parents.people.firstName,
-              parentLastName: parent.parents.people.lastName,
-              isParentAdded: false,
-            };
-          }),
-      };
-    });
-  return players.map((player) => {
-    return {
-      ...player,
-      isPlayerVisible: player.status === defaultRosterStatus(season).label,
-    };
-  });
-}
-export function visibleRosterStatus(players, status) {
-  if (status.value === 0)
-    //if no filter
-    return players.map((player) => {
-      return { ...player, isPlayerVisible: true };
-    });
-  return players.map((player) => {
-    //if filter
-    if (player.status === status.label) {
-      return { ...player, isPlayerVisible: true };
-    } else return { ...player, isPlayerVisible: false };
-  });
-}
+
 export function filterBySeasonPhase(season) {
   const defaultFilter = defaultRosterStatus(season);
   return {

@@ -32,7 +32,7 @@ const Right = styled.div`
 `;
 
 function ScheduleTable() {
-  const { currentSeason } = useCurrentSeason();
+  const { currentSeason, defaultTeam } = useCurrentSeason();
   const { isLoading: isLoadingGamesSeason, data: gamesSeason } = useData({
     table: 'games',
     filter: [{ field: 'seasonId', value: currentSeason.id }],
@@ -44,7 +44,7 @@ function ScheduleTable() {
   return (
     <PrintStyle>
       <Heading as="h2" location="center">
-        Independence High School Girls&#39; <br></br>
+        {defaultTeam.team_name} Girls&#39; <br></br>
         {`Soccer Season ${currentSeason.season}`}
       </Heading>
       {currentSeason.teamLevels.map((team) => (
